@@ -1,0 +1,115 @@
+spring: 
+  profiles: 
+    active: local
+
+  config:
+    import: data-config.yml
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${dataconfig.mail-username}
+    password: ${dataconfig.mail-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${dataconfig.google-client-id}
+            client-secret: ${dataconfig.google-client-secret}
+            scope:
+              - email
+              - profile
+
+  ai: #AI 챗봇 (Groq - OpenAI 호환 API)
+    openai:
+      api-key: ${dataconfig.groq-api-key}
+      base-url: https://api.groq.com/openai
+      chat:
+        options:
+          model: qwen/qwen3-32b
+          temperature: 0.7
+      # RAG용 임베딩 설정 (Chroma 없이 개발할 땐 통째로 주석 처리)
+      # embedding:
+      #   base-url: https://api.openai.com
+      #   api-key: ${dataconfig.openai-embedding-api-key}
+      #   options:
+      #     model: text-embedding-3-small
+    # RAG용 벡터스토어 설정 (Chroma 없이 개발할 땐 통째로 주석 처리)
+    # vectorstore:
+    #   chroma:
+    #     client:
+    #       host: http://localhost
+    #       port: 8010
+    #     tenant-name: SpringAiTenant
+    #     database-name: SpringAiDatabase
+    #     collection-name: teamsync-bot-log
+    #     initialize-schema: true
+
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+  
+  thymeleaf:
+    prefix: classpath:templates/
+    suffix: .html
+    view-names: thviews/* #thymeleaf 단독 지정시 생략할 수 있지만 JSP 동시 사용시는 필수 지정
+    check-template-location: true
+    enabled: true
+    mode: HTML5
+    cache: false #캐시 사용하지 않음. 새로고침하면 변경사항 바로 확인    
+      
+  datasource: #DB 접속
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: ${dataconfig.db-url}
+    username: ${dataconfig.db-username}
+    password: ${dataconfig.db-password}
+    hikari: #커넥션풀 
+      connection-timeout : 30000 #클라이언트가 pool에 connection을 요청하는데 기다리는 최대시간을 설정 30초
+      maximum-pool-size : 10 #최대 커넥션 개수 설정
+      max-lifetime : 1800000   
+      
+  messages: #메시지
+    basename: messages.member,messages.shop,messages.validation
+    encoding: UTF-8
+    
+  devtools: #정적 자원(html, css, js) 수정 시 새로고침 없이 바로 적용
+    livereload:
+      enabled: true
+    
+    restart: #컨트롤러, 모델단이 바뀌었을 때 프로젝트 재시작 설정 (정확히는 classpath에 있는 모든 파일)
+      enabled: true #재시작 여부 지정   
+      
+  servlet:
+    multipart:
+      max-file-size: 50MB #파일 한 개당 최대 사이즈
+      max-request-size: 50MB #요청당 최대 파일 크기(주의) maxRequestSize도 설정이 필
+
+mybatis: #mybatis 설정
+  type-aliases-package: kr.spring.**.vo 
+  mapper-locations: classpath:/mapper/*.xml 
+  
+logging: #로그 지정
+  level:
+    root: error
+    '[kr.spring]': debug
+    org:
+      spring:
+        security: info
+    
+server:
+  port: 8001
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true

@@ -1,0 +1,702 @@
+/* assets/css/YJ/calendar-common.css */
+
+/* =========================
+   FullCalendar 공통
+========================= */
+
+.fc {
+    font-family: inherit;
+    color: #2f2750;
+}
+
+/* 툴바 제목 */
+.fc .fc-toolbar-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #21183f;
+}
+
+/* 캘린더 버튼 */
+.fc .fc-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 36px;
+    box-sizing: border-box;
+
+    padding: 0 13px !important;
+    border-radius: 12px !important;
+
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+
+    box-shadow: none !important;
+}
+/* 이전·다음 화살표 아이콘 중앙 정렬 */
+.fc .fc-button .fc-icon {
+    display: block;
+    margin: 0 !important;
+    line-height: 1 !important;
+    vertical-align: middle;
+}
+
+/* 여러 버튼 높이와 중심축 통일 */
+.fc .fc-button-group {
+    display: inline-flex;
+    align-items: center;
+}
+
+.fc .fc-button-primary {
+    border: 1px solid #ded6ff !important;
+    background-color: #fff !important;
+    color: #6c5ce7 !important;
+}
+
+.fc .fc-button-primary:hover {
+    border-color: #c8bbff !important;
+    background-color: #f3efff !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    border-color: #6c5ce7 !important;
+    background-color: #6c5ce7 !important;
+    color: #fff !important;
+}
+
+/* 오늘 버튼 */
+.fc .fc-today-button {
+    border-color: #6c5ce7 !important;
+    background-color: #6c5ce7 !important;
+    color: #fff !important;
+}
+
+.fc .fc-today-button:hover {
+    border-color: #5c4bd1 !important;
+    background-color: #5c4bd1 !important;
+}
+
+/* 요일 헤더 */
+.fc .fc-col-header-cell {
+    border-color: #eee8ff;
+    background: #f7f3ff;
+}
+
+.fc .fc-col-header-cell-cushion {
+    color: #665a8f;
+    font-size: 13px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+/* 날짜 칸 */
+.fc .fc-daygrid-day {
+    border-color: #eee8ff;
+    background: #fff;
+}
+
+.fc .fc-daygrid-day-number {
+    color: #4d426f;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+/* 오늘 날짜 */
+.fc .fc-day-today {
+    background: #fbf8ff !important;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: #48357f;
+    color: #fff;
+}
+
+/* 이전·다음 달 날짜 */
+.fc .fc-day-other {
+    background: #fcfbff;
+}
+
+.fc .fc-day-other .fc-daygrid-day-number {
+    color: #c2bad8;
+}
+
+/* 캘린더 이벤트 */
+.fc .fc-event {
+    padding: 3px 8px !important;
+    border: none !important;
+    border-radius: 999px !important;
+    box-shadow: 0 6px 14px rgba(108, 92, 231, 0.16);
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    cursor: pointer;
+}
+
+/* 일정이 많을 때 더보기 */
+.fc .fc-daygrid-more-link {
+    color: #6c5ce7;
+    font-size: 12px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+
+/* =========================
+   홈 캘린더 전용
+========================= */
+
+#homeCalendar .fc-daygrid-day,
+#homeCalendar .fc-daygrid-day-frame,
+#homeCalendar .fc-daygrid-day-number,
+#homeCalendar .fc-event {
+    cursor: pointer;
+}
+
+#homeCalendar .fc-daygrid-day:hover {
+    background: #f8f5ff;
+}
+
+
+/* =========================
+   홈 일정 등록 모달 전용
+========================= */
+
+#homeScheduleModalLayer button,
+#homeScheduleModalLayer select,
+#homeScheduleModalLayer input[type="date"],
+#homeScheduleModalLayer input[type="color"] {
+    cursor: pointer;
+}
+
+#homeScheduleModalLayer input[type="text"],
+#homeScheduleModalLayer textarea {
+    cursor: text;
+}
+
+#homeScheduleModalLayer .btn,
+#homeScheduleModalLayer .mClose {
+    transition:
+        transform 0.15s ease,
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        filter 0.15s ease;
+}
+
+#homeScheduleModalLayer .btn:not(.primary):hover,
+#homeScheduleModalLayer .mClose:hover {
+    border-color: #c8bbff;
+    background-color: #f3efff;
+    transform: translateY(-1px);
+}
+
+#homeScheduleModalLayer .btn.primary:hover {
+    filter: brightness(0.97);
+    transform: translateY(-1px);
+}
+
+#homeScheduleModalLayer button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =========================
+   공통 색상 입력
+========================= */
+
+#homeScheduleModalLayer input[type="color"],
+.mLayer input[type="color"] {
+    width: 100%;
+    height: 44px;
+    box-sizing: border-box;
+    padding: 4px 6px;
+    border: 1px solid #ded6ff;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+}
+
+#homeScheduleModalLayer input[type="color"]::-webkit-color-swatch-wrapper,
+.mLayer input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+#homeScheduleModalLayer input[type="color"]::-webkit-color-swatch,
+.mLayer input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 8px;
+}
+
+#homeScheduleModalLayer input[type="color"]::-moz-color-swatch,
+.mLayer input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 8px;
+}
+
+
+/* =========================
+   일정 상세 모달
+========================= */
+
+.schedule-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.schedule-detail-title {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eee8ff;
+}
+
+.schedule-detail-title h3 {
+    margin: 0 0 6px;
+    color: #21183f;
+    font-size: 20px;
+    font-weight: 900;
+    word-break: break-word;
+}
+
+.schedule-detail-color {
+    width: 16px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 999px;
+}
+
+.schedule-detail-category {
+    display: inline-flex;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: #f3efff;
+    color: #6c5ce7;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.schedule-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.schedule-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    border: 1px solid #eee8ff;
+    border-radius: 14px;
+    background: #fcfbff;
+}
+
+.schedule-detail-item.full {
+    grid-column: 1 / -1;
+}
+
+.schedule-detail-label {
+    color: #7b7394;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.schedule-detail-item strong {
+    color: #2f2750;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.schedule-detail-content {
+    min-height: 60px;
+    color: #4d426f;
+    font-size: 13px;
+    line-height: 1.7;
+    word-break: break-word;
+}
+
+.schedule-detail .btn.danger {
+    border: 1px solid #ffcbd5;
+    background: #fff1f4;
+    color: #e84b67;
+}
+
+.schedule-detail .btn.danger:hover {
+    border-color: #ffaebb;
+    background: #ffe8ed;
+}
+
+
+/* =========================
+   종일 일정 토글 공통
+   - 홈: home-*
+   - 팀/큰 캘린더: schedule-*
+========================= */
+
+.home-all-day-wrap,
+.schedule-all-day-row {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+}
+
+.home-switch-label,
+.schedule-switch-label {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #4d4565;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.home-switch,
+.schedule-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.home-switch input,
+.schedule-switch input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.home-switch-slider,
+.schedule-switch-slider {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: #d9d3ec;
+    transition: 0.2s;
+}
+
+.home-switch-slider::before,
+.schedule-switch-slider::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(45, 35, 80, 0.2);
+    transition: 0.2s;
+}
+
+.home-switch input:checked + .home-switch-slider,
+.schedule-switch input:checked + .schedule-switch-slider {
+    background: #6c5ce7;
+}
+
+.home-switch input:checked + .home-switch-slider::before,
+.schedule-switch input:checked + .schedule-switch-slider::before {
+    transform: translateX(22px);
+}
+
+
+/* =========================
+   일정 시간 입력 표시/숨김
+========================= */
+
+/* 홈 등록 모달은 show 클래스 방식 */
+.home-schedule-time-field {
+    display: none;
+}
+
+.home-schedule-time-field.show {
+    display: flex;
+}
+
+/* 홈 수정·큰 캘린더 등록/수정은 hidden 속성 방식 */
+.home-edit-time-field[hidden],
+.calendar-page-time-field[hidden] {
+    display: none !important;
+}
+
+.home-edit-time-field:not([hidden]),
+.calendar-page-time-field:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================
+   캘린더 공통 모달
+========================= */
+
+.mLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(31, 24, 58, 0.45);
+    backdrop-filter: blur(4px);
+}
+
+.mLayer.open {
+    display: flex;
+}
+
+.mLayer > .modal {
+    width: min(680px, 100%);
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #eee8ff;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 25px 70px rgba(35, 24, 73, 0.28);
+}
+
+/* 모달 상단 */
+.mLayer .mHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #eee8ff;
+}
+
+.mLayer .mHead h3 {
+    margin: 0;
+    color: #21183f;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+/* 닫기 버튼 */
+.mLayer .mClose {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #e5defb;
+    border-radius: 12px;
+    background: #fff;
+    color: #40365f;
+    font-size: 18px;
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.mLayer .mClose:hover {
+    border-color: #cfc3ff;
+    background: #f4f0ff;
+    transform: translateY(-1px);
+}
+
+/* 모달 본문 */
+.mLayer .mBody {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+/* 입력 폼 2열 구조 */
+.mLayer .fG {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.mLayer .f {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mLayer .f.full {
+    grid-column: 1 / -1;
+}
+
+.mLayer .f label {
+    color: #4d4565;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* 공통 입력창 */
+.mLayer input[type="text"],
+.mLayer input[type="date"],
+.mLayer input[type="time"],
+.mLayer select,
+.mLayer textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ded6ff;
+    border-radius: 13px;
+    background: #fff;
+    color: #2f2750;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.mLayer input[type="text"],
+.mLayer input[type="date"],
+.mLayer input[type="time"],
+.mLayer select {
+    height: 44px;
+    padding: 0 13px;
+}
+
+.mLayer textarea {
+    min-height: 110px;
+    padding: 12px 13px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.mLayer input:focus,
+.mLayer select:focus,
+.mLayer textarea:focus {
+    border-color: #8c79f2;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.12);
+}
+
+/* 하단 버튼 */
+.mLayer .acts {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.mLayer .btn {
+    min-width: 76px;
+    height: 42px;
+    padding: 0 16px;
+    border: 1px solid #ded6ff;
+    border-radius: 13px;
+    background: #fff;
+    color: #51486d;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        background-color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.mLayer .btn:hover {
+    border-color: #cbbfff;
+    background: #f5f2ff;
+    transform: translateY(-1px);
+}
+
+.mLayer .btn.primary {
+    border-color: #6c5ce7;
+    background: #6c5ce7;
+    color: #fff;
+}
+
+.mLayer .btn.primary:hover {
+    border-color: #5d4dd2;
+    background: #5d4dd2;
+}
+
+.mLayer .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =========================
+   토스트
+========================= */
+
+#toast {
+    position: fixed;
+    left: 50%;
+    bottom: 32px;
+    z-index: 10000;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: #30274e;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 15px);
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+#toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+
+/* =========================
+   반응형
+========================= */
+
+@media (max-width: 700px) {
+    .mLayer {
+        align-items: flex-start;
+        padding: 14px;
+    }
+
+    .mLayer > .modal {
+        max-height: calc(100vh - 28px);
+        border-radius: 18px;
+    }
+
+    .mLayer .mHead,
+    .mLayer .mBody {
+        padding: 18px;
+    }
+
+    .mLayer .fG {
+        grid-template-columns: 1fr;
+    }
+
+    .mLayer .f.full {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .schedule-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .schedule-detail-item.full {
+        grid-column: auto;
+    }
+}

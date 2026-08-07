@@ -1,0 +1,1161 @@
+/* =========================================
+   회의록 페이지 공통 초기화
+========================================= */
+
+.minutes-page,
+.minutes-page * {
+    box-sizing: border-box;
+}
+
+.minutes-page {
+    min-height: calc(100vh - 80px);
+    padding: 20px;
+
+    background: linear-gradient(
+        180deg,
+        #f8f5ff 0%,
+        #ffffff 48%
+    );
+}
+
+
+/* =========================================
+   회의록 전체 컨테이너
+========================================= */
+
+.minutes-container {
+    display: grid;
+    grid-template-columns: 330px minmax(0, 1fr);
+
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    overflow: hidden;
+
+    background: #ffffff;
+    border: 1px solid #eee8ff;
+    border-radius: 24px;
+
+    box-shadow: 0 18px 45px rgba(72, 50, 130, 0.12);
+}
+
+
+/* =========================================
+   왼쪽 회의록 목록 영역
+========================================= */
+
+.minutes-list-panel {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+    overflow: hidden;
+
+    background: #ffffff;
+    border-right: 1px solid #eee8ff;
+}
+
+
+/* 목록 상단 */
+
+.minutes-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 20px 18px 14px;
+
+    border-bottom: 1px solid #f1edfb;
+}
+
+.minutes-list-header > div {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 8px;
+}
+
+.minutes-list-header h2 {
+    margin: 0;
+
+    color: #31284d;
+    font-size: 17px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.minutes-count {
+    flex-shrink: 0;
+
+    padding: 3px 8px;
+
+    color: #7669a5;
+    font-size: 11px;
+    font-weight: 800;
+
+    background: #f4f0ff;
+    border-radius: 999px;
+}
+
+
+/* 작성 버튼 */
+
+.minutes-write-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: auto;
+    height: 34px;
+    padding: 0 14px;
+
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+
+    background: #6c5ce7;
+    border: 0;
+    border-radius: 11px;
+
+    box-shadow: 0 6px 15px rgba(108, 92, 231, 0.24);
+
+    transition:
+        transform 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.minutes-write-btn:hover {
+    color: #ffffff;
+    background: #5b4bd8;
+    transform: translateY(-1px);
+}
+
+
+/* 검색 영역 */
+
+.minutes-search-wrap {
+    padding: 12px 14px;
+
+    border-bottom: 1px solid #f2eefb;
+}
+
+.minutes-page .minutes-search {
+    display: block;
+
+    width: 100%;
+    height: 38px;
+    margin: 0;
+    padding: 0 13px;
+
+    color: #41395a;
+    font-size: 13px;
+    font-family: inherit;
+
+    background: #faf8ff;
+    border: 1px solid #e9e2fa;
+    border-radius: 11px;
+    outline: none;
+
+    box-shadow: none;
+}
+
+.minutes-page .minutes-search::placeholder {
+    color: #aaa2ba;
+}
+
+.minutes-page .minutes-search:focus {
+    border-color: #8878ee;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+}
+
+
+/* 목록 스크롤 영역 */
+
+.minutes-list {
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+/* 목록 항목 */
+
+.minutes-list-item {
+    display: block;
+
+    width: 100%;
+    padding: 16px;
+
+    color: inherit;
+    text-decoration: none;
+
+    background: #ffffff;
+    border-bottom: 1px solid #f2eff8;
+    border-left: 4px solid transparent;
+
+    transition: background-color 0.15s ease;
+}
+
+.minutes-list-item:hover {
+    color: inherit;
+    background: #faf8ff;
+}
+
+.minutes-list-item.is-active {
+    background: #f5f1ff;
+    border-left-color: #6c5ce7;
+}
+
+.minutes-item-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.minutes-item-top strong {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+
+    color: #332b4c;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.minutes-schedule-badge {
+    flex-shrink: 0;
+
+    padding: 3px 7px;
+
+    color: #6c5ce7;
+    font-size: 10px;
+    font-weight: 900;
+    white-space: nowrap;
+
+    background: #ebe7ff;
+    border-radius: 999px;
+}
+
+.minutes-item-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+
+    margin-top: 7px;
+
+    color: #968dab;
+    font-size: 11px;
+}
+
+.meta-dot {
+    color: #cbc4da;
+}
+
+.minutes-item-preview {
+    display: -webkit-box;
+    overflow: hidden;
+
+    margin: 8px 0 0;
+
+    color: #7c748f;
+    font-size: 12px;
+    line-height: 1.55;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+
+/* 목록 빈 상태 */
+
+.minutes-list-empty {
+    padding: 70px 20px;
+
+    color: #817891;
+    text-align: center;
+}
+
+.minutes-list-empty .empty-icon {
+    margin-bottom: 12px;
+
+    font-size: 34px;
+}
+
+.minutes-list-empty strong {
+    display: block;
+
+    color: #403751;
+    font-size: 14px;
+}
+
+.minutes-list-empty p {
+    margin: 8px 0 18px;
+
+    font-size: 12px;
+}
+
+.minutes-list-empty a {
+    color: #6c5ce7;
+    font-size: 13px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+
+/* =========================================
+   오른쪽 상세 영역
+========================================= */
+
+.minutes-detail-panel {
+    min-width: 0;
+
+    background: #ffffff;
+}
+
+
+/* 탭 영역 */
+
+.minutes-tab-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 57px;
+    padding: 11px 16px;
+
+    border-bottom: 1px solid #eee8ff;
+}
+
+.minutes-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    height: 34px;
+    padding: 0 14px;
+
+    color: #8d84a3;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+
+    background: #f8f6fd;
+    border: 1px solid transparent;
+    border-radius: 10px;
+}
+
+.minutes-tab:hover {
+    color: #6655df;
+}
+
+.minutes-tab.is-active {
+    color: #6655df;
+
+    background: #ffffff;
+    border-color: #dcd4ff;
+
+    box-shadow: 0 4px 12px rgba(86, 65, 150, 0.1);
+}
+
+
+/* 상세 본문 */
+
+.minutes-detail {
+    width: 100%;
+    padding: 24px 28px 40px;
+}
+
+
+/* 상세 상단 */
+
+.minutes-detail-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 20px;
+
+    width: 100%;
+}
+
+.minutes-title-area {
+    min-width: 0;
+}
+
+.minutes-title-area h1 {
+    margin: 0;
+
+    color: #2d2547;
+    font-size: 25px;
+    font-weight: 950;
+    line-height: 1.35;
+
+    overflow-wrap: anywhere;
+}
+
+.minutes-main-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    margin-top: 11px;
+
+    color: #857c98;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.meta-divider {
+    color: #cdc6dc;
+}
+
+
+/* =========================================
+   상세 상단 버튼 영역
+========================================= */
+
+.minutes-detail-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    gap: 7px;
+
+    min-width: max-content;
+
+    white-space: nowrap;
+}
+
+
+/* 링크 버튼과 일반 버튼 공통 */
+
+.minutes-page .minutes-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    width: auto;
+    min-width: auto;
+    min-height: 32px;
+    height: 32px;
+
+    margin: 0;
+    padding: 0 11px;
+
+    color: #564b74;
+    font-size: 11px;
+    font-weight: 900;
+    font-family: inherit;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+
+    background: #ffffff;
+    border: 1px solid #e3dcf4;
+    border-radius: 10px;
+
+    box-shadow: none;
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.minutes-page .minutes-action-btn:hover {
+    color: #564b74;
+    background: #f8f5ff;
+    border-color: #d5cbed;
+}
+
+.minutes-page .minutes-action-btn.print {
+    color: #4938c4;
+}
+
+.minutes-page .minutes-action-btn.delete {
+    color: #e25b77;
+}
+
+
+/* 공통 form CSS가 삭제 폼에 적용되지 않도록 초기화 */
+
+.minutes-detail-actions .minutes-delete-form {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+
+    box-shadow: none !important;
+}
+
+
+/* 삭제 폼 안 hidden input은 레이아웃에 영향 없도록 처리 */
+
+.minutes-delete-form input[type="hidden"] {
+    display: none !important;
+}
+
+
+/* 공통 button CSS보다 우선 적용 */
+
+.minutes-detail-actions
+.minutes-delete-form
+button.minutes-action-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: auto !important;
+    min-width: auto !important;
+    height: 32px !important;
+    min-height: 32px !important;
+
+    margin: 0 !important;
+    padding: 0 11px !important;
+
+    color: #e25b77 !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    font-family: inherit !important;
+    line-height: 1 !important;
+
+    background: #ffffff !important;
+    border: 1px solid #e3dcf4 !important;
+    border-radius: 10px !important;
+
+    box-shadow: none !important;
+}
+
+
+/* =========================================
+   연결 일정
+========================================= */
+
+.minutes-linked-schedule {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    width: 100%;
+    margin-top: 22px;
+    padding: 13px 15px;
+
+    color: #665a83;
+    font-size: 12px;
+
+    background: #f2edff;
+    border-radius: 12px;
+}
+
+.minutes-linked-schedule > div {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    min-width: 0;
+    gap: 8px;
+}
+
+.minutes-linked-schedule strong {
+    flex-shrink: 0;
+
+    color: #6454d7;
+}
+
+.linked-title {
+    min-width: 0;
+
+    color: #403659;
+    font-weight: 800;
+
+    overflow-wrap: anywhere;
+}
+
+.minutes-linked-schedule a {
+    flex-shrink: 0;
+
+    color: #6654d8;
+    font-size: 11px;
+    font-weight: 900;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   상세 공통 섹션
+========================================= */
+
+.minutes-section {
+    margin-top: 24px;
+}
+
+.minutes-section h3 {
+    margin: 0 0 11px;
+
+    color: #443b59;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.minutes-section h3 span {
+    color: #8b819f;
+    font-size: 11px;
+}
+
+
+/* 참석자 */
+
+.minutes-attendee-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.minutes-attendee {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    height: 32px;
+    padding: 0 10px;
+
+    color: #504667;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+
+    background: #faf8ff;
+    border: 1px solid #e9e3f7;
+    border-radius: 999px;
+}
+
+.attendee-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 20px;
+    height: 20px;
+
+    font-size: 10px;
+
+    background: #ece7ff;
+    border-radius: 50%;
+}
+
+.minutes-no-data {
+    color: #a299b2;
+    font-size: 12px;
+}
+
+
+/* 회의 내용, 결정 사항, 액션 아이템 */
+
+.minutes-content-box {
+    width: 100%;
+    min-height: 75px;
+    padding: 17px 18px;
+
+    color: #4c445e;
+    font-size: 13px;
+    line-height: 1.75;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    background: #faf9fe;
+    border: 1px solid #f1edf8;
+    border-radius: 14px;
+}
+
+.minutes-content-box.action-item {
+    background: #fbfaff;
+}
+
+
+/* =========================================
+   상세 빈 상태
+========================================= */
+
+.minutes-detail-empty {
+    padding: 130px 30px;
+
+    text-align: center;
+}
+
+.minutes-detail-empty .empty-icon {
+    font-size: 48px;
+}
+
+.minutes-detail-empty h3 {
+    margin: 16px 0 8px;
+
+    color: #3f3653;
+    font-size: 18px;
+}
+
+.minutes-detail-empty p {
+    margin: 0 0 22px;
+
+    color: #91879f;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.minutes-detail-empty a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    height: 38px;
+    padding: 0 17px;
+
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+    text-decoration: none;
+
+    background: #6c5ce7;
+    border-radius: 11px;
+}
+
+
+/* =========================================
+   스크롤바
+========================================= */
+
+.minutes-list::-webkit-scrollbar {
+    width: 7px;
+}
+
+.minutes-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.minutes-list::-webkit-scrollbar-thumb {
+    background: #ddd6ed;
+    border-radius: 999px;
+}
+
+.minutes-list::-webkit-scrollbar-thumb:hover {
+    background: #c9c0df;
+}
+
+
+/* =========================================
+   반응형 - 태블릿
+========================================= */
+
+@media (max-width: 1200px) {
+
+    .minutes-container {
+        grid-template-columns: 290px minmax(0, 1fr);
+    }
+
+    .minutes-detail {
+        padding: 22px;
+    }
+
+    .minutes-detail-top {
+        grid-template-columns: 1fr;
+    }
+
+    .minutes-detail-actions {
+        justify-content: flex-start;
+        min-width: 0;
+    }
+}
+
+
+/* =========================================
+   반응형 - 작은 태블릿
+========================================= */
+
+@media (max-width: 900px) {
+
+    .minutes-page {
+        padding: 14px;
+    }
+
+    .minutes-container {
+        grid-template-columns: 260px minmax(0, 1fr);
+    }
+
+    .minutes-title-area h1 {
+        font-size: 22px;
+    }
+
+    .minutes-linked-schedule {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+
+/* =========================================
+   반응형 - 모바일
+========================================= */
+
+@media (max-width: 760px) {
+
+    .minutes-page {
+        padding: 10px;
+    }
+
+    .minutes-container {
+        display: block;
+
+        min-height: auto;
+        border-radius: 18px;
+    }
+
+    .minutes-list-panel {
+        max-height: 430px;
+
+        border-right: 0;
+        border-bottom: 1px solid #eee8ff;
+    }
+
+    .minutes-detail {
+        padding: 20px 16px 32px;
+    }
+
+    .minutes-tab-header {
+        overflow-x: auto;
+    }
+
+    .minutes-detail-actions {
+        flex-wrap: wrap;
+    }
+
+    .minutes-main-meta {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .minutes-main-meta .meta-divider {
+        display: none;
+    }
+}
+
+
+/* =========================================
+   매우 작은 모바일
+========================================= */
+
+@media (max-width: 480px) {
+
+    .minutes-list-header {
+        align-items: flex-start;
+    }
+
+    .minutes-list-header > div {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .minutes-detail-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        width: 100%;
+    }
+
+    .minutes-page .minutes-action-btn,
+    .minutes-detail-actions
+    .minutes-delete-form
+    button.minutes-action-btn {
+        width: 100% !important;
+    }
+
+    .minutes-detail-actions .minutes-delete-form {
+        width: 100% !important;
+    }
+}
+/* =========================================
+   회의록 작성 폼
+========================================= */
+
+.minutes-form-wrap {
+    padding: 22px 24px 36px;
+}
+
+.minutes-form-notice {
+    margin-bottom: 20px;
+    padding: 13px 15px;
+
+    color: #655a85;
+    font-size: 12px;
+    font-weight: 700;
+
+    background: #faf8ff;
+    border: 1px solid #e5ddff;
+    border-radius: 12px;
+}
+
+.minutes-page .minutes-write-form {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.minutes-form-group {
+    margin-bottom: 19px;
+}
+
+.minutes-form-group > label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #443b59;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.required {
+    color: #e45b77;
+}
+
+.form-help {
+    margin-left: 5px;
+
+    color: #978daa;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.minutes-page .minutes-form-control,
+.minutes-page .minutes-form-textarea {
+    display: block;
+
+    width: 100%;
+    margin: 0;
+    padding: 11px 13px;
+
+    color: #433a57;
+    font-size: 13px;
+    font-family: inherit;
+
+    background: #ffffff;
+    border: 1px solid #e5dff2;
+    border-radius: 11px;
+    outline: none;
+
+    box-shadow: none;
+}
+
+.minutes-page .minutes-form-control {
+    height: 42px;
+}
+
+.minutes-page .minutes-form-textarea {
+    min-height: 100px;
+
+    line-height: 1.65;
+    resize: vertical;
+}
+
+.minutes-page .minutes-form-control:focus,
+.minutes-page .minutes-form-textarea:focus {
+    border-color: #8271ec;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+}
+
+
+/* 참석자 선택 */
+
+.minutes-member-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    padding: 11px;
+
+    background: #faf9fe;
+    border: 1px solid #e8e2f4;
+    border-radius: 12px;
+}
+
+.minutes-member-chip {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+
+    min-height: 34px;
+    margin: 0 !important;
+    padding: 4px 9px;
+
+    color: #554b68;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+
+    background: #ffffff;
+    border: 1px solid #e6e0f1;
+    border-radius: 999px;
+
+    cursor: pointer;
+}
+
+.minutes-member-chip input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    opacity: 0;
+}
+
+.member-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 17px;
+    height: 17px;
+
+    color: transparent;
+    font-size: 10px;
+
+    border: 1px solid #d8d0e8;
+    border-radius: 5px;
+}
+
+.minutes-member-chip:has(input:checked) {
+    color: #5544cf;
+
+    background: #f2efff;
+    border-color: #b9adf7;
+}
+
+.minutes-member-chip input:checked + .member-check {
+    color: #ffffff;
+
+    background: #6c5ce7;
+    border-color: #6c5ce7;
+}
+
+.member-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 21px;
+    height: 21px;
+
+    color: #ffffff;
+    font-size: 10px;
+
+    background: #8171e8;
+    border-radius: 50%;
+}
+
+.member-role {
+    color: #9b92ab;
+    font-size: 9px;
+}
+
+
+/* 작성 버튼 */
+
+.minutes-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    margin-top: 25px;
+}
+
+.minutes-page .minutes-form-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    height: 38px;
+    margin: 0;
+    padding: 0 16px;
+
+    font-size: 12px;
+    font-weight: 900;
+    font-family: inherit;
+
+    border-radius: 11px;
+    box-shadow: none;
+
+    cursor: pointer;
+}
+
+.minutes-page .minutes-form-btn.reset {
+    color: #665c78;
+
+    background: #ffffff;
+    border: 1px solid #ddd6ea;
+}
+
+.minutes-page .minutes-form-btn.submit {
+    color: #ffffff;
+
+    background: #6c5ce7;
+    border: 1px solid #6c5ce7;
+}
+
+.minutes-page .minutes-form-btn.submit:hover {
+    background: #5b4bd8;
+}
+
+.minutes-page a.minutes-form-btn {
+    text-decoration: none;
+}
+
+.minutes-page a.minutes-form-btn:hover {
+    text-decoration: none;
+}

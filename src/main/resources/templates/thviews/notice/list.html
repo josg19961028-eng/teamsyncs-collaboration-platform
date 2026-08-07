@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+    <title>공지사항</title>
+    <th:block layout:fragment="pageCss">
+        <link rel="stylesheet" th:href="@{/assets/css/MY/notice.css}" type="text/css">
+    </th:block>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+<section class="panel noticeMain">
+
+    <!-- 툴바 -->
+    <div class="noticeToolbar">
+        <div>
+            <h2>📢 공지사항</h2>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">팀 전체에 공유되는 중요 안내</div>
+        </div>
+        <div class="toolbarRight">
+            <!-- LEADER(3) / MANAGER(2) 만 작성 가능 -->
+            <button th:if="${myRole >= 2}" class="btn primary" onclick="openWriteModal(0)">+ 공지 작성</button>
+        </div>
+    </div>
+
+    <!-- 검색 -->
+    <div class="searchWrap">
+        <input id="searchInput" placeholder="공지사항 검색...">
+    </div>
+
+    <!-- 고정 공지 (JS 렌더) -->
+    <div id="pinnedSection" class="pinnedSection"></div>
+
+    <!-- 일반 공지 목록 (JS 렌더) -->
+    <div id="noticeList" class="noticeList">
+        <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">
+            불러오는 중...
+        </div>
+    </div>
+
+</section>
+
+<!-- 모달 -->
+<div id="modalLayer" class="modalLayer">
+    <div class="modal">
+        <div class="modalHead">
+            <h3 id="modalTitle"></h3>
+            <button class="closeBtn" onclick="closeModal()">×</button>
+        </div>
+        <div id="modalBody" class="modalBody"></div>
+    </div>
+</div>
+
+</th:block>
+
+<th:block layout:fragment="pageJs">
+<!-- 서버 데이터를 JavaScript 변수로 주입 -->
+<script th:inline="javascript">
+/*<![CDATA[*/
+var NOTICES      = /*[[${notices}]]*/ [];
+var myRole       = /*[[${myRole}]]*/ 1;
+var myUserNum    = /*[[${myUserNum}]]*/ 0;
+var CSRF_TOKEN   = /*[[${_csrf.token}]]*/ '';
+var CSRF_HEADER  = /*[[${_csrf.headerName}]]*/ 'X-CSRF-TOKEN';
+/*]]>*/
+</script>
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/assets/js/MY/notice.js}"></script>
+</th:block>
+
+</body>
+</html>

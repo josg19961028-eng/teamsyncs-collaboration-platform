@@ -1,0 +1,339 @@
+/* =====================================================
+   notice.css - 공지사항 페이지 전용 스타일
+   ===================================================== */
+
+:root {
+    --primary: #6c5ce7;
+    --violet:  #8f65f6;
+    --rose:    #e46aa1;
+    --green:   #34b77b;
+    --orange:  #f0a04b;
+    --muted:   #7b7394;
+    --line:    #e8e1fb;
+    --ink:     #1e1635;
+    --blueS:   #f1edff;
+    --roseS:   #fff1f7;
+    --shadow:  0 16px 44px rgba(73,47,133,.12);
+    --r:       24px;
+}
+
+/* ── 패널 ── */
+.panel {
+    background: rgba(255,255,255,.92);
+    border: 1px solid rgba(255,255,255,.9);
+    box-shadow: var(--shadow);
+    border-radius: var(--r);
+    overflow: hidden;
+}
+
+/* ── 툴바 ── */
+.noticeMain {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.noticeToolbar {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+}
+
+.noticeToolbar h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 950;
+}
+
+.toolbarRight {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ── 검색 ── */
+.searchWrap {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line);
+}
+
+.searchWrap input {
+    flex: 1;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 9px 12px;
+    font-size: 13px;
+    background: #f8f5ff;
+    outline: none;
+    font-family: inherit;
+    transition: .15s;
+}
+
+.searchWrap input:focus {
+    border-color: rgba(108,92,231,.4);
+    background: #fff;
+}
+
+/* ── 고정 공지 영역 ── */
+.pinnedSection {
+    padding: 14px 20px 8px;
+    background: linear-gradient(90deg, #f8f5ff, #fff);
+    border-bottom: 1px solid var(--line);
+}
+
+.pinnedSection:empty {
+    display: none;
+}
+
+.pinnedLabel {
+    font-size: 11px;
+    font-weight: 950;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 8px;
+}
+
+.pinnedCard {
+    background: #fff;
+    border: 1px solid rgba(108,92,231,.2);
+    border-left: 3px solid var(--primary);
+    border-radius: 14px;
+    padding: 13px 14px;
+    cursor: pointer;
+    transition: .12s;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pinnedCard:hover {
+    background: #f8f5ff;
+}
+
+.pinnedCard .pt {
+    font-size: 14px;
+    font-weight: 950;
+    flex: 1;
+}
+
+.pinnedCard .pm {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* ── 공지 목록 ── */
+.noticeList {
+    display: flex;
+    flex-direction: column;
+}
+
+.noticeRow {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    cursor: pointer;
+    transition: .12s;
+}
+
+.noticeRow:last-child {
+    border-bottom: none;
+}
+
+.noticeRow:hover {
+    background: #faf8ff;
+}
+
+.noticeRow.unread {
+    background: linear-gradient(90deg, #f8f5ff, transparent);
+}
+
+.noticeNum {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 950;
+    width: 32px;
+    flex: 0 0 32px;
+    padding-top: 1px;
+}
+
+.noticeBody {
+    flex: 1;
+    min-width: 0;
+}
+
+.noticeTitle {
+    font-size: 14px;
+    font-weight: 950;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.newBadge {
+    background: var(--roseS);
+    color: var(--rose);
+    border-radius: 999px;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-weight: 950;
+    white-space: nowrap;
+}
+
+.noticeMeta {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.noticeViews {
+    text-align: right;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── 모달 ── */
+.modalLayer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,18,33,.48);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+}
+
+.modalLayer.active {
+    display: flex;
+}
+
+.modal {
+    width: min(720px, 100%);
+    max-height: 90vh;
+    overflow: auto;
+    background: #fff;
+    border-radius: 26px;
+    box-shadow: 0 40px 100px rgba(0,0,0,.25);
+}
+
+.modalHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+}
+
+.modalHead h3 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 950;
+}
+
+.closeBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: #f4f6fb;
+    border: 1px solid var(--line);
+    font-size: 18px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    line-height: 1;
+    font-family: inherit;
+}
+
+.modalBody {
+    padding: 22px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 14px;
+}
+
+.field label {
+    font-size: 12px;
+    font-weight: 950;
+    color: #51586f;
+}
+
+.field input,
+.field textarea {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 11px 12px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+    transition: .15s;
+    font-family: inherit;
+}
+
+.field input:focus,
+.field textarea:focus {
+    border-color: rgba(108,92,231,.4);
+}
+
+.field textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 16px;
+}
+
+/* ── 버튼 ── */
+.btn {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 950;
+    background: #fff;
+    color: #42485b;
+    cursor: pointer;
+    transition: .15s;
+    font-family: inherit;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, var(--primary), #7476ff);
+    border: 0;
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(86,87,245,.2);
+}
+
+.btn.danger {
+    background: var(--roseS);
+    color: var(--rose);
+    border-color: transparent;
+}

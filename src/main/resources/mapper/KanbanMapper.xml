@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.kanban.dao.KanbanMapper">
+
+
+	<select id="selectTeamMember" parameterType="long"
+		resultType="kr.spring.team.vo.TeamMemberVO">
+		SELECT u.user_num,
+		u.user_name
+		FROM team_member tm
+		JOIN users
+		u
+		ON tm.user_num = u.user_num
+		WHERE
+		tm.team_num = #{team_num}
+		AND
+		tm.join_status = 1
+		ORDER BY u.user_name
+	</select>
+
+	<!-- 칸반 카드 등록 -->
+	<insert id="insertKanbanCard"
+		parameterType="kr.spring.kanban.vo.KanbanCardVO">
+		<selectKey keyProperty="card_num" resultType="long"
+			order="BEFORE">
+			SELECT SEQ_KANBAN_CARD.nextval FROM dual
+		</selectKey>
+		INSERT INTO kanban_card(
+		card_num,
+		team_num,
+		writer_num,
+		title,
+		content,
+		tag,
+		tag_color,
+		deadline,
+		filename
+		) VALUES (
+		#{card_num},
+		#{team_num},
+		#{writer_num},
+		#{title},
+		#{content},
+		#{tag},
+		#{tag_color},
+		#{deadline},
+		#{filename,jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<!-- 칸반카드 태그 조회 -->
+	<select id="selectKanbanTagList" parameterType="long"
+		resultType="kr.spring.kanban.vo.KanbanCardVO">
+
+		SELECT tag,
+		CASE
+		WHEN tag = '기타' THEN '#8b95a5'
+		ELSE
+		MIN(tag_color)
+		END AS tag_color
+		FROM (
+		SELECT NVL(TRIM(tag), '기타') AS
+		tag,
+		NVL(tag_color, '#6c5ce7') AS tag_color
+		FROM kanban_card
+		WHERE
+		team_num = #{team_num}
+		AND status != 2
+		)
+		GROUP BY tag
+		ORDER BY
+		CASE WHEN
+		tag = '기타' THEN 1 ELSE 0 END,
+		tag
+
+	</select>
+
+	<!-- 담당자 지정 -->
+	<insert id="insertKanbanCardAssign"
+		parameterType="kr.spring.kanban.vo.KanbanAssignVO">
+		INSERT INTO kanban_assign (
+		assignee_num,
+		team_num,
+		card_num,
+		user_num
+		) VALUES (
+		SEQ_KANBAN_ASSIGN.nextval,
+		#{team_num},
+		#{card_num},
+		#{user_num}
+		)
+	</insert>
+
+	<!-- 특정 팀의 전체 칸반 카드 조회 -->
+	<select id="selectKanbanCardList" parameterType="map"
+		resultType="kanbanCardVO">
+		SELECT kc.card_num,
+		kc.team_num,
+		kc.writer_num,
+		u.user_name AS
+		writer_name,
+		kc.title,
+		kc.content,
+		kc.tag,
+		kc.tag_color,
+		kc.kanban_status,
+		kc.deadline,
+		kc.reg_date,
+		kc.modify_date,
+		kc.status
+		FROM kanban_card kc
+		JOIN users u ON
+		kc.writer_num = u.user_num
+		WHERE kc.team_num =
+		#{team_num}
+		AND kc.status
+		!= 2
+
+		<if test="tag != null and tag != ''">
+			AND NVL(TRIM(kc.tag), '기타') = #{tag}
+		</if>
+
+		<if test="keyword != null and keyword != ''">
+			AND (
+			kc.title LIKE '%' || #{keyword} || '%'
+			OR kc.content
+			LIKE '%' || #{keyword} || '%'
+			)
+		</if>
+
+		<if test="myOnly == true">
+			AND (
+			kc.writer_num = #{user_num}
+			OR EXISTS (
+			SELECT 1
+			FROM
+			kanban_assign ka
+			WHERE ka.card_num = kc.card_num
+			AND ka.user_num =
+			#{user_num}
+			)
+			)
+		</if>
+
+		ORDER BY kc.kanban_status ASC, kc.card_num DESC
+	</select>
+
+	<!-- 카드 상세보기에서 해당 카드 담당자 조회 -->
+	<select id="selectKanbanAssignList" parameterType="long"
+		resultType="kr.spring.kanban.vo.KanbanAssignVO">
+		SELECT
+		ka.assignee_num,
+		ka.team_num,
+		ka.card_num,
+		ka.user_num,
+		u.user_name
+		FROM kanban_assign ka
+		JOIN users u
+		ON ka.user_num =
+		u.user_num
+		WHERE ka.card_num = #{card_num}
+		ORDER BY u.user_name
+	</select>
+
+	<!-- 카드 상세보기 : 카드 1건 조회 -->
+	<select id="selectKanbanCard"
+		resultType="kr.spring.kanban.vo.KanbanCardVO">
+		SELECT
+		kc.card_num,
+		kc.team_num,
+		kc.writer_num,
+		u.user_name AS writer_name,
+		kc.title,
+		kc.content,
+		kc.tag,
+		kc.tag_color,
+		kc.kanban_status,
+		kc.deadline,
+		kc.filename,
+		cf.file_num,
+		cf.origin_name,
+		kc.reg_date,
+		kc.modify_date,
+		kc.status
+		FROM kanban_card kc
+		JOIN users u
+		ON kc.writer_num = u.user_num
+		LEFT JOIN chat_file cf
+		ON cf.save_name = kc.filename
+		AND cf.team_num = kc.team_num
+		WHERE kc.card_num = #{card_num}
+		AND kc.team_num = #{team_num}
+		AND kc.status != 2
+	</select>
+
+	<!-- 카드 상태 변경 -->
+	<update id="updateKanbanStatus"
+		parameterType="kr.spring.kanban.vo.KanbanCardVO">
+		UPDATE kanban_card
+		SET
+		kanban_status=#{kanban_status},
+		modify_date=SYSDATE
+		WHERE
+		card_num=#{card_num}
+		AND team_num=#{team_num}
+		AND status!=2
+	</update>
+
+	<!-- 칸반카드 수정 -->
+	<update id="updateKanbanCard"
+		parameterType="kr.spring.kanban.vo.KanbanCardVO">
+		UPDATE kanban_card
+		SET title=#{title},
+		content=#{content},
+		tag=#{tag},
+		tag_color=#{tag_color},
+		deadline=#{deadline},
+		filename=#{filename},
+		modify_date=SYSDATE
+		WHERE
+		card_num=#{card_num}
+		AND
+		team_num=#{team_num}
+		AND status!=2
+	</update>
+
+
+	<!-- 댓글 목록 -->
+	<select id="selectListComment" parameterType="long"
+		resultType="kanbanCommentVO">
+
+		SELECT c.comment_num,
+		c.card_num,
+		c.user_num,
+		c.content,
+		c.reg_date,
+		c.modify_date,
+		c.status,
+		u.user_name
+		FROM kanban_comment c
+		JOIN users u
+		ON c.user_num = u.user_num
+		WHERE c.card_num = #{card_num}
+		AND c.status = 1
+		ORDER BY c.comment_num DESC
+
+	</select>
+
+	<!-- 파일업로드 -->
+
+
+
+</mapper>
+
+
+

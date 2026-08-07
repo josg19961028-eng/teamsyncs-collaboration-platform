@@ -1,0 +1,157 @@
+/* ── 상세 레이아웃 ── */
+.detailGrid{display:grid;grid-template-columns:1fr 268px;gap:22px}
+.detailL{display:flex;flex-direction:column;gap:16px}
+.detailR{display:flex;flex-direction:column;gap:12px}
+.dsec h4{font-size:11px;font-weight:950;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.07em;margin:0 0 9px}
+.dContent{font-size:14px;line-height:1.75;background:#f9f7ff;border-radius:13px;
+  padding:13px;min-height:48px;white-space:pre-wrap;color:var(--ink)}
+
+
+.detailTitleRow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.detailTitleRow h2{
+    margin:0;
+    font-size:20px;
+    font-weight:950;
+    letter-spacing:-.04em;
+}
+
+.detailMeta{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+
+.metaText{
+    font-size:12px;
+    color:var(--muted);
+}
+
+.miniAv{
+    width:20px;
+    height:20px;
+    border-radius:7px;
+    background:var(--primary);
+    color:#fff;
+    display:grid;
+    place-items:center;
+    font-size:10px;
+    font-weight:950;
+}
+
+.detailActions{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.cProgBar{height:4px;background:#eee8ff;border-radius:999px;overflow:hidden}
+.cProgFill{height:100%;background:linear-gradient(90deg,var(--primary),var(--violet));border-radius:999px}
+.cProgLbl{font-size:10px;color:var(--muted);margin-top:3px;font-weight:800}
+
+.chkList{display:flex;flex-direction:column}
+.chkItem{display:flex;align-items:center;gap:9px;padding:0px 0;
+  border-bottom:1px solid var(--line)}
+.chkItem:last-child{border-bottom:none}
+.chkItem input[type=checkbox]{width:16px;height:16px;accent-color:var(--primary);
+  cursor:pointer;flex:0 0 16px}
+.chkLbl{flex:1;font-size:13px;line-height:1}
+.chkLbl.done{text-decoration:line-through;color:var(--muted)}
+.chkDel{background:none;border:none;color:#ccc;font-size:15px;cursor:pointer;
+  padding:0 3px;line-height:1;transition:.1s}
+.chkDel:hover{color:var(--rose)}
+.addRow{display:flex;gap:8px;margin-top:10px}
+.addRow input{flex:1;border:1px solid var(--line);border-radius:12px;
+  padding:9px 11px;font-size:13px;outline:none;transition:.15s}
+.addRow input:focus{border-color:rgba(108,92,231,.4)}
+
+.commentUpdateForm {
+	display: flex;
+	align-items: stretch;
+	gap: 6px;
+	margin-top: 6px;
+}
+
+.commentUpdateContent {
+	flex: 1;
+	min-width: 0;
+	padding: 8px 10px;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	font-size: 13px;
+	outline: none;
+}
+
+.commentUpdateContent:focus {
+	border-color: var(--primary);
+}
+
+.commentUpdateBtns {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.commentUpdateBtns .btn {
+	white-space: nowrap;
+}
+
+/*============================셀렉문 디자인=========================*/
+.assignSelectWrap {
+	position: relative;
+	margin-top: 10px;
+}
+
+.assignSelectWrap::after {
+	content: '⌄';
+	position: absolute;
+	right: 12px;
+	top: 50%;
+	transform: translateY(-55%);
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--muted);
+	pointer-events: none;
+}
+
+.assignAddSel {
+	width: 100%;
+	padding: 9px 34px 9px 12px;
+
+	background: #fff;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--muted);
+
+	cursor: pointer;
+	outline: none;
+
+	appearance: none;
+	-webkit-appearance: none;
+
+	transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.assignAddSel:hover {
+	border-color: var(--primary);
+	background: var(--blueS);
+}
+
+.assignAddSel:focus {
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+	color: var(--text);
+}
+/*============================셀렉문 디자인=========================*/

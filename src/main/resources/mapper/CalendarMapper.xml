@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+
+<mapper namespace="kr.spring.calendar.dao.CalendarMapper">
+
+	<resultMap id="calendarEventMap" type="kr.spring.calendar.vo.CalendarEventVO">
+		<result property="id" column="EVENT_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="start" column="START_DATE"/>
+		<result property="end" column="END_DATE"/>
+		<result property="color" column="COLOR"/>
+		<result property="allDay" column="ALL_DAY_VALUE"/>
+
+		<result property="type" column="EVENT_TYPE"/>
+		<result property="schedule_num" column="SCHEDULE_NUM"/>
+		<result property="team_num" column="TEAM_NUM"/>
+		<result property="category" column="CATEGORY"/>
+		<result property="content" column="CONTENT"/>
+	</resultMap>
+
+	<resultMap id="kanbanEventMap"
+	           type="kr.spring.calendar.vo.CalendarEventVO"
+	           extends="calendarEventMap">
+		<result property="card_num" column="CARD_NUM"/>
+		<result property="kanban_status" column="KANBAN_STATUS"/>
+	</resultMap>
+
+	<select id="selectScheduleEventList"
+        resultMap="calendarEventMap">
+
+    SELECT
+        'SCHEDULE-' || S.SCHEDULE_NUM AS EVENT_ID,
+        S.TITLE,
+
+        CASE
+            WHEN S.ALL_DAY = 1
+                THEN TO_CHAR(S.START_DATE, 'YYYY-MM-DD')
+            ELSE TO_CHAR(S.START_DATE, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS START_DATE,
+
+        CASE
+            WHEN S.ALL_DAY = 1
+                THEN TO_CHAR(S.END_DATE, 'YYYY-MM-DD')
+            ELSE TO_CHAR(S.END_DATE, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS END_DATE,
+
+        S.COLOR,
+
+        CASE
+            WHEN S.ALL_DAY = 1 THEN 1
+            ELSE 0
+        END AS ALL_DAY_VALUE,
+
+        'SCHEDULE' AS EVENT_TYPE,
+        S.SCHEDULE_NUM,
+        S.TEAM_NUM,
+        S.CATEGORY,
+        S.CONTENT
+
+    FROM SCHEDULE S
+    WHERE S.TEAM_NUM = #{team_num}
+      AND S.STATUS = 1
+    ORDER BY S.START_DATE ASC
+
+	</select>
+	
+	<!-- 홈 캘린더용 : 로그인한 사용자가 속한 모든 팀 일정 조회 -->
+<select id="selectMyScheduleEventList"
+        resultMap="calendarEventMap">
+
+    SELECT
+        'SCHEDULE-' || S.SCHEDULE_NUM AS EVENT_ID,
+        S.TITLE,
+
+        CASE
+            WHEN S.ALL_DAY = 1
+                THEN TO_CHAR(S.START_DATE, 'YYYY-MM-DD')
+            ELSE TO_CHAR(S.START_DATE, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS START_DATE,
+
+        CASE
+            WHEN S.ALL_DAY = 1
+                THEN TO_CHAR(S.END_DATE, 'YYYY-MM-DD')
+            ELSE TO_CHAR(S.END_DATE, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS END_DATE,
+
+        S.COLOR,
+
+        CASE
+            WHEN S.ALL_DAY = 1 THEN 1
+            ELSE 0
+        END AS ALL_DAY_VALUE,
+
+        'SCHEDULE' AS EVENT_TYPE,
+        S.SCHEDULE_NUM,
+        S.TEAM_NUM,
+        S.CATEGORY,
+        S.CONTENT
+
+    FROM SCHEDULE S
+
+    WHERE S.STATUS = 1
+      AND S.TEAM_NUM IN (
+          SELECT TM.TEAM_NUM
+          FROM TEAM_MEMBER TM
+          WHERE TM.USER_NUM = #{user_num}
+            AND TM.JOIN_STATUS = 1
+      )
+
+    ORDER BY S.START_DATE ASC
+
+	</select>
+	
+	<!-- 일정 등록 권한 확인
+     ROLE 2: 매니저, ROLE 3: 팀장 -->
+	<select id="countScheduleWritePermission"
+	        resultType="int">
+	
+	    SELECT COUNT(*)
+	    FROM TEAM_MEMBER
+	    WHERE TEAM_NUM = #{team_num}
+	      AND USER_NUM = #{user_num}
+	      AND JOIN_STATUS = 1
+	      AND ROLE IN (2, 3)
+	
+	</select>
+	
+	<!-- 일정 등록 -->
+	<insert id="insertSchedule"
+        parameterType="kr.spring.schedule.vo.ScheduleVO">
+
+    INSERT INTO SCHEDULE (
+        SCHEDULE_NUM,
+        TEAM_NUM,
+        USER_NUM,
+        TITLE,
+        CONTENT,
+        CATEGORY,
+        COLOR,
+        START_DATE,
+        END_DATE,
+        ALL_DAY,
+        STATUS,
+        REG_DATE
+    )
+    VALUES (
+        SEQ_SCHEDULE.NEXTVAL,
+        #{team_num},
+        #{user_num},
+        #{title},
+        #{content},
+        #{category},
+        NVL(#{color}, '#6C5CE7'),
+
+        CASE
+            WHEN NVL(#{all_day}, 1) = 1
+                THEN TO_DATE(
+                    #{start_date},
+                    'YYYY-MM-DD'
+                )
+            ELSE TO_DATE(
+                    #{start_date},
+                    'YYYY-MM-DD"T"HH24:MI'
+                 )
+        END,
+
+        CASE
+            WHEN NVL(#{all_day}, 1) = 1
+                THEN TO_DATE(
+                    #{end_date},
+                    'YYYY-MM-DD'
+                ) + 1
+            ELSE TO_DATE(
+                    #{end_date},
+                    'YYYY-MM-DD"T"HH24:MI'
+                 )
+        END,
+
+        NVL(#{all_day}, 1),
+        1,
+        SYSDATE
+    )
+
+	</insert>
+
+
+	<!-- 특정 기간과 겹치는 팀 일정 조회 -->
+<select id="selectScheduleEventListByPeriod"
+        resultMap="calendarEventMap">
+
+    SELECT
+        'SCHEDULE-' || S.SCHEDULE_NUM AS EVENT_ID,
+        S.TITLE,
+
+        CASE
+            WHEN S.ALL_DAY = 1
+                THEN TO_CHAR(S.START_DATE, 'YYYY-MM-DD')
+            ELSE TO_CHAR(S.START_DATE, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS START_DATE,
+
+        CASE
+            WHEN S.ALL_DAY = 1
+                THEN TO_CHAR(S.END_DATE, 'YYYY-MM-DD')
+            ELSE TO_CHAR(S.END_DATE, 'YYYY-MM-DD"T"HH24:MI:SS')
+        END AS END_DATE,
+
+        S.COLOR,
+
+        CASE
+            WHEN S.ALL_DAY = 1 THEN 1
+            ELSE 0
+        END AS ALL_DAY_VALUE,
+
+        'SCHEDULE' AS EVENT_TYPE,
+        S.SCHEDULE_NUM,
+        S.TEAM_NUM,
+        S.CATEGORY,
+        S.CONTENT
+
+    FROM SCHEDULE S
+
+    WHERE S.TEAM_NUM = #{team_num}
+      AND S.STATUS = 1
+      AND S.START_DATE &lt; TO_DATE(#{end_date}, 'YYYY-MM-DD')
+      AND S.END_DATE &gt; TO_DATE(#{start_date}, 'YYYY-MM-DD')
+
+    ORDER BY S.START_DATE ASC
+
+	</select>
+
+	<!-- 특정 기간의 팀 칸반 마감 일정 조회 -->
+	<select id="selectKanbanEventList"
+	        resultMap="kanbanEventMap">
+
+	    SELECT
+	        'KANBAN-' || KC.CARD_NUM AS EVENT_ID,
+	        KC.TITLE,
+	        TO_CHAR(KC.DEADLINE, 'YYYY-MM-DD') AS START_DATE,
+	        CAST(NULL AS VARCHAR2(10)) AS END_DATE,
+	        NVL(KC.TAG_COLOR, '#6C5CE7') AS COLOR,
+	        1 AS ALL_DAY_VALUE,
+	        'KANBAN' AS EVENT_TYPE,
+	        CAST(NULL AS NUMBER) AS SCHEDULE_NUM,
+	        KC.CARD_NUM,
+	        KC.TEAM_NUM,
+	        KC.TAG AS CATEGORY,
+	        KC.CONTENT,
+	        KC.KANBAN_STATUS
+
+	    FROM KANBAN_CARD KC
+	    WHERE KC.TEAM_NUM = #{team_num}
+	      AND KC.STATUS != 2
+	      AND KC.DEADLINE IS NOT NULL
+	      AND KC.DEADLINE &gt;= TO_DATE(#{start_date}, 'YYYY-MM-DD')
+	      AND KC.DEADLINE &lt; TO_DATE(#{end_date}, 'YYYY-MM-DD')
+	      AND EXISTS (
+	          SELECT 1
+	          FROM TEAM_MEMBER TM
+	          WHERE TM.TEAM_NUM = KC.TEAM_NUM
+	            AND TM.USER_NUM = #{user_num}
+	            AND TM.JOIN_STATUS = 1
+	      )
+
+	    ORDER BY KC.DEADLINE ASC, KC.CARD_NUM DESC
+
+	</select>
+	
+	<!-- 일정 수정 -->
+<update id="updateSchedule"
+        parameterType="kr.spring.schedule.vo.ScheduleVO">
+
+    UPDATE SCHEDULE S
+    SET
+        S.TITLE = #{title},
+        S.CONTENT = #{content},
+        S.CATEGORY = #{category},
+        S.COLOR = NVL(#{color}, '#6C5CE7'),
+
+        S.START_DATE =
+            CASE
+                WHEN NVL(#{all_day}, 1) = 1
+                    THEN TO_DATE(
+                        #{start_date},
+                        'YYYY-MM-DD'
+                    )
+                ELSE TO_DATE(
+                        #{start_date},
+                        'YYYY-MM-DD"T"HH24:MI'
+                     )
+            END,
+
+        S.END_DATE =
+            CASE
+                WHEN NVL(#{all_day}, 1) = 1
+                    THEN TO_DATE(
+                        #{end_date},
+                        'YYYY-MM-DD'
+                    ) + 1
+                ELSE TO_DATE(
+                        #{end_date},
+                        'YYYY-MM-DD"T"HH24:MI'
+                     )
+            END,
+
+        S.ALL_DAY = NVL(#{all_day}, 1),
+        S.MODIFY_DATE = SYSDATE
+
+    WHERE S.SCHEDULE_NUM = #{schedule_num}
+      AND S.STATUS = 1
+
+      AND EXISTS (
+          SELECT 1
+          FROM TEAM_MEMBER TM
+          WHERE TM.TEAM_NUM = S.TEAM_NUM
+            AND TM.USER_NUM = #{user_num}
+            AND TM.JOIN_STATUS = 1
+            AND TM.ROLE IN (2, 3)
+      )
+
+	</update>
+	
+	<!-- 일정 삭제 -->
+	<update id="deleteSchedule">
+	
+	    UPDATE SCHEDULE S
+	    SET
+	        S.STATUS = 2,
+	        S.MODIFY_DATE = SYSDATE
+	
+	    WHERE S.SCHEDULE_NUM = #{schedule_num}
+	      AND S.STATUS = 1
+	
+	      AND EXISTS (
+	          SELECT 1
+	          FROM TEAM_MEMBER TM
+	          WHERE TM.TEAM_NUM = S.TEAM_NUM
+	            AND TM.USER_NUM = #{user_num}
+	            AND TM.JOIN_STATUS = 1
+	            AND TM.ROLE IN (2, 3)
+	      )
+	
+	</update>
+</mapper>

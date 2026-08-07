@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <title>개인 To-Do</title>
+    <link rel="stylesheet" th:href="@{/assets/css/header.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/JW/notification-empty.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/JW/notification-detail.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/chatbot.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/SY/member.mypage.css(v=2)}">
+</head>
+<body>
+<div class="sy-mypage" th:with="currentMenu='mypage'">
+    <th:block th:insert="~{fragments/header::header}"></th:block>
+
+    <div class="sy-mypage-wrap">
+        <aside class="sy-mypage-card sy-mypage-side">
+            <div class="sy-mypage-avatar" th:text="${user.firstChar}">U</div>
+            <div class="sy-mypage-name" th:text="${user.user_name}">닉네임</div>
+            <div class="sy-mypage-real-name" th:text="${user.real_name}">이름</div>
+
+            <div class="sy-mypage-badges">
+                <span class="sy-mypage-badge" th:text="${user.auth == 'USER_ADMIN' ? '관리자' : '유저'}">유저</span>
+                <span class="sy-mypage-badge sy-mypage-badge-muted"
+                      th:text="${user.google_id != null and !#strings.isEmpty(user.google_id) ? 'Google 연동' : 'Google 비연동'}">Google 비연동</span>
+            </div>
+
+            <div class="sy-mypage-stats">
+                <div class="sy-mypage-stat">
+                    <strong th:text="${teamCount}">0</strong>
+                    <span>참여팀</span>
+                </div>
+                <div class="sy-mypage-stat">
+                    <strong th:text="${kanbanCount}">0</strong>
+                    <span>칸반카드</span>
+                </div>
+                <div class="sy-mypage-stat">
+                    <strong th:text="${minutesCount}">0</strong>
+                    <span>회의록</span>
+                </div>
+            </div>
+
+            <nav class="sy-mypage-menu">
+                <a th:href="@{/member/myPage}"><span>👤</span>프로필 수정</a>
+                <a class="active" th:href="@{/member/todos}"><span>✅</span>개인 To-Do</a>
+                <a th:href="@{/member/notifications}"><span>🔔</span>알림관리</a>
+                <a href="#"><span>⚠</span>계정 관리</a>
+            </nav>
+        </aside>
+
+        <section class="sy-mypage-card sy-mypage-main sy-todo-card">
+            <div class="sy-todo-head">
+                <h2 class="sy-mypage-title sy-todo-title">개인 To-Do</h2>
+
+                <div class="sy-todo-head-tools">
+                    <form th:action="@{/member/todos}" method="get" class="sy-todo-sort-form">
+                        <select name="sort" onchange="this.form.submit()">
+                            <option value="deadline" th:selected="${todoSort == 'deadline'}">마감일 빠른순</option>
+                            <option value="deadlineDesc" th:selected="${todoSort == 'deadlineDesc'}">마감일 느린순</option>
+                            <option value="priority" th:selected="${todoSort == 'priority'}">우선순위 높은순</option>
+                            <option value="priorityAsc" th:selected="${todoSort == 'priorityAsc'}">우선순위 낮은순</option>
+                        </select>
+                    </form>
+
+                    <details class="sy-todo-add">
+                        <summary>+ 추가</summary>
+                        <form th:action="@{/member/todos/add}" method="post" class="sy-todo-add-form">
+                            <input type="hidden" name="sort" th:value="${todoSort}">
+                            <input type="text" name="title" placeholder="할 일 제목" maxlength="200" required>
+                            <input type="date" name="deadlineText" th:min="${todayText}">
+                            <select name="todo_category_num">
+                                <option value="">카테고리 없음</option>
+                                <option th:each="c : ${todoCategories}"
+                                        th:value="${c.todo_category_num}"
+                                        th:text="${c.category_name}">업무</option>
+                            </select>
+                            <select name="priority">
+                                <option value="2" selected>우선 순위</option>
+                                <option value="1">낮음</option>
+                                <option value="2">보통</option>
+                                <option value="3">높음</option>
+                            </select>
+                            <textarea name="content" placeholder="메모" maxlength="1000"></textarea>
+                            <button type="submit">등록</button>
+                        </form>
+                    </details>
+                </div>
+            </div>
+
+            <div class="sy-mypage-alert error" th:if="${todoError}" th:text="${todoError}"></div>
+
+            <div class="sy-todo-category-area">
+                <div class="sy-todo-label">카테고리</div>
+                <div class="sy-todo-chips">
+                    <form th:each="c : ${todoCategories}"
+                          th:action="@{/member/todos/categories/delete}"
+                          method="post"
+                          class="sy-todo-chip"
+                          th:style="'--todo-color:' + ${c.displayColor}">
+                        <input type="hidden" name="sort" th:value="${todoSort}">
+                        <input type="hidden" name="todo_category_num" th:value="${c.todo_category_num}">
+                        <span class="sy-todo-chip-dot"></span>
+                        <span th:text="${c.category_name}">업무</span>
+                        <button type="submit" aria-label="카테고리 삭제">x</button>
+                    </form>
+                </div>
+
+                <details class="sy-todo-category-add">
+                    <summary>+ 카테고리 추가</summary>
+                    <form th:action="@{/member/todos/categories/add}" method="post">
+                        <input type="hidden" name="sort" th:value="${todoSort}">
+                        <input type="text" name="category_name" placeholder="카테고리명" maxlength="50" required>
+                        <input type="color" name="color" value="#7c5cff" aria-label="카테고리 색상">
+                        <button type="submit">추가</button>
+                    </form>
+                </details>
+            </div>
+
+            <div class="sy-todo-sections">
+                <div class="sy-todo-section-head">
+                    <span>현재 일정</span>
+                    <strong id="syTodoActiveCount" th:text="${#lists.size(activeTodos)}">0</strong>
+                </div>
+
+                <div class="sy-todo-list sy-todo-list-active" id="syTodoActiveList">
+                    <article class="sy-todo-item sy-todo-detail-trigger"
+                             th:each="todo : ${activeTodos}"
+                             th:attr="data-title=${todo.title},
+                                      data-todo-num=${todo.todo_num},
+                                      data-category-num=${todo.todo_category_num},
+                                      data-category=${todo.category_name != null ? todo.category_name : '카테고리 없음'},
+                                      data-deadline=${!#strings.isEmpty(todo.deadlineText) ? todo.deadlineText : '일정 없음'},
+                                      data-deadline-raw=${todo.deadlineText},
+                                      data-content=${todo.content != null and !#strings.isEmpty(todo.content) ? todo.content : '메모 없음'},
+                                      data-priority=${todo.priorityLabel},
+                                      data-priority-value=${todo.priority}">
+                        <form th:action="@{/member/todos/toggle}" method="post" class="sy-todo-check-form">
+                            <input type="hidden" name="sort" th:value="${todoSort}">
+                            <input type="hidden" name="todo_num" th:value="${todo.todo_num}">
+                            <input type="hidden" name="complete" value="2">
+                            <button class="sy-todo-check" type="submit" aria-label="완료 처리"><span></span></button>
+                        </form>
+
+                        <div class="sy-todo-body">
+                            <strong th:text="${todo.title}">캘린더 API 연결</strong>
+                            <span class="sy-todo-date" th:if="${!#strings.isEmpty(todo.deadlineText)}"
+                                  th:text="${todo.deadlineText}">2026-07-11</span>
+                        </div>
+
+                        <div class="sy-todo-meta">
+                            <span class="sy-todo-category"
+                                  th:if="${todo.category_name != null}"
+                                  th:style="'--todo-color:' + ${todo.categoryColor}"
+                                  th:text="${todo.category_name}">업무</span>
+                            <span class="sy-todo-priority"
+                                  th:classappend="${todo.priorityClass}"
+                                  th:text="${todo.priorityLabel}">보통</span>
+                        </div>
+
+                        <form th:action="@{/member/todos/delete}" method="post" class="sy-todo-delete-form">
+                            <input type="hidden" name="sort" th:value="${todoSort}">
+                            <input type="hidden" name="todo_num" th:value="${todo.todo_num}">
+                            <button type="submit" aria-label="할 일 삭제">x</button>
+                        </form>
+                    </article>
+
+                    <div class="sy-todo-empty" id="syTodoActiveEmpty" th:if="${#lists.isEmpty(activeTodos)}">
+                        진행 중인 일정이 없습니다.
+                    </div>
+                </div>
+
+                <details class="sy-todo-completed" id="syTodoCompleted">
+                    <summary>
+                        <span>완료</span>
+                        <strong id="syTodoCompletedCount" th:text="${#lists.size(completedTodos)}">0</strong>
+                        <span class="sy-todo-completed-arrow">&gt;</span>
+                    </summary>
+
+                    <div class="sy-todo-list sy-todo-list-completed" id="syTodoCompletedList">
+                        <article class="sy-todo-item done sy-todo-detail-trigger"
+                                 th:each="todo : ${completedTodos}"
+                                 th:attr="data-title=${todo.title},
+                                          data-todo-num=${todo.todo_num},
+                                          data-category-num=${todo.todo_category_num},
+                                          data-category=${todo.category_name != null ? todo.category_name : '카테고리 없음'},
+                                          data-deadline=${!#strings.isEmpty(todo.deadlineText) ? todo.deadlineText : '일정 없음'},
+                                          data-deadline-raw=${todo.deadlineText},
+                                          data-content=${todo.content != null and !#strings.isEmpty(todo.content) ? todo.content : '메모 없음'},
+                                          data-priority=${todo.priorityLabel},
+                                          data-priority-value=${todo.priority}">
+                            <form th:action="@{/member/todos/toggle}" method="post" class="sy-todo-check-form">
+                                <input type="hidden" name="sort" th:value="${todoSort}">
+                                <input type="hidden" name="todo_num" th:value="${todo.todo_num}">
+                                <input type="hidden" name="complete" value="1">
+                                <button class="sy-todo-check checked" type="submit" aria-label="미완료 처리"><span></span></button>
+                            </form>
+
+                            <div class="sy-todo-body">
+                                <strong th:text="${todo.title}">완료된 일정</strong>
+                                <span class="sy-todo-date" th:if="${!#strings.isEmpty(todo.deadlineText)}"
+                                      th:text="${todo.deadlineText}">2026-07-11</span>
+                            </div>
+
+                            <div class="sy-todo-meta">
+                                <span class="sy-todo-category"
+                                      th:if="${todo.category_name != null}"
+                                      th:style="'--todo-color:' + ${todo.categoryColor}"
+                                      th:text="${todo.category_name}">업무</span>
+                                <span class="sy-todo-priority"
+                                      th:classappend="${todo.priorityClass}"
+                                      th:text="${todo.priorityLabel}">보통</span>
+                            </div>
+
+                            <form th:action="@{/member/todos/delete}" method="post" class="sy-todo-delete-form">
+                                <input type="hidden" name="sort" th:value="${todoSort}">
+                                <input type="hidden" name="todo_num" th:value="${todo.todo_num}">
+                                <button type="submit" aria-label="할 일 삭제">x</button>
+                            </form>
+                        </article>
+                    </div>
+                </details>
+            </div>
+        </section>
+    </div>
+
+    <div class="sy-todo-modal-overlay" id="syTodoModalOverlay">
+        <div class="sy-todo-modal" role="dialog" aria-modal="true" aria-labelledby="syTodoModalTitle">
+            <button class="sy-todo-modal-close" id="syTodoModalClose" type="button" aria-label="닫기">x</button>
+
+            <div class="sy-todo-detail-view" id="syTodoDetailView">
+                <h3 id="syTodoModalTitle">제목</h3>
+                <dl>
+                    <div>
+                        <dt>카테고리</dt>
+                        <dd id="syTodoModalCategory">카테고리 없음</dd>
+                    </div>
+                    <div>
+                        <dt>일정시간</dt>
+                        <dd id="syTodoModalDeadline">일정 없음</dd>
+                    </div>
+                    <div>
+                        <dt>우선순위</dt>
+                        <dd id="syTodoModalPriority">보통</dd>
+                    </div>
+                    <div class="full">
+                        <dt>메모</dt>
+                        <dd id="syTodoModalContent">메모 없음</dd>
+                    </div>
+                </dl>
+                <div class="sy-todo-modal-actions">
+                    <button type="button" class="sy-mypage-btn primary" id="syTodoEditOpen">수정</button>
+                </div>
+            </div>
+
+            <form th:action="@{/member/todos/update}" method="post" class="sy-todo-edit-form" id="syTodoEditForm">
+                <input type="hidden" name="sort" th:value="${todoSort}">
+                <input type="hidden" name="todo_num" id="syTodoEditNum">
+                <label>
+                    <span>제목</span>
+                    <input type="text" name="title" id="syTodoEditTitle" maxlength="200" required>
+                </label>
+                <label>
+                    <span>카테고리</span>
+                    <select name="todo_category_num" id="syTodoEditCategoryNum">
+                        <option value="">카테고리 없음</option>
+                        <option th:each="c : ${todoCategories}"
+                                th:value="${c.todo_category_num}"
+                                th:text="${c.category_name}">업무</option>
+                    </select>
+                </label>
+                <label>
+                    <span>일정시간</span>
+                    <input type="date" name="deadlineText" id="syTodoEditDeadline" th:min="${todayText}">
+                </label>
+                <label>
+                    <span>우선순위</span>
+                    <select name="priority" id="syTodoEditPriority">
+                        <option value="1">낮음</option>
+                        <option value="2">보통</option>
+                        <option value="3">높음</option>
+                    </select>
+                </label>
+                <label class="full">
+                    <span>메모</span>
+                    <textarea name="content" id="syTodoEditContent" maxlength="1000"></textarea>
+                </label>
+                <div class="sy-todo-modal-actions">
+                    <button type="button" class="sy-mypage-btn" id="syTodoEditCancel">취소</button>
+                    <button type="submit" class="sy-mypage-btn primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <th:block th:insert="~{fragments/chatbot::chatbot}"></th:block>
+</div>
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/chatbot.js}"></script>
+<script>
+    (function () {
+        var overlay = document.getElementById('syTodoModalOverlay');
+        if (!overlay) return;
+
+        var detailView = document.getElementById('syTodoDetailView');
+        var editForm = document.getElementById('syTodoEditForm');
+        var title = document.getElementById('syTodoModalTitle');
+        var category = document.getElementById('syTodoModalCategory');
+        var deadline = document.getElementById('syTodoModalDeadline');
+        var priority = document.getElementById('syTodoModalPriority');
+        var content = document.getElementById('syTodoModalContent');
+        var closeBtn = document.getElementById('syTodoModalClose');
+        var editOpen = document.getElementById('syTodoEditOpen');
+        var editCancel = document.getElementById('syTodoEditCancel');
+        var currentItem = null;
+
+        function csrfOptions(method) {
+            var headerMeta = document.querySelector('meta[name="csrf-header"]');
+            var tokenMeta = document.querySelector('meta[name="csrf-token"]');
+            var opts = { method: method || 'POST', credentials: 'same-origin' };
+            if (headerMeta && tokenMeta) {
+                opts.headers = {};
+                opts.headers[headerMeta.content] = tokenMeta.content;
+            }
+            return opts;
+        }
+
+        function itemList(done) {
+            return done ? document.getElementById('syTodoCompletedList') : document.getElementById('syTodoActiveList');
+        }
+
+        function updateCounts() {
+            var activeCount = document.querySelectorAll('#syTodoActiveList .sy-todo-item').length;
+            var completedCount = document.querySelectorAll('#syTodoCompletedList .sy-todo-item').length;
+            var activeCountEl = document.getElementById('syTodoActiveCount');
+            var completedCountEl = document.getElementById('syTodoCompletedCount');
+            var activeEmpty = document.getElementById('syTodoActiveEmpty');
+            if (activeCountEl) activeCountEl.textContent = activeCount;
+            if (completedCountEl) completedCountEl.textContent = completedCount;
+            if (activeEmpty) activeEmpty.style.display = activeCount === 0 ? '' : 'none';
+        }
+
+        function openDetail(item) {
+            currentItem = item;
+            title.textContent = item.dataset.title || '';
+            category.textContent = item.dataset.category || '카테고리 없음';
+            deadline.textContent = item.dataset.deadline || '일정 없음';
+            priority.textContent = item.dataset.priority || '보통';
+            content.textContent = item.dataset.content || '메모 없음';
+            detailView.style.display = '';
+            editForm.style.display = 'none';
+            overlay.classList.add('open');
+        }
+
+        function bindDetail(item) {
+            item.addEventListener('click', function (event) {
+                if (event.target.closest('form') || event.target.closest('button')) return;
+                openDetail(item);
+            });
+        }
+
+        document.querySelectorAll('.sy-todo-detail-trigger').forEach(bindDetail);
+
+        document.querySelectorAll('.sy-todo-check-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                fetch(form.action, Object.assign(csrfOptions('POST'), { body: new FormData(form) }))
+                    .then(function () {
+                        var item = form.closest('.sy-todo-item');
+                        var completeInput = form.querySelector('input[name="complete"]');
+                        var check = form.querySelector('.sy-todo-check');
+                        var nextComplete = completeInput.value;
+                        var done = nextComplete === '2';
+
+                        item.classList.toggle('done', done);
+                        check.classList.toggle('checked', done);
+                        completeInput.value = done ? '1' : '2';
+                        itemList(done).appendChild(item);
+                        updateCounts();
+                    });
+            });
+        });
+
+        document.querySelectorAll('.sy-todo-delete-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                fetch(form.action, Object.assign(csrfOptions('POST'), { body: new FormData(form) }))
+                    .then(function () {
+                        form.closest('.sy-todo-item').remove();
+                        updateCounts();
+                    });
+            });
+        });
+
+        if (editOpen) {
+            editOpen.addEventListener('click', function () {
+                if (!currentItem) return;
+                document.getElementById('syTodoEditNum').value = currentItem.dataset.todoNum || '';
+                document.getElementById('syTodoEditTitle').value = currentItem.dataset.title || '';
+                document.getElementById('syTodoEditCategoryNum').value = currentItem.dataset.categoryNum || '';
+                document.getElementById('syTodoEditDeadline').value = currentItem.dataset.deadlineRaw || '';
+                document.getElementById('syTodoEditPriority').value = currentItem.dataset.priorityValue || '2';
+                document.getElementById('syTodoEditContent').value = currentItem.dataset.content === '메모 없음' ? '' : (currentItem.dataset.content || '');
+                detailView.style.display = 'none';
+                editForm.style.display = 'grid';
+            });
+        }
+
+        if (editCancel) {
+            editCancel.addEventListener('click', function () {
+                editForm.style.display = 'none';
+                detailView.style.display = '';
+            });
+        }
+
+        function close() {
+            overlay.classList.remove('open');
+        }
+
+        overlay.addEventListener('click', function (event) {
+            if (event.target === overlay) close();
+        });
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') close();
+        });
+    })();
+</script>
+</body>
+</html>

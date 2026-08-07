@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <title>팀 초대 - TeamSync</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --violet: #8f65f6;
+            --rose: #e46aa1;
+            --green: #34b77b;
+            --orange: #f0a04b;
+            --muted: #7b7394;
+            --line: #e8e1fb;
+            --ink: #1e1635;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(108,92,231,.18) 0%, transparent 45%),
+                radial-gradient(circle at 85% 15%, rgba(228,106,161,.16) 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(143,101,246,.14) 0%, transparent 50%),
+                linear-gradient(160deg, #f7f6fb 0%, #efeaff 100%);
+        }
+
+        /* 도트그리드 텍스처 */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(108,92,231,.18) 1px, transparent 1px);
+            background-size: 26px 26px;
+            opacity: .5;
+            pointer-events: none;
+        }
+
+        /* 떠다니는 블러 오브 */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(4px);
+            opacity: .55;
+            pointer-events: none;
+            animation: floatOrb 9s ease-in-out infinite;
+        }
+        .orb1 {
+            width: 260px; height: 260px;
+            background: radial-gradient(circle, rgba(108,92,231,.55), transparent 70%);
+            top: -60px; left: -60px;
+            animation-delay: 0s;
+        }
+        .orb2 {
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(228,106,161,.5), transparent 70%);
+            bottom: -70px; right: -40px;
+            animation-delay: 2.4s;
+        }
+        .orb3 {
+            width: 160px; height: 160px;
+            background: radial-gradient(circle, rgba(143,101,246,.5), transparent 70%);
+            top: 55%; right: 8%;
+            animation-delay: 4.6s;
+        }
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(18px, -22px) scale(1.06); }
+        }
+
+        .brandMark {
+            position: absolute;
+            top: 32px;
+            left: 32px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-size: 17px;
+            color: var(--ink);
+            z-index: 2;
+        }
+        .brandMark .tsIcon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--violet));
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 900;
+            box-shadow: 0 8px 20px rgba(108,92,231,.3);
+        }
+
+        .inviteCard {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 440px;
+            background: rgba(255,255,255,.72);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 1px solid rgba(255,255,255,.6);
+            border-radius: 28px;
+            box-shadow: 0 30px 80px rgba(73,47,133,.22);
+            padding: 46px 36px;
+            text-align: center;
+            animation: cardIn .5s cubic-bezier(.2,.8,.2,1);
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(16px) scale(.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .inviteIcon {
+            width: 76px; height: 76px;
+            border-radius: 22px;
+            margin: 0 auto 22px;
+            background: linear-gradient(135deg, var(--primary), var(--violet));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 14px 30px rgba(108,92,231,.35);
+        }
+        .inviteCard h1 {
+            font-size: 22px; font-weight: 950; margin-bottom: 10px;
+            color: var(--ink); letter-spacing: -.03em;
+        }
+        .inviteCard h1 span { color: var(--primary); }
+        .inviteCard p {
+            font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.6;
+        }
+
+        .inviteActions { display: flex; flex-direction: column; gap: 10px; }
+        .ibtn {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 13px 18px;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: #42485b;
+            background: rgba(255,255,255,.9);
+            transition: .15s;
+            font-family: inherit;
+        }
+        .ibtn:hover { transform: translateY(-1px); }
+        .ibtn.primary {
+            background: linear-gradient(135deg, var(--primary), #7476ff);
+            border: 0; color: #fff;
+            box-shadow: 0 12px 26px rgba(86,87,245,.3);
+        }
+        .ibtn.danger { background: transparent; border-color: #f3d9e2; color: #c4457a; }
+        .ibtn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+        .ibtn[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
+    </style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="brandMark">
+    <span class="tsIcon">TS</span>
+    <span>TeamSync</span>
+</div>
+
+<div class="inviteCard">
+
+    <!-- 수락/거절 가능 -->
+    <th:block th:if="${emailInviteStatus == 'OK'}">
+        <div class="inviteIcon">✉️</div>
+        <h1><span th:text="${teamName}">팀</span>에 초대받았습니다</h1>
+        <p>아래 버튼을 눌러 초대에 응답해주세요.</p>
+        <div class="inviteActions">
+            <button type="button" id="acceptBtn" class="ibtn primary" onclick="tsAcceptInvite()">수락하기</button>
+            <button type="button" id="rejectBtn" class="ibtn danger" onclick="tsRejectInvite()">거절하기</button>
+            <a class="ibtn ghost" th:href="@{/main/home}">나중에 할게요</a>
+        </div>
+    </th:block>
+
+    <!-- 이미 참여 중 -->
+    <th:block th:if="${emailInviteStatus == 'ALREADY_JOINED'}">
+        <div class="inviteIcon">✅</div>
+        <h1>이미 참여 중인 팀입니다</h1>
+        <p><span th:text="${teamName}">팀</span>에 이미 소속되어 있어요.</p>
+        <div class="inviteActions">
+            <a class="ibtn primary" th:href="@{/main/home}">내 홈으로</a>
+        </div>
+    </th:block>
+
+    <!-- 이미 거절함 -->
+    <th:block th:if="${emailInviteStatus == 'REJECTED'}">
+        <div class="inviteIcon">🙅</div>
+        <h1>이미 거절한 초대입니다</h1>
+        <p><span th:text="${teamName}">팀</span> 초대를 이미 거절했어요.</p>
+        <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+    </th:block>
+
+    <!-- 만료 -->
+    <th:block th:if="${emailInviteStatus == 'EXPIRED'}">
+        <div class="inviteIcon">⏰</div>
+        <h1>만료된 초대입니다</h1>
+        <p>이 초대는 유효기간이 지났어요. 팀장에게 재초대를 요청해주세요.</p>
+        <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+    </th:block>
+
+    <!-- 상태 이상(취소 등) -->
+    <th:block th:if="${emailInviteStatus == 'NOT_PENDING'}">
+        <div class="inviteIcon">❓</div>
+        <h1>더 이상 유효하지 않은 초대입니다</h1>
+        <p>초대가 취소되었거나 이미 처리되었어요.</p>
+        <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+    </th:block>
+
+    <!-- 초대 없음 -->
+    <th:block th:if="${emailInviteStatus == 'NOTFOUND'}">
+        <div class="inviteIcon">❓</div>
+        <h1>유효하지 않은 초대입니다</h1>
+        <p>초대 링크가 올바르지 않아요. 링크를 다시 확인해주세요.</p>
+        <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+    </th:block>
+
+    <!-- 다른 계정으로 로그인 중 -->
+    <th:block th:if="${emailInviteStatus == 'WRONG_USER'}">
+        <div class="inviteIcon">🚫</div>
+        <h1>올바르지 않은 접근입니다</h1>
+        <p>이 초대는 현재 로그인된 계정으로 발송된 초대가 아닙니다.<br>초대받은 이메일 계정으로 로그인해주세요.</p>
+        <div class="inviteActions"><a class="ibtn primary" th:href="@{/main/home}">내 홈으로</a></div>
+    </th:block>
+
+</div>
+
+<input type="hidden" id="invitationNum" th:value="${invitationNum}">
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script>
+function tsCsrf(xhr) {
+    var hMeta = document.querySelector('meta[name="csrf-header"]');
+    var tMeta = document.querySelector('meta[name="csrf-token"]');
+    if (hMeta && tMeta) xhr.setRequestHeader(hMeta.content, tMeta.content);
+}
+
+function tsSetButtonsDisabled(disabled) {
+    var a = document.getElementById('acceptBtn');
+    var r = document.getElementById('rejectBtn');
+    if (a) a.disabled = disabled;
+    if (r) r.disabled = disabled;
+}
+
+function tsAcceptInvite() {
+    var invitationNum = document.getElementById('invitationNum').value;
+    tsSetButtonsDisabled(true);
+
+    $.ajax({
+        url: '/team/invite/email/accept',
+        type: 'POST',
+        data: { invitationNum: invitationNum },
+        beforeSend: tsCsrf
+    })
+    .done(function (res) {
+        if (res === 'OK') {
+            location.href = '/main/home?invite=accepted';
+        } else if (res === 'ALREADY_JOINED') {
+            alert('이미 참여 중인 팀입니다.');
+            location.href = '/main/home';
+        } else if (res === 'EXPIRED') {
+            alert('만료된 초대입니다.'); location.reload();
+        } else if (res === 'NOT_PENDING') {
+            alert('이미 처리된 초대입니다.'); location.reload();
+        } else {
+            alert('수락 처리에 실패했습니다. (' + res + ')');
+            tsSetButtonsDisabled(false);
+        }
+    })
+    .fail(function () {
+        alert('수락 처리 중 오류가 발생했습니다.');
+        tsSetButtonsDisabled(false);
+    });
+}
+
+function tsRejectInvite() {
+    if (!confirm('정말 초대를 거절하시겠습니까?')) return;
+    var invitationNum = document.getElementById('invitationNum').value;
+    tsSetButtonsDisabled(true);
+
+    $.ajax({
+        url: '/team/invite/email/reject',
+        type: 'POST',
+        data: { invitationNum: invitationNum },
+        beforeSend: tsCsrf
+    })
+    .done(function (res) {
+        if (res === 'OK') {
+            location.href = '/main/home?invite=rejected';
+        } else if (res === 'NOT_PENDING') {
+            alert('이미 처리된 초대입니다.'); location.reload();
+        } else {
+            alert('거절 처리에 실패했습니다. (' + res + ')');
+            tsSetButtonsDisabled(false);
+        }
+    })
+    .fail(function () {
+        alert('거절 처리 중 오류가 발생했습니다.');
+        tsSetButtonsDisabled(false);
+    });
+}
+</script>
+</body>
+</html>

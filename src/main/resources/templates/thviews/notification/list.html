@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+    <title>notification</title>
+    <th:block layout:fragment="pageCss">
+        <link rel="stylesheet" th:href="@{/assets/css/JW/notification-list.css}">
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content" th:with="currentMenu='notification'">
+
+    <div class="noti-page">
+        <div class="noti-card">
+
+            <!-- 상단 헤더 -->
+            <div class="noti-page-hd">
+                <div>
+                    <div class="tt">🔔 알림</div>
+                    <div class="sub">팀 활동 및 주요 이벤트 알림을 확인하세요.</div>
+                </div>
+                <div class="noti-hd-actions">
+                    <span class="noti-unread-pill" id="notiPageUnreadPill"
+                          th:classappend="${unreadNotiCount == 0} ? ' zero' : ''"
+                          th:text="${unreadNotiCount} + '개 미읽음'">0개 미읽음</span>
+                    <button class="noti-btn" id="notiPageReadAll" type="button"
+                            th:disabled="${unreadNotiCount == 0}">✓ 모두 읽음</button>
+                    <button class="noti-btn noti-btn-danger" id="notiPageDeleteAll" type="button"
+                            th:disabled="${#lists.isEmpty(notifications)}">전체 삭제</button>
+                </div>
+            </div>
+
+            <!-- 카테고리 탭 -->
+            <div class="noti-tabs" id="notiTabs">
+                <button class="noti-tab active" type="button" data-filter="all">전체</button>
+                <button class="noti-tab" type="button" data-filter="1">📅 일정</button>
+                <button class="noti-tab" type="button" data-filter="2">💬 채팅</button>
+                <button class="noti-tab" type="button" data-filter="3">📋 칸반</button>
+                <button class="noti-tab" type="button" data-filter="4">👥 팀</button>
+                <button class="noti-tab" type="button" data-filter="5">📢 공지</button>
+                <button class="noti-tab" type="button" data-filter="unread">🔴 미읽음</button>
+            </div>
+
+            <!-- 목록 -->
+            <div class="noti-list" id="notiList">
+
+                <th:block th:each="n, iter : ${notifications}">
+                    <div class="noti-date-group"
+                         th:if="${iter.index == 0 or n.dateLabel != notifications[iter.index - 1].dateLabel}"
+                         th:text="${n.dateLabel}"></div>
+
+                    <div class="noti-item"
+                         th:classappend="${(n.read ? '' : 'unread') + ' ' + n.typeClass}"
+                         th:attr="data-noti-num=${n.noti_num},data-type=${n.noti_type},data-read=${n.read}">
+                        <div class="ico" th:text="${n.icon}">🔔</div>
+                        <div class="body">
+                            <div>
+                                <span class="badge" th:text="${n.typeLabel}">알림</span>
+                                <span class="title" th:text="${n.title}">제목</span>
+                            </div>
+                            <div class="desc" th:text="${n.content}">내용</div>
+                            <div class="meta">
+                                <span th:text="${n.timeText}">방금 전</span>
+                                <span class="dvd">·</span>
+                                <span th:text="${n.senderName}">발신자</span>
+                                <th:block th:if="${n.teamName != null}">
+                                    <span class="dvd">·</span>
+                                    <span class="team" th:text="${n.teamName}">팀</span>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-detail" type="button">상세</button>
+                            <button class="btn-delete" type="button" title="알림 삭제">✕</button>
+                        </div>
+                        <span class="dot"></span>
+                    </div>
+                </th:block>
+
+                <div class="noti-page-empty" id="notiPageEmpty" th:if="${#lists.isEmpty(notifications)}">
+                    <div class="t">받은 알림이 없습니다.</div>
+                    <div class="s">새로운 팀 활동이 있으면 여기에 표시됩니다.</div>
+                </div>
+
+                <div class="noti-page-empty" id="notiFilterEmpty" style="display:none;">
+                    <div class="t">해당 카테고리의 알림이 없습니다.</div>
+                    <div class="s">다른 카테고리를 선택해 보세요.</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<th:block layout:fragment="pageJs">
+<script th:inline="javascript">
+    (function () {
+        var list       = document.getElementById('notiList');
+        var tabs       = document.getElementById('notiTabs');
+        var readAllBtn = document.getElementById('notiPageReadAll');
+        var delAllBtn  = document.getElementById('notiPageDeleteAll');
+        var unreadPill = document.getElementById('notiPageUnreadPill');
+        var pageEmpty  = document.getElementById('notiPageEmpty');
+        var filterEmpty= document.getElementById('notiFilterEmpty');
+        if (!list) return;
+
+        function csrfOptions(method) {
+            var headerMeta = document.querySelector('meta[name="csrf-header"]');
+            var tokenMeta  = document.querySelector('meta[name="csrf-token"]');
+            var opts = { method: method || 'POST' };
+            if (headerMeta && tokenMeta) {
+                opts.headers = {};
+                opts.headers[headerMeta.content] = tokenMeta.content;
+            }
+            return opts;
+        }
+
+        function items() {
+            return Array.prototype.slice.call(list.querySelectorAll('.noti-item'));
+        }
+
+        function updateUnreadPill() {
+            var unreadCount = items().filter(function (it) {
+                return it.getAttribute('data-read') === 'false';
+            }).length;
+
+            unreadPill.textContent = unreadCount + '개 미읽음';
+            unreadPill.classList.toggle('zero', unreadCount === 0);
+            readAllBtn.disabled = (unreadCount === 0);
+
+            // 헤더 드롭다운 배지도 함께 갱신
+            var headerBadge = document.getElementById('notiBadge');
+            var headerCnt   = document.getElementById('notiCnt');
+            if (headerBadge) {
+                headerBadge.textContent = unreadCount;
+                headerBadge.classList.toggle('hide', unreadCount === 0);
+            }
+            if (headerCnt) headerCnt.textContent = unreadCount + '개 미읽음';
+        }
+
+        function updateEmptyStates() {
+            var total = items().length;
+            delAllBtn.disabled = (total === 0);
+            if (pageEmpty) pageEmpty.style.display = (total === 0) ? '' : 'none';
+        }
+
+        function currentFilter() {
+            var active = tabs.querySelector('.noti-tab.active');
+            return active ? active.getAttribute('data-filter') : 'all';
+        }
+
+        // ── 카테고리 탭 필터링 ──
+        function applyFilter(filter) {
+            var groupEls = Array.prototype.slice.call(list.children);
+            var currentGroup = null;
+            var groupHasVisible = false;
+            var anyVisible = false;
+
+            function closeGroup() {
+                if (currentGroup) currentGroup.classList.toggle('hide', !groupHasVisible);
+            }
+
+            groupEls.forEach(function (el) {
+                if (el.classList.contains('noti-date-group')) {
+                    closeGroup();
+                    currentGroup = el;
+                    groupHasVisible = false;
+                    return;
+                }
+                if (el.classList.contains('noti-item')) {
+                    var show = true;
+                    if (filter === 'unread') {
+                        show = el.getAttribute('data-read') === 'false';
+                    } else if (filter !== 'all') {
+                        show = el.getAttribute('data-type') === filter;
+                    }
+                    el.classList.toggle('hide', !show);
+                    if (show) { groupHasVisible = true; anyVisible = true; }
+                }
+            });
+            closeGroup();
+
+            if (filterEmpty) {
+                var totalItems = items().length;
+                filterEmpty.style.display = (totalItems > 0 && !anyVisible) ? '' : 'none';
+            }
+        }
+
+        tabs.addEventListener('click', function (e) {
+            var btn = e.target.closest('.noti-tab');
+            if (!btn) return;
+            tabs.querySelectorAll('.noti-tab').forEach(function (t) { t.classList.remove('active'); });
+            btn.classList.add('active');
+            applyFilter(btn.getAttribute('data-filter'));
+        });
+
+        // ── 상세 팝업 열기 (읽음 처리는 팝업 오픈 시 서버에서 함께 처리) ──
+        list.addEventListener('click', function (e) {
+            var detailBtn = e.target.closest('.btn-detail');
+            if (!detailBtn) return;
+            var item = detailBtn.closest('.noti-item');
+            if (!item) return;
+            var num = item.getAttribute('data-noti-num');
+            if (window.TSNotiModal) window.TSNotiModal.open(num);
+        });
+
+        // ── 팝업에서 읽음 처리된 알림을 목록에도 반영 ──
+        document.addEventListener('ts:notification-read', function (e) {
+            var num = e.detail && e.detail.notiNum;
+            if (!num) return;
+            var item = list.querySelector('.noti-item[data-noti-num="' + num + '"]');
+            if (item && item.getAttribute('data-read') === 'false') {
+                item.classList.remove('unread');
+                item.setAttribute('data-read', 'true');
+                updateUnreadPill();
+            }
+        });
+
+        // ── 알림 1건 삭제 ──
+        list.addEventListener('click', function (e) {
+            var delBtn = e.target.closest('.btn-delete');
+            if (!delBtn) return;
+            var item = delBtn.closest('.noti-item');
+            if (!item) return;
+            var num = item.getAttribute('data-noti-num');
+
+            fetch('/notification/delete/' + num, csrfOptions('POST'))
+                .then(function () {
+                    var prevGroup = item.previousElementSibling;
+                    var nextGroup = item.nextElementSibling;
+                    item.remove();
+
+                    // 그룹 헤더 뒤에 남은 항목이 없으면 헤더도 제거
+                    if (prevGroup && prevGroup.classList.contains('noti-date-group')) {
+                        var stillHasItem = nextGroup && nextGroup.classList.contains('noti-item');
+                        if (!stillHasItem) prevGroup.remove();
+                    }
+
+                    updateUnreadPill();
+                    updateEmptyStates();
+                    applyFilter(currentFilter());
+                })
+                .catch(function (err) { console.error('알림 삭제 실패', err); });
+        });
+
+        // ── 모두 읽음 ──
+        readAllBtn.addEventListener('click', function () {
+            fetch('/notification/readAll', csrfOptions('POST'))
+                .then(function () {
+                    items().forEach(function (it) {
+                        it.classList.remove('unread');
+                        it.setAttribute('data-read', 'true');
+                    });
+                    updateUnreadPill();
+                })
+                .catch(function (err) { console.error('전체 읽음 처리 실패', err); });
+        });
+
+        // ── 전체 삭제 ──
+        delAllBtn.addEventListener('click', function () {
+            if (!confirm('모든 알림을 삭제할까요? 삭제한 알림은 복구할 수 없습니다.')) return;
+
+            fetch('/notification/deleteAll', csrfOptions('POST'))
+                .then(function () {
+                    list.querySelectorAll('.noti-item, .noti-date-group').forEach(function (el) {
+                        el.remove();
+                    });
+                    if (filterEmpty) filterEmpty.style.display = 'none';
+                    updateUnreadPill();
+                    updateEmptyStates();
+                })
+                .catch(function (err) { console.error('전체 삭제 실패', err); });
+        });
+    })();
+</script>
+</th:block>
+
+</body>
+</html>

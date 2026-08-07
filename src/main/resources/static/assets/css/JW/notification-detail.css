@@ -1,0 +1,70 @@
+/* ================================================
+   알림 상세 팝업 (작은 모달창)
+   header.css 의 .ts-noti-* 스타일과 세트로 사용
+   ================================================ */
+
+/* div 로 변경된 드롭다운 항목도 클릭 가능하게 표시 */
+.ts-noti-item{ cursor:pointer; }
+
+.ts-noti-modal-overlay{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(43,36,74,.35);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .18s ease;
+  padding:20px;
+}
+.ts-noti-modal-overlay.open{opacity:1;pointer-events:auto;}
+
+.ts-noti-modal{
+  position:relative;width:360px;max-width:100%;
+  background:#fff;border-radius:24px;border:1px solid var(--ts-line);
+  box-shadow:0 30px 70px rgba(73,47,133,.28);
+  padding:28px 24px 22px;
+  transform:translateY(8px) scale(.97);
+  transition:transform .18s cubic-bezier(.34,1.4,.64,1);
+}
+.ts-noti-modal-overlay.open .ts-noti-modal{transform:none;}
+
+.ts-noti-modal-close{
+  position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:10px;
+  border:1px solid var(--ts-line);background:#fff;color:#8a839f;
+  font-size:13px;cursor:pointer;display:grid;place-items:center;
+  transition:.14s;
+}
+.ts-noti-modal-close:hover{background:#f4f0ff;color:var(--ts-primary);}
+
+.ts-noti-modal-ico{
+  width:52px;height:52px;border-radius:16px;background:#f1edff;
+  display:grid;place-items:center;font-size:24px;margin-bottom:14px;
+}
+.ts-noti-modal-badge{
+  display:inline-block;font-size:11.5px;font-weight:900;color:var(--ts-primary);
+  background:#f1edff;border-radius:8px;padding:3px 9px;margin-bottom:8px;
+}
+.ts-noti-modal-title{
+  font-size:16.5px;font-weight:950;color:var(--ts-ink);
+  letter-spacing:-.02em;line-height:1.4;margin-bottom:8px;
+  word-break:break-word;
+}
+.ts-noti-modal-content{
+  font-size:13.5px;color:#5a5274;line-height:1.6;margin-bottom:16px;
+  white-space:pre-line;word-break:break-word;
+}
+.ts-noti-modal-meta{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ts-muted);}
+.ts-noti-modal-meta .dvd{color:#c9c2df;}
+.ts-noti-modal-time{font-size:11.5px;color:#a79fc0;font-weight:800;margin-top:6px;}
+
+.ts-noti-modal-actions{display:flex;gap:8px;margin-top:20px;}
+.ts-noti-modal-actions .ts-btn{
+  flex:1;height:38px;padding:0;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;
+}
+.ts-noti-modal-go{
+  background:linear-gradient(135deg,var(--ts-primary),var(--ts-violet));
+  color:#fff;border-color:transparent;
+}
+.ts-noti-modal-go:hover{opacity:.92;transform:translateY(-1px);}
+
+@media (max-width:480px){
+  .ts-noti-modal{width:100%;}
+}

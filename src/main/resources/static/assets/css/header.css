@@ -1,0 +1,214 @@
+@charset "UTF-8";
+
+/* ================================================
+   TeamSync Header CSS
+   전역 초기화 및 변수는 공통 레이아웃 CSS를 상속받습니다.
+   ================================================ */
+
+/* --ts- 변수 기본값 - 다른 CSS 파일이 이 변수들을 정의하지 않아도
+   header.css가 항상 정상 동작하도록 자체 폴백값을 둠 */
+:root{
+  --ts-primary: #6c5ce7;
+  --ts-violet: #8f65f6;
+  --ts-ink: #1e1635;
+  --ts-muted: #7b7394;
+  --ts-line: #e8e1fb;
+  --ts-shadow: 0 16px 44px rgba(73,47,133,.12);
+}
+
+/* 1. 헤더 레이아웃 (Top Bar) */
+/* ================================================
+   TeamSync Header CSS - 본문 박스 라인 매칭 버전
+   ================================================ */
+.ts-header {
+  height: var(--ts-header-height, 74px);
+  background: rgba(255, 255, 255, .9);
+  border: 1px solid rgba(255, 255, 255, .9);
+  border-radius: 30px;
+  box-shadow: var(--ts-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% - 48px);
+  max-width: 1672px;     
+  padding: 0 24px;
+  margin: 16px auto 0 auto; 
+  
+  position: sticky;
+  top: 16px;
+  z-index: 50;
+  backdrop-filter: blur(18px);
+}
+
+/* 2. 로고 영역 (Brand) */
+.ts-brand {
+  flex-shrink: 0;
+}
+
+.ts-brand > a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 23px;
+  font-weight: 950;
+  letter-spacing: -.055em;
+  cursor: pointer;
+  color: var(--ts-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ts-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 17px;
+  background: linear-gradient(135deg, var(--ts-primary), var(--ts-violet));
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 950;
+  flex-shrink: 0;
+}
+
+/* 3. 우측 사용자 및 기능 영역 (Top Right) */
+.ts-header-right {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1vw, 12px);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ts-user-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.ts-username {
+  font-size: 13px;
+  font-weight: 850;
+  color: var(--ts-muted);
+  white-space: nowrap;
+}
+
+/* 버튼 정의 */
+.ts-btn {
+  border: 1px solid var(--ts-line);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 950;
+  background: #fff;
+  color: #42485b;
+  cursor: pointer;
+  transition: .15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.ts-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* 아바타 */
+.ts-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 15px;
+  background: #fff;
+  color: var(--ts-primary);
+  display: grid;
+  place-items: center;
+  font-weight: 950;
+  border: 1px solid var(--ts-line);
+  font-size: 16px;
+  /*cursor: pointer;*/
+  flex-shrink: 0;
+}
+
+/* 4. 알림 아이콘 버튼 */
+.ts-icon-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: #fff;
+  border: 1px solid var(--ts-line);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+/* ================================================
+   알림 드롭다운 (헤더 종 아이콘)
+   ================================================ */
+.ts-noti{position:relative;flex-shrink:0;}
+
+/* 종 버튼 위 미읽음 배지 */
+.ts-noti-badge{
+  position:absolute;top:-5px;right:-5px;min-width:20px;height:20px;padding:0 5px;
+  border-radius:999px;background:linear-gradient(135deg,var(--ts-primary),var(--ts-violet));
+  color:#fff;font-size:10.5px;font-weight:950;display:grid;place-items:center;
+  border:2.5px solid #fff;box-shadow:0 2px 6px rgba(108,92,231,.5);
+}
+.ts-noti-badge.hide{display:none;}
+
+/* 드롭다운 패널 */
+.ts-noti-panel{
+  position:absolute;top:calc(100% + 14px);right:0;z-index:120;
+  width:360px;max-width:calc(100vw - 48px);
+  background:rgba(255,255,255,.98);backdrop-filter:blur(20px);
+  border:1px solid var(--ts-line);border-radius:22px;
+  box-shadow:0 24px 60px rgba(73,47,133,.22);overflow:hidden;
+  opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top right;
+  pointer-events:none;transition:opacity .2s ease,transform .2s cubic-bezier(.34,1.4,.64,1);
+}
+.ts-noti.open .ts-noti-panel{opacity:1;transform:none;pointer-events:auto;}
+
+/* 패널 헤더 */
+.ts-noti-hd{display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px;border-bottom:1px solid var(--ts-line);}
+.ts-noti-hd .ttl{font-size:15px;font-weight:950;color:var(--ts-ink);letter-spacing:-.02em;}
+.ts-noti-hd .cnt{font-size:12px;font-weight:800;color:var(--ts-muted);margin-left:7px;}
+.ts-noti-readall{border:1px solid var(--ts-line);background:#fff;border-radius:11px;
+  padding:6px 11px;font-size:12px;font-weight:900;color:#5a5274;cursor:pointer;font-family:inherit;transition:.14s;}
+.ts-noti-readall:hover{background:#f4f0ff;border-color:var(--ts-violet);color:var(--ts-primary);}
+
+/* 목록 */
+.ts-noti-list{max-height:444px;overflow-y:auto;}
+.ts-noti-list::-webkit-scrollbar{width:6px;}
+.ts-noti-list::-webkit-scrollbar-thumb{background:#dcd4f0;border-radius:99px;}
+
+.ts-noti-item{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;
+  text-decoration:none;border-bottom:1px solid #f1ecfb;position:relative;transition:background .14s;}
+.ts-noti-item:last-child{border-bottom:none;}
+.ts-noti-item:hover{background:#f8f5ff;}
+.ts-noti-item .ico{width:40px;height:40px;border-radius:13px;background:#f1edff;
+  display:grid;place-items:center;font-size:19px;flex-shrink:0;}
+.ts-noti-item .body{flex:1;min-width:0;}
+.ts-noti-item .t{font-size:13.5px;font-weight:900;color:var(--ts-ink);line-height:1.4;letter-spacing:-.01em;}
+.ts-noti-item .s{font-size:12px;color:var(--ts-muted);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ts-noti-item .tm{font-size:11px;color:#a79fc0;font-weight:800;margin-top:5px;}
+.ts-noti-item .dot{position:absolute;top:18px;right:18px;width:8px;height:8px;
+  border-radius:50%;background:var(--ts-violet);flex-shrink:0;}
+.ts-noti-item:not(.unread) .dot{display:none;}
+.ts-noti-item:not(.unread) .t{font-weight:800;color:#6b6385;}
+
+/* 푸터 */
+.ts-noti-foot{display:block;text-align:center;padding:14px;border-top:1px solid var(--ts-line);
+  font-size:13px;font-weight:950;color:var(--ts-primary);text-decoration:none;transition:background .14s;}
+.ts-noti-foot:hover{background:#f6f2ff;}
+
+@media (max-width:560px){
+  .ts-noti-panel{position:fixed;top:80px;right:12px;left:12px;width:auto;max-width:none;}
+}

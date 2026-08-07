@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.notification.dao.NotificationMapper">
+
+    <!-- resultMap -->
+    <resultMap id="notificationResultMap" type="kr.spring.notification.vo.NotificationVO">
+        <id     property="noti_num"     column="NOTI_NUM"/>
+        <result property="sender_num"   column="SENDER_NUM"/>
+        <result property="receiver_num" column="RECEIVER_NUM"/>
+        <result property="team_num"     column="TEAM_NUM"/>
+        <result property="noti_type"    column="NOTI_TYPE"/>
+        <result property="title"        column="TITLE"/>
+        <result property="content"      column="CONTENT"/>
+        <result property="reg_date"     column="REG_DATE"/>
+        <result property="read_status"  column="READ_STATUS"/>
+        <result property="link"         column="LINK"/>
+        <result property="senderName"   column="SENDER_NAME"/>
+        <result property="teamName"     column="TEAM_NAME"/>
+    </resultMap>
+
+    <!-- 로그인한 사용자(수신자)의 알림 목록 조회 (최신순, 최대 30건) -->
+    <select id="selectNotificationList" parameterType="long" resultMap="notificationResultMap">
+        SELECT *
+        FROM (
+            SELECT n.NOTI_NUM, n.SENDER_NUM, n.RECEIVER_NUM, n.TEAM_NUM,
+                   n.NOTI_TYPE, n.TITLE, n.CONTENT, n.REG_DATE,
+                   n.READ_STATUS, n.LINK,
+                   u.USER_NAME AS SENDER_NAME,
+                   t.TEAM_NAME AS TEAM_NAME
+            FROM NOTIFICATION n
+            JOIN USERS u ON n.SENDER_NUM = u.USER_NUM
+            LEFT JOIN TEAM t ON n.TEAM_NUM = t.TEAM_NUM
+            WHERE n.RECEIVER_NUM = #{receiver_num}
+            ORDER BY n.REG_DATE DESC, n.NOTI_NUM DESC
+        )
+        WHERE ROWNUM &lt;= 30
+    </select>
+
+    <!-- 로그인한 사용자(수신자)의 알림 전체 목록 조회 (전체 알림 페이지용, 최신순, 최대 100건) -->
+    <select id="selectNotificationListPage" parameterType="long" resultMap="notificationResultMap">
+        SELECT *
+        FROM (
+            SELECT n.NOTI_NUM, n.SENDER_NUM, n.RECEIVER_NUM, n.TEAM_NUM,
+                   n.NOTI_TYPE, n.TITLE, n.CONTENT, n.REG_DATE,
+                   n.READ_STATUS, n.LINK,
+                   u.USER_NAME AS SENDER_NAME,
+                   t.TEAM_NAME AS TEAM_NAME
+            FROM NOTIFICATION n
+            JOIN USERS u ON n.SENDER_NUM = u.USER_NUM
+            LEFT JOIN TEAM t ON n.TEAM_NUM = t.TEAM_NUM
+            WHERE n.RECEIVER_NUM = #{receiver_num}
+            ORDER BY n.REG_DATE DESC, n.NOTI_NUM DESC
+        )
+        WHERE ROWNUM &lt;= 100
+    </select>
+
+    <!-- 알림 1건 상세 조회 (본인이 받은 알림만, 상세 팝업용) -->
+    <select id="selectNotificationDetail" resultMap="notificationResultMap">
+        SELECT n.NOTI_NUM, n.SENDER_NUM, n.RECEIVER_NUM, n.TEAM_NUM,
+               n.NOTI_TYPE, n.TITLE, n.CONTENT, n.REG_DATE,
+               n.READ_STATUS, n.LINK,
+               u.USER_NAME AS SENDER_NAME,
+               t.TEAM_NAME AS TEAM_NAME
+        FROM NOTIFICATION n
+        JOIN USERS u ON n.SENDER_NUM = u.USER_NUM
+        LEFT JOIN TEAM t ON n.TEAM_NUM = t.TEAM_NUM
+        WHERE n.NOTI_NUM = #{noti_num}
+          AND n.RECEIVER_NUM = #{receiver_num}
+    </select>
+
+    <!-- 안읽은 알림 개수 (1=안읽음) -->
+    <select id="selectUnreadCount" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM NOTIFICATION
+        WHERE RECEIVER_NUM = #{receiver_num}
+          AND READ_STATUS = 1
+    </select>
+
+    <!-- 알림 1건 등록 -->
+    <insert id="insertNotification" parameterType="kr.spring.notification.vo.NotificationVO">
+        <selectKey keyProperty="noti_num" resultType="long" order="BEFORE">
+            SELECT SEQ_NOTIFICATION.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO NOTIFICATION (
+            NOTI_NUM, SENDER_NUM, RECEIVER_NUM, TEAM_NUM,
+            NOTI_TYPE, TITLE, CONTENT, REG_DATE, READ_STATUS, LINK
+        ) VALUES (
+            #{noti_num}, #{sender_num}, #{receiver_num}, #{team_num},
+            #{noti_type}, #{title}, #{content}, SYSDATE, 1, #{link, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 알림 1건 읽음 처리 (본인이 받은 알림만, 1=안읽음 -> 2=읽음) -->
+    <update id="updateRead">
+        UPDATE NOTIFICATION
+        SET READ_STATUS = 2
+        WHERE NOTI_NUM = #{noti_num}
+          AND RECEIVER_NUM = #{receiver_num}
+    </update>
+
+    <!-- 수신자의 전체 알림 읽음 처리 -->
+    <update id="updateReadAll" parameterType="long">
+        UPDATE NOTIFICATION
+        SET READ_STATUS = 2
+        WHERE RECEIVER_NUM = #{receiver_num}
+          AND READ_STATUS = 1
+    </update>
+
+    <!-- 알림 1건 삭제 (본인이 받은 알림만) -->
+    <delete id="deleteNotification">
+        DELETE FROM NOTIFICATION
+        WHERE NOTI_NUM = #{noti_num}
+          AND RECEIVER_NUM = #{receiver_num}
+    </delete>
+
+    <!-- 수신자의 전체 알림 삭제 -->
+    <delete id="deleteAllNotification" parameterType="long">
+        DELETE FROM NOTIFICATION
+        WHERE RECEIVER_NUM = #{receiver_num}
+    </delete>
+
+</mapper>

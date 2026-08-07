@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<th:block th:fragment="header">
+<header class="ts-header">
+
+    <!-- 로고 -->
+    <div class="ts-brand">
+        <a th:href="@{/team/dashboard}">
+            <div class="ts-mark">TS</div>
+            <span>TeamSync</span>
+        </a>
+    </div>
+
+    <!-- 우측 영역 -->
+    <div class="ts-header-right">
+
+        <!-- 알림 (종 + 드롭다운) -->
+        <div class="ts-noti" id="notiWrap" sec:authorize="isAuthenticated()">
+            <button class="ts-icon-btn" id="notiBtn" type="button" aria-label="알림">
+                <span>🔔</span>
+                <span class="ts-noti-badge" id="notiBadge"
+                      th:text="${unreadNotiCount}"
+                      th:classappend="${unreadNotiCount == 0} ? ' hide' : ''">5</span>
+            </button>
+
+            <div class="ts-noti-panel" id="notiPanel">
+                <div class="ts-noti-hd">
+                    <div>
+                        <span class="ttl">알림</span>
+                        <span class="cnt" id="notiCnt" th:text="${unreadNotiCount} + '개 미읽음'">5개 미읽음</span>
+                    </div>
+                    <button class="ts-noti-readall" id="notiReadAll" type="button">모두 읽음</button>
+                </div>
+
+                <div class="ts-noti-list">
+
+                    <div class="ts-noti-item" th:each="n : ${notifications}"
+                         th:classappend="${!n.read} ? ' unread' : ''"
+                         th:attr="data-notification-num=${n.noti_num}"
+                         tabindex="0" role="button">
+                        <div class="ico" th:text="${n.icon}">알림</div>
+                        <div class="body">
+                            <div class="t" th:text="${n.title}">제목</div>
+                            <div class="s" th:text="${n.content}">부가 설명</div>
+                            <div class="tm" th:text="${n.timeText}">방금 전</div>
+                        </div>
+                        <span class="dot"></span>
+                    </div>
+
+                    <div class="ts-noti-empty" th:if="${#lists.isEmpty(notifications)}">
+                        받은 알림이 없습니다.
+                    </div>
+
+                </div>
+
+                <a class="ts-noti-foot" th:href="@{/member/notifications}">전체 알림 보기 →</a>
+            </div>
+        </div>
+
+        <!-- 로그인 상태 -->
+        <th:block sec:authorize="isAuthenticated()">
+                <div class="ts-avatar"
+                     th:text="${#authentication.principal.usersVO.firstChar}"></div>
+            <a th:href="@{/member/myPage}" class="ts-user-area">
+                <span class="ts-username"
+                      th:text="${#authentication.principal.usersVO.user_name}"></span>
+            </a>
+            <form th:action="@{/member/logout}" method="post" id="frm_logout" style="display:none;"></form>
+            <button class="ts-btn" id="btn-logout">로그아웃</button>
+        </th:block>
+
+        <!-- 비로그인 상태 -->
+        <th:block sec:authorize="!isAuthenticated()">
+            <a th:href="@{/member/login}" class="ts-btn">로그인</a>
+        </th:block>
+
+    </div>
+</header>
+
+<!-- 알림 상세 팝업 (작은 모달창) -->
+<div class="ts-noti-modal-overlay" id="notiModalOverlay" sec:authorize="isAuthenticated()">
+    <div class="ts-noti-modal" id="notiModal" role="dialog" aria-modal="true" aria-labelledby="notiModalTitle">
+        <button class="ts-noti-modal-close" id="notiModalClose" type="button" aria-label="닫기">✕</button>
+        <div class="ts-noti-modal-ico" id="notiModalIco">🔔</div>
+        <span class="ts-noti-modal-badge" id="notiModalType">알림</span>
+        <div class="ts-noti-modal-title" id="notiModalTitle">제목</div>
+        <div class="ts-noti-modal-content" id="notiModalContent">내용</div>
+        <div class="ts-noti-modal-meta">
+            <span id="notiModalSender">발신자</span>
+            <span class="dvd" id="notiModalTeamDvd">·</span>
+            <span id="notiModalTeam">팀</span>
+        </div>
+        <div class="ts-noti-modal-time" id="notiModalTime">방금 전</div>
+        <div class="ts-noti-modal-actions">
+            <button class="ts-btn" id="notiModalCloseBtn" type="button">닫기</button>
+            <a class="ts-btn ts-noti-modal-go" id="notiModalGo" href="#" style="display:none;">바로가기</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var lo = document.getElementById('btn-logout');
+        if (lo) lo.addEventListener('click', function () {
+            document.getElementById('frm_logout').submit();
+        });
+    })();
+
+    (function () {
+        var wrap = document.getElementById('notiWrap');
+        var btn  = document.getElementById('notiBtn');
+        if (!wrap || !btn) return;
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            wrap.classList.toggle('open');
+        });
+        document.addEventListener('click', function (e) {
+            if (!wrap.contains(e.target)) wrap.classList.remove('open');
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') wrap.classList.remove('open');
+        });
+
+        var readAll = document.getElementById('notiReadAll');
+        if (readAll) readAll.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var headerMeta = document.querySelector('meta[name="csrf-header"]');
+            var tokenMeta  = document.querySelector('meta[name="csrf-token"]');
+            var fetchOpts = { method: 'POST' };
+            if (headerMeta && tokenMeta) {
+                fetchOpts.headers = {};
+                fetchOpts.headers[headerMeta.content] = tokenMeta.content;
+            }
+
+            fetch('/notification/readAll', fetchOpts).catch(function (err) {
+                console.error('알림 읽음 처리 실패', err);
+            });
+
+            wrap.querySelectorAll('.ts-noti-item.unread').forEach(function (it) {
+                it.classList.remove('unread');
+            });
+            var cnt = document.getElementById('notiCnt');
+            if (cnt) cnt.textContent = '0개 미읽음';
+            var badge = document.getElementById('notiBadge');
+            if (badge) badge.classList.add('hide');
+        });
+
+        // 알림 항목 클릭 시 상세 팝업으로 표시 (읽음 처리는 팝업 오픈 시 서버에서 함께 처리)
+        function openNotiDetail(item) {
+            var num = item.getAttribute('data-notification-num');
+            wrap.classList.remove('open');
+            if (window.TSNotiModal) window.TSNotiModal.open(num);
+        }
+        wrap.querySelectorAll('.ts-noti-item[data-notification-num]').forEach(function (item) {
+            item.addEventListener('click', function () {
+                openNotiDetail(item);
+            });
+            item.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openNotiDetail(item);
+                }
+            });
+        });
+    })();
+
+    // 알림 상세 팝업 (헤더 드롭다운 + 알림 목록 페이지에서 공용으로 사용)
+    window.TSNotiModal = (function () {
+        var overlay = document.getElementById('notiModalOverlay');
+        if (!overlay) return { open: function () {}, close: function () {} };
+
+        var elIco     = document.getElementById('notiModalIco');
+        var elType    = document.getElementById('notiModalType');
+        var elTitle   = document.getElementById('notiModalTitle');
+        var elContent = document.getElementById('notiModalContent');
+        var elSender  = document.getElementById('notiModalSender');
+        var elTeam    = document.getElementById('notiModalTeam');
+        var elTeamDvd = document.getElementById('notiModalTeamDvd');
+        var elTime    = document.getElementById('notiModalTime');
+        var elGo      = document.getElementById('notiModalGo');
+        var closeBtn  = document.getElementById('notiModalClose');
+        var closeBtn2 = document.getElementById('notiModalCloseBtn');
+
+        function csrfOptions() {
+            var headerMeta = document.querySelector('meta[name="csrf-header"]');
+            var tokenMeta  = document.querySelector('meta[name="csrf-token"]');
+            var opts = {};
+            if (headerMeta && tokenMeta) {
+                opts.headers = {};
+                opts.headers[headerMeta.content] = tokenMeta.content;
+            }
+            return opts;
+        }
+
+        function close() {
+            overlay.classList.remove('open');
+        }
+
+        // 헤더 드롭다운의 배지/카운트/미읽음 표시를 로컬에서 갱신하고,
+        // 알림 목록 페이지가 함께 열려 있으면 그 쪽 상태도 갱신하도록 이벤트를 알린다.
+        function markLocalRead(num) {
+            var item = document.querySelector('.ts-noti-item[data-notification-num="' + num + '"]');
+            if (item && item.classList.contains('unread')) {
+                item.classList.remove('unread');
+
+                var badge = document.getElementById('notiBadge');
+                if (badge) {
+                    var n = parseInt(badge.textContent, 10);
+                    n = isNaN(n) ? 0 : Math.max(0, n - 1);
+                    badge.textContent = n;
+                    if (n === 0) badge.classList.add('hide');
+                }
+                var cnt = document.getElementById('notiCnt');
+                if (cnt) {
+                    var n2 = parseInt(cnt.textContent, 10);
+                    n2 = isNaN(n2) ? 0 : Math.max(0, n2 - 1);
+                    cnt.textContent = n2 + '개 미읽음';
+                }
+            }
+            document.dispatchEvent(new CustomEvent('ts:notification-read', { detail: { notiNum: num } }));
+        }
+
+        function open(num) {
+            fetch('/notification/' + num, csrfOptions())
+                .then(function (res) {
+                    if (!res.ok) throw new Error('알림 조회 실패: ' + res.status);
+                    return res.json();
+                })
+                .then(function (n) {
+                    elIco.textContent     = n.icon || '🔔';
+                    elType.textContent    = n.typeLabel || '알림';
+                    elTitle.textContent   = n.title || '';
+                    elContent.textContent = n.content || '';
+                    elSender.textContent  = n.senderName || '';
+
+                    if (n.teamName) {
+                        elTeam.textContent = n.teamName;
+                        elTeam.style.display = '';
+                        elTeamDvd.style.display = '';
+                    } else {
+                        elTeam.style.display = 'none';
+                        elTeamDvd.style.display = 'none';
+                    }
+
+                    elTime.textContent = n.fullDateText || n.timeText || '';
+
+                    if (n.link) {
+                        elGo.href = n.link;
+                        elGo.style.display = '';
+                    } else {
+                        elGo.removeAttribute('href');
+                        elGo.style.display = 'none';
+                    }
+
+                    overlay.classList.add('open');
+                    markLocalRead(num);
+                })
+                .catch(function (err) {
+                    console.error('알림 상세 조회 실패', err);
+                });
+        }
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) close();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') close();
+        });
+        if (closeBtn)  closeBtn.addEventListener('click', close);
+        if (closeBtn2) closeBtn2.addEventListener('click', close);
+
+        return { open: open, close: close };
+    })();
+</script>
+</th:block>
+
+</html>

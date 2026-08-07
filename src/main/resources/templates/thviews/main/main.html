@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="csrf-header" th:content="${_csrf.headerName}">
+  <meta name="csrf-token" th:content="${_csrf.token}">
+  <title>TeamSync - 팀 협업 플랫폼</title>
+  
+  <!-- Thymeleaf CSS 링크 바인딩 -->
+  <link rel="stylesheet" th:href="@{/assets/css/landing.css}"/>
+  <link rel="stylesheet" th:href="@{/assets/css/chatbot.css}"/>
+</head>
+<body>
+
+<!-- ══════ NAVBAR ══════ -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="navInner">
+      <div class="navBrand">
+        <div class="navMark">TS</div>
+        TeamSync
+      </div>
+      <div class="navLinks">
+        <a href="#features">주요 기능</a>
+        <a href="#stack">기술 스택</a>
+        <a href="#screens">화면 소개</a>
+        <a href="#database">데이터베이스</a>
+        <a href="#team">팀 소개</a>
+      </div>
+      <div class="navRight">
+        <!-- Thymeleaf url 매핑에 맞춘 로그인/회원가입 경로 매핑 -->
+        <button class="btnNavLogin" th:onclick="|location.href='@{/member/login}'|">로그인</button>
+        <button class="btnNavStart" th:onclick="|location.href='@{/member/login}'|">무료 시작하기 →</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero">
+  <div class="container">
+    <div class="heroContent">
+      <div class="heroLeft">
+        <div class="heroBadge">
+          <span></span>
+          2026 팀프로젝트 · FE팀 6인 개발 중
+        </div>
+        <h1 class="heroTitle">
+          팀의 모든 일정과 업무를<br/>
+          <span>하나로 싱크</span>하다.
+        </h1>
+        <p class="heroDesc">
+          TeamSync는 캘린더, 실시간 채팅, 칸반보드, 회의록을 하나의 플랫폼에 통합하여<br/>
+          팀의 의사결정 속도와 효율성을 비약적으로 높이는 협업 웹 서비스입니다.
+        </p>
+        <div class="heroBtns">
+          <button class="btnHeroPrimary" th:onclick="|location.href='@{/member/login}'|">무료로 시작하기</button>
+          <button class="btnHeroSecondary" onclick="location.href='#features'">더 알아보기</button>
+        </div>
+      </div>
+      <div class="heroRight">
+        <div class="heroImgWrap">
+          <img th:src="@{/images/main_dashboard.png}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80'" class="heroImg" alt="메인 대시보드 미리보기"/>
+        </div>
+        <div class="floatingCard fc1">
+          <div class="fcIcon v">📅</div>
+          <div class="fcText">
+            <span class="fcLabel">Today 스케줄</span>
+            <span class="fcVal">5건 예정됨</span>
+          </div>
+        </div>
+        <div class="floatingCard fc2">
+          <div class="fcIcon g">💬</div>
+          <div class="fcText">
+            <span class="fcLabel">실시간 알림</span>
+            <span class="fcVal">멘션 도착</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ FEATURES ══════ -->
+<section class="section features" id="features">
+  <div class="container">
+    <div class="secTitle">성공적인 협업을 위한 올인원 솔루션</div>
+    <div class="secSubtitle">팀원들과 함께 효율을 극대화할 수 있는 강력한 기능들을 제공합니다.</div>
+    
+    <div class="featGrid">
+      <div class="featCard">
+        <div class="featIcon v">📅</div>
+        <h3 class="featTitle">스마트 캘린더</h3>
+        <p class="featDesc">FullCalendar.js를 활용하여 전체 팀 일정 및 개인 일정을 통합 시각화합니다. 일정 참여자를 직접 초대하고 수락 상태를 실시간 트래킹할 수 있습니다.</p>
+      </div>
+      <div class="featCard">
+        <div class="featIcon r">📋</div>
+        <h3 class="featTitle">칸반 보드</h3>
+        <p class="featDesc">드래그 앤 드롭 방식을 채택하여 할 일, 진행 중, 검토, 완료 단계를 직관적으로 매핑하고 팀별 전체 업무 진행률 바를 한눈에 볼 수 있습니다.</p>
+      </div>
+      <div class="featCard">
+        <div class="featIcon g">💬</div>
+        <h3 class="featTitle">WebSocket 채팅 & 멘션</h3>
+        <p class="featDesc">STOMP 기반의 채널 격리 대화방을 구현했습니다. @팀원 태그 멘션을 하면 멘션 테이블과 알림 서버에 즉시 전송되며 푸쉬 알림을 발송합니다.</p>
+      </div>
+      <div class="featCard">
+        <div class="featIcon o">📝</div>
+        <h3 class="featTitle">연동형 회의록</h3>
+        <p class="featDesc">특정 일정과 직접 매핑하여 상세한 회의 내용을 작성하고 보관할 수 있습니다. 작성 완료 시 정제된 레이아웃의 PDF 보고서로 내보낼 수 있습니다.</p>
+      </div>
+      <div class="featCard">
+        <div class="featIcon v">🗂️</div>
+        <h3 class="featTitle">계층형 폴더 보관함</h3>
+        <p class="featDesc">부모-자식 자기참조(Oracle START WITH CONNECT BY) 모델을 활용하여 구글 드라이브 같은 계층 폴더 시스템을 완벽히 재현했습니다.</p>
+      </div>
+      <div class="featCard">
+        <div class="featIcon g">📊</div>
+        <h3 class="featTitle">대시보드 시각화</h3>
+        <p class="featDesc">Chart.js 라이브러리를 이용하여 월별 주간 일정, 팀원별 칸반 기여율, 채널별 채팅 활성 비율 등을 한눈에 그래프로 제공합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ TECH STACK ══════ -->
+<section class="section stack" id="stack">
+  <div class="container">
+    <div class="secTitle">TeamSync 기술 아키텍처</div>
+    <div class="secSubtitle">최신 클라우드 기술과 자바 생태계 표준을 활용하여 검증된 신뢰성의 인프라를 지향합니다.</div>
+    
+    <div class="stackGrid">
+      <div class="stackCard">
+        <div class="stackIcon">🍃</div>
+        <div class="stackTitle">Spring Boot 3.x</div>
+        <div class="stackDesc">강력한 엔터프라이즈 기능</div>
+      </div>
+      <div class="stackCard">
+        <div class="stackIcon">🗄️</div>
+        <div class="stackTitle">Oracle 21c</div>
+        <div class="stackDesc">대용량 처리용 RDBMS</div>
+      </div>
+      <div class="stackCard">
+        <div class="stackIcon">⚡</div>
+        <div class="stackTitle">MyBatis</div>
+        <div class="stackDesc">고성능 SQL 맵핑 엔진</div>
+      </div>
+      <div class="stackCard">
+        <div class="stackIcon">🔗</div>
+        <div class="stackTitle">Websocket & STOMP</div>
+        <div class="stackDesc">실시간 양방향 프레임워크</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ SCREENS SHOWCASE ══════ -->
+<section class="section screens" id="screens">
+  <div class="container">
+    <div class="secTitle">직관적으로 구성된 실시간 협업 화면</div>
+    <div class="secSubtitle">팀 협업 전 과정의 흐름에 맞춰 설계된 프리미엄 UI 디자인을 만나보세요.</div>
+    
+    <div class="tabMenu">
+      <button class="tabBtn active" onclick="switchTab('screenCalendar', this)">📅 캘린더</button>
+      <button class="tabBtn" onclick="switchTab('screenKanban', this)">📋 칸반보드</button>
+      <button class="tabBtn" onclick="switchTab('screenChat', this)">💬 실시간 채팅</button>
+      <button class="tabBtn" onclick="switchTab('screenDoc', this)">🗂️ 보관함 & 회의록</button>
+    </div>
+    
+    <!-- Tab 1 -->
+    <div class="tabContent active" id="screenCalendar">
+      <div class="screenWrap">
+        <div class="screenLeft">
+          <img th:src="@{/images/sub_calendar.png}" onerror="this.src='https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1000&q=80'" class="screenImg" alt="스마트 캘린더 화면"/>
+        </div>
+        <div class="screenRight">
+          <div class="screenLabel">Team Calendar</div>
+          <h4 class="screenName">캘린더 일정을 통한 시각적 일정 공유</h4>
+          <p class="screenDesc">팀 전체의 스케줄을 한 눈에 확인하고, 날짜 클릭 시 나타나는 모달 창에서 간편하게 일정을 추가 및 수정할 수 있습니다.</p>
+          <div class="screenPoints">
+            <div class="screenPoint"><span>1</span>FullCalendar 기반 월간/주간/일간 뷰 전환 스위치</div>
+            <div class="screenPoint"><span>2</span>특정 팀원들을 선택해 일정에 초대하는 동적 동기화 기능</div>
+            <div class="screenPoint"><span>3</span>초대받은 멤버들의 수락 및 거절 상태 실시간 모니터링</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tab 2 -->
+    <div class="tabContent" id="screenKanban">
+      <div class="screenWrap">
+        <div class="screenLeft">
+          <img th:src="@{/images/sub_kanban.png}" onerror="this.src='https://images.unsplash.com/photo-1611224885990-ab7363d1f2a9?auto=format&fit=crop&w=1000&q=80'" class="screenImg" alt="칸반 보드 화면"/>
+        </div>
+        <div class="screenRight">
+          <div class="screenLabel">Task Kanban Board</div>
+          <h4 class="screenName">드래그 앤 드롭을 이용한 유연한 업무 프로세스</h4>
+          <p class="screenDesc">스마트한 칸반보드 모듈을 탑재하여 팀 업무 진행 상황을 4단계('할 일' ➔ '진행 중' ➔ '검토 중' ➔ '완료') 컬럼 구조로 정형화했습니다.</p>
+          <div class="screenPoints">
+            <div class="screenPoint"><span>1</span>업무 카드를 마우스로 드래그하여 상태를 직관적으로 제어</div>
+            <div class="screenPoint"><span>2</span>카드 내부 세부 체크리스트 완료 시 진행률 바 자동 계산 반영</div>
+            <div class="screenPoint"><span>3</span>마감기한 설정 및 태그 기능으로 중요 업무 가독성 고도화</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tab 3 -->
+    <div class="tabContent" id="screenChat">
+      <div class="screenWrap">
+        <div class="screenLeft">
+          <img th:src="@{/images/sub_chat.png}" onerror="this.src='https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=1000&q=80'" class="screenImg" alt="실시간 채팅 화면"/>
+        </div>
+        <div class="screenRight">
+          <div class="screenLabel">Real-time Messaging</div>
+          <h4 class="screenName">WebSocket 기반 실시간 소통 인프라</h4>
+          <p class="screenDesc">STOMP 프로토콜로 각 채널방을 격리하여 빠른 전송 속도를 자랑합니다. 대화창에서 파일 첨부 및 멘션 호출이 자유롭게 결합되어 있습니다.</p>
+          <div class="screenPoints">
+            <div class="screenPoint"><span>1</span>@팀원을 작성해 특정 멤버에게 타겟 푸쉬 알림 발송 가능</div>
+            <div class="screenPoint"><span>2</span>채팅창 내 이미지 및 다큐먼트 파일(최대 10MB) 즉시 전송</div>
+            <div class="screenPoint"><span>3</span>답글 달기 기능을 제공하여 이전 문맥과의 연속성 보장</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tab 4 -->
+    <div class="tabContent" id="screenDoc">
+      <div class="screenWrap">
+        <div class="screenLeft">
+          <img th:src="@{/images/sub_files.png}" onerror="this.src='https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1000&q=80'" class="screenImg" alt="보관함 및 회의록 화면"/>
+        </div>
+        <div class="screenRight">
+          <div class="screenLabel">Archive & Minutes</div>
+          <h4 class="screenName">드라이브형 통합 파일 보관함 및 회의록</h4>
+          <p class="screenDesc">채팅이나 회의에서 파생된 결과물들을 한 눈에 모아보고 트리 형태로 관리할 수 있는 가상 드라이브 구조를 완벽하게 정형화했습니다.</p>
+          <div class="screenPoints">
+            <div class="screenPoint"><span>1</span>계층형 쿼리를 활용한 파일 보관 폴더 생성 및 이동 트리 뷰</div>
+            <div class="screenPoint"><span>2</span>일정과 매칭된 회의록 생성 및 가독성 높은 PDF 다운로드 제공</div>
+            <div class="screenPoint"><span>3</span>업로드 일시, 용량, 업로더의 족보를 트래킹하는 메타 인포 노출</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ DATABASE SECTION ══════ -->
+<section class="section database" id="database">
+  <div class="container">
+    <div class="dbWrap">
+      <div class="dbLeft">
+        <div class="screenLabel">Structured Database</div>
+        <h2 class="heroTitle" style="font-size:36px; margin-bottom:20px;">엄격한 DB 모델링과<br/>정규화를 통과한 설계</h2>
+        <p class="heroDesc" style="font-size:15px; margin-bottom:24px;">
+          안정적인 협업 솔루션을 실현하기 위해 멘션 테이블, 파일 관리, 읽음 확인 뱃지를 구현할 복합키 테이블 및 자가 참조 계층 폴더 설계에 이르기까지 꼼꼼한 Oracle 모델링 규칙을 수립했습니다.
+        </p>
+        <button class="btnHeroPrimary" onclick="openModal()">🔍 전체 ERD 모델 상세히 분석하기</button>
+      </div>
+      <div class="dbRight">
+        <img th:src="@{/images/team_sync_erd.png}" onerror="this.src='https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=1000&q=80'" class="dbImg" alt="DB 관계형 다이어그램 요약" onclick="openModal()"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ TEAM SECTION ══════ -->
+<section class="section team" id="team">
+  <div class="container">
+    <div class="secTitle">TeamSync 기획 및 개발팀원</div>
+    <div class="secSubtitle">6인의 차세대 자바 클라우드 풀스택 개발자들이 혼신을 다해 제작한 시스템입니다.</div>
+    
+    <div class="teamGrid" id="teamGrid">
+      <!-- JavaScript를 통해 동적으로 팀 카드 명세가 삽입됩니다. -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════ FOOTER ══════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footerGrid">
+      <div>
+        <div class="footerBrand">
+          <div class="footerMark">TS</div>
+          TeamSync
+        </div>
+        <p class="footerBrandDesc">
+          분산된 팀 업무와 소통 인프라를 하나로 결합하는 최고의 자바 클라우드 풀스택 솔루션.
+        </p>
+      </div>
+      <div>
+        <div class="footerColTitle">주요 링크</div>
+        <div class="footerLinks">
+          <a href="#features">주요 기능</a>
+          <a href="#stack">기술 스택</a>
+          <a href="#screens">화면 소개</a>
+          <a href="#database">데이터베이스</a>
+          <a href="#team">팀 소개</a>
+        </div>
+      </div>
+      <div>
+        <div class="footerColTitle">협업 기능</div>
+        <div class="footerLinks">
+          <a th:href="@{/login}">📅 캘린더</a>
+          <a th:href="@{/login}">📋 칸반보드</a>
+          <a th:href="@{/login}">💬 실시간 채팅</a>
+          <a th:href="@{/login}">📝 회의록</a>
+          <a th:href="@{/login}">🗂️ 파일 보관함</a>
+        </div>
+      </div>
+      <div>
+        <div class="footerColTitle">서비스</div>
+        <div class="footerLinks">
+          <a th:href="@{/login}">📢 공지사항</a>
+          <a th:href="@{/login}">👥 팀원 관리</a>
+          <a th:href="@{/login}">⚙️ 팀 설정</a>
+          <a th:href="@{/login}">👤 마이페이지</a>
+          <a th:href="@{/login}">🔔 알림</a>
+        </div>
+      </div>
+    </div>
+    <div class="footerBottom">
+      <div class="footerCopy">© 2026 TeamSync. 1조 팀 프로젝트. All rights reserved.</div>
+      <div class="footerTechStack">
+        <span class="footerTech">Spring Boot 3.x</span>
+        <span class="footerTech">Oracle 21c</span>
+        <span class="footerTech">MyBatis</span>
+        <span class="footerTech">Thymeleaf</span>
+        <span class="footerTech">WebSocket</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════ MODAL DIALOG ══════ -->
+<div class="modalOverlay" id="dbModal">
+  <div class="modalBox">
+    <div class="modalHead">
+      <h3 class="modalTitle">TeamSync 통합 관계형 데이터베이스 모델링(ERD)</h3>
+      <button class="btnCloseModal" onclick="closeModal()">×</button>
+    </div>
+    <div class="modalBody">
+      <img th:src="@{/images/team_sync_erd_full.png}" onerror="this.src='https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=1200&q=80'" class="dbImgModal" alt="전체 고화질 ERD 맵"/>
+    </div>
+  </div>
+</div>
+<th:block th:insert="~{fragments/chatbot::chatbot}"></th:block>
+
+<!-- Thymeleaf JS 링크 바인딩 -->
+<script th:src="@{/assets/js/Chatbot.js}"></script>
+<script th:src="@{/assets/js/landing.js}"></script>
+</body>
+</html>

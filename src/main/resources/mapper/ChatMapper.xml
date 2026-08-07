@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.chat.dao.ChatMapper">
+	<select id="selectChannelList" resultType="ChatChannelVO">
+		SELECT
+		c.channel_num,
+		c.team_num,
+		c.channel_name,
+		c.category,
+		c.channel_desc,
+		c.is_default,
+		<!-- 안읽은 메시지 개수 - NVL로 NULL 처리 -->
+		(SELECT COUNT(*)
+		FROM chat_message m
+		WHERE m.channel_num = c.channel_num
+		AND m.message_num > NVL(rs.last_read_message_num, 0)
+		) AS unreadCount,
+		<!-- 마지막 메시지 내용 - 파일이면 파일명으로 대체 -->
+		(SELECT NVL(msg.content, '📁 ' || f.origin_name)
+		FROM chat_message msg
+		LEFT JOIN chat_file f ON msg.message_num = f.message_num
+		WHERE msg.message_num = (
+		SELECT MAX(message_num)
+		FROM chat_message
+		WHERE channel_num = c.channel_num
+		)
+		) AS lastMessage,
+		<!-- 마지막 메시지 시간 -->
+		(SELECT TO_CHAR(send_date, 'AM HH:MI')
+		FROM chat_message
+		WHERE message_num = (
+		SELECT MAX(message_num)
+		FROM chat_message
+		WHERE channel_num = c.channel_num
+		)
+		) AS lastTime
+		FROM chat_channel c
+		LEFT OUTER JOIN chat_read_status rs
+		ON c.channel_num = rs.channel_num
+		AND rs.user_num = #{user_num}
+		WHERE c.team_num = #{team_num}
+		ORDER BY c.channel_num ASC
+	</select>
+
+	<select id="selectMessageList" parameterType="long"
+		resultType="ChatMessageVO">
+		select
+		m.message_num,
+		m.channel_num,
+		m.user_num,
+		m.content,
+		m.parent_message,
+		m.send_date,
+		u.user_name as userName,
+		f.file_num,
+		f.origin_name, f.file_type, f.file_size,
+		pm.content as parentContent,
+		pu.user_name as parentUserName
+		from chat_message m
+		join users u on
+		m.user_num = u.user_num
+		left outer join chat_file f on m.message_num =
+		f.message_num
+		left outer join chat_message pm on m.parent_message =
+		pm.message_num
+		left join users pu on pm.user_num = pu.user_num
+		where
+		m.channel_num = #{channel_num}
+		order by m.message_num asc
+	</select>
+
+	<insert id="insertChannel" parameterType="ChatChannelVO">
+		<selectKey keyProperty="channel_num" resultType="long"
+			order="BEFORE">
+			select seq_chat_channel.nextval from dual
+		</selectKey>
+		insert into chat_channel(
+		channel_num,
+		team_num,
+		channel_name,
+		is_default,
+		create_date,
+		create_by,
+		channel_desc,
+		category
+		)values (
+		#{channel_num},
+		#{team_num},
+		#{channel_name},
+		NVL(#{is_default,jdbcType=CHAR},'N'),
+		sysdate,
+		#{create_by},
+		#{channel_desc},
+		#{category}
+		)
+	</insert>
+
+	<insert id="insertMessage" parameterType="ChatMessageVO">
+		<selectKey keyProperty="message_num" resultType="long"
+			order="BEFORE">
+			select seq_chat_message.nextval from dual
+		</selectKey>
+		insert into chat_message(
+		message_num,
+		channel_num,
+		user_num,
+		content,
+		send_date,
+		parent_message
+		)values (
+		#{message_num},
+		#{channel_num},
+		#{user_num},
+		#{content},
+		sysdate,
+		#{parent_message,jdbcType=NUMERIC}
+		)
+	</insert>
+
+	<!-- 파일 insert -->
+	<insert id="insertChatFile" parameterType="ChatFileVO">
+		<selectKey keyProperty="file_num" resultType="long"
+			order="BEFORE">
+			select seq_chat_file.nextval from dual
+		</selectKey>
+		insert into chat_file(
+		file_num,
+		message_num,
+		channel_num,
+		uploader_num,
+		origin_name,
+		save_name,
+		file_path,
+		file_size,
+		file_type,
+		upload_date,
+		team_num,
+		folder_num,
+		file_source
+		) values (
+		#{file_num},
+		#{message_num},
+		#{channel_num},
+		#{uploader_num},
+		#{origin_name},
+		#{save_name},
+		#{file_path},
+		#{file_size},
+		#{file_type},
+		SYSDATE,
+		#{team_num},
+		#{folder_num,jdbcType=NUMERIC},
+		#{file_source}
+		)
+	</insert>
+
+	<delete id="deleteChildFoldersByChannelName" parameterType="long">
+	    DELETE FROM file_folder
+	    WHERE folder_num IN (
+	        SELECT folder_num
+	        FROM file_folder
+	        START WITH channel_num = #{channel_num}
+	            AND is_chat_folder = 'Y'
+	        CONNECT BY PRIOR folder_num = parent_folder_num
+	    )
+	</delete>
+
+	<delete id="deleteFilesByChildFolders" parameterType="long">
+	    DELETE FROM chat_file
+	    WHERE folder_num IN (
+	        SELECT folder_num
+	        FROM file_folder
+	        START WITH channel_num = #{channel_num}
+	            AND is_chat_folder = 'Y'
+	        CONNECT BY PRIOR folder_num = parent_folder_num
+	    )
+	</delete>
+</mapper>
+
+
+
+
+
+
+

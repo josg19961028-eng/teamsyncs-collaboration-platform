@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <title layout:title-pattern="$CONTENT_TITLE - TeamSync">TeamSync</title>
+
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/common.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/MY/layout.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/header.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/JW/notification-empty.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/JW/notification-detail.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/chatbot.css}">
+
+    <!-- 페이지별 추가 CSS -->
+    <th:block layout:fragment="pageCss"></th:block>
+</head>
+<body>
+<div class="ts-wrap">
+
+    <!-- 공통 헤더 -->
+
+
+
+    <th:block th:insert="~{fragments/header::header}"></th:block>
+
+
+
+    <div class="ts-body">
+
+        <!-- 팀 사이드바 -->
+        <th:block th:insert="~{fragments/sidebar::sidebar}"></th:block>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="ts-content">
+            <div layout:fragment="content"></div>
+        </main>
+
+    </div>
+</div>
+
+<!-- 챗봇 위젯 (모든 페이지 공통) -->
+<th:block th:insert="~{fragments/chatbot::chatbot}"></th:block>
+
+<!-- 공통 JS -->
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/chatbot.js}"></script>
+
+<!-- 페이지별 추가 JS -->
+<th:block layout:fragment="pageJs"></th:block>
+</body>
+</html>

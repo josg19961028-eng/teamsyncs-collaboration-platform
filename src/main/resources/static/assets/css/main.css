@@ -1,0 +1,153 @@
+@charset "UTF-8";
+
+.search-bar{
+	height:30px;
+	padding-bottom:15px;
+}
+.input-search{
+	display:block;
+	float:left;
+	background-color:#FFFFFF;
+	border:1px solid #CCCCCC;
+	/*상좌 상우 하우 하좌*/
+	border-radius:15px 0 0 15px;
+	box-shadow:0 1px 1px rgba(0,0,0,0.05);
+	width:350px;
+	height:35px;
+	padding:0 0 0 10px;
+	font-size:12px;
+	color:#555555;
+}
+.input-search:focus{
+	border-color:rgba(82,168,236,0.8);
+	/*border 바깥 외곽선*/
+	outline:0;
+	box-shadow:0 1px 1px rgba(0,0,0,0.05);
+}
+.input-search-submit{
+	width:50px;
+    height:35px;
+    /*상좌 상우 하우 하좌*/
+	    border-radius:0 15px 15px 0;
+	    border:1px solid #CCCCCC;
+	    margin-left:-1px;
+	}
+	.search-bar form{
+		width:400px;
+		padding:0;
+		border:none;
+	}
+	.input-search-submit{
+	cursor:pointer;
+}
+/* 카드 정렬
+--------------------------------*/
+.item-container {
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+.card {
+    background: white;
+    width: 22%;
+    margin: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+.card-content {
+    padding: 15px;
+}
+.card-content a:hover {
+    text-decoration: none;
+}
+.card-content span {
+	display:block;
+    font-size: 18px;
+    font-weight:bold;
+}
+.card-content b {
+    font-size: 14px;
+    color: #666;
+}
+/* 다이얼로그 배경 */
+.dialog {
+  display: none; /* 기본적으로 다이얼로그는 보이지 않음 */
+ position: fixed;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* 다이얼로그 콘텐츠 */
+.dialog-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 600px;
+  height: 400px;
+  position: relative;
+}
+
+/* 닫기 버튼 */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+.dialog-nav{
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	width: 800px;
+}
+.board_detail{
+	cursor: pointer;
+}
+.detail-content{
+	height:200px;
+	overflow:auto;
+}
+#left_btn{
+	color:#FFFFFF;
+	font-size:25pt;
+	margin-right:50px;
+	cursor: pointer;
+}
+#right_btn{
+    color:#FFFFFF;
+    font-size:25pt;
+	margin-left:50px;
+	cursor: pointer;
+}

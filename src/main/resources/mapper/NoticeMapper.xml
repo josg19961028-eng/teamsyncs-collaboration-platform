@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.spring.notice.dao.NoticeMapper">
+
+    <!-- 팀 공지 목록: CONTENT 제외, 고정 우선·날짜 내림차순 -->
+    <select id="selectNoticesByTeam" parameterType="long"
+            resultType="kr.spring.notice.vo.NoticeVO">
+        SELECT n.NOTICE_NUM,
+               n.TEAM_NUM,
+               n.USER_NUM,
+               n.TITLE,
+               n.IS_FIXED,
+               n.REG_DATE,
+               n.VIEW_COUNT,
+               u.USER_NAME AS WRITER_NAME
+          FROM NOTICE n
+          JOIN USERS u ON n.USER_NUM = u.USER_NUM
+         WHERE n.TEAM_NUM = #{teamNum}
+         ORDER BY CASE WHEN n.IS_FIXED = 'Y' THEN 0 ELSE 1 END,
+                  n.REG_DATE DESC,
+                  n.NOTICE_NUM DESC
+    </select>
+
+    <!-- 공지 상세: CONTENT 포함 -->
+    <select id="selectNoticeByNum" parameterType="long"
+            resultType="kr.spring.notice.vo.NoticeVO">
+        SELECT n.NOTICE_NUM,
+               n.TEAM_NUM,
+               n.USER_NUM,
+               n.TITLE,
+               n.CONTENT,
+               n.IS_FIXED,
+               n.REG_DATE,
+               n.VIEW_COUNT,
+               u.USER_NAME AS WRITER_NAME
+          FROM NOTICE n
+          JOIN USERS u ON n.USER_NUM = u.USER_NUM
+         WHERE n.NOTICE_NUM = #{noticeNum}
+    </select>
+
+    <!-- 공지 작성 -->
+    <insert id="insertNotice" parameterType="kr.spring.notice.vo.NoticeVO">
+        INSERT INTO NOTICE
+            (NOTICE_NUM, TEAM_NUM, USER_NUM, TITLE, CONTENT, IS_FIXED, REG_DATE, VIEW_COUNT)
+        VALUES
+            (SEQ_NOTICE.NEXTVAL,
+             #{team_num},
+             #{user_num},
+             #{title},
+             #{content,  jdbcType=CLOB},
+             #{is_fixed, jdbcType=VARCHAR},
+             SYSDATE,
+             0)
+    </insert>
+
+    <!-- 공지 수정 (제목/내용/고정여부) -->
+    <update id="updateNotice" parameterType="kr.spring.notice.vo.NoticeVO">
+        UPDATE NOTICE
+           SET TITLE    = #{title},
+               CONTENT  = #{content,  jdbcType=CLOB},
+               IS_FIXED = #{is_fixed, jdbcType=VARCHAR}
+         WHERE NOTICE_NUM = #{notice_num}
+    </update>
+
+    <!-- 공지 삭제 -->
+    <delete id="deleteNotice" parameterType="long">
+        DELETE FROM NOTICE
+         WHERE NOTICE_NUM = #{noticeNum}
+    </delete>
+
+    <!-- 조회수 +1 -->
+    <update id="updateViewCount" parameterType="long">
+        UPDATE NOTICE
+           SET VIEW_COUNT = VIEW_COUNT + 1
+         WHERE NOTICE_NUM = #{noticeNum}
+    </update>
+
+    <!-- 고정 토글 Y↔N -->
+    <update id="togglePin" parameterType="long">
+        UPDATE NOTICE
+           SET IS_FIXED = CASE WHEN IS_FIXED = 'Y' THEN 'N' ELSE 'Y' END
+         WHERE NOTICE_NUM = #{noticeNum}
+    </update>
+
+</mapper>

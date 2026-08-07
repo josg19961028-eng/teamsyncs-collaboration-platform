@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.users.dao.UsersMapper">
+
+	<!-- 공통 resultMap -->
+	<resultMap id="usersResultMap"
+		type="kr.spring.users.vo.UsersVO">
+		<id property="user_num" column="USER_NUM" />
+		<result property="email" column="EMAIL" />
+		<result property="passwd" column="PASSWD" />
+		<result property="user_name" column="USER_NAME" />
+		<result property="real_name" column="REAL_NAME" />
+		<result property="phone" column="PHONE" />
+		<result property="birth" column="BIRTH" />
+		<result property="intro" column="INTRO" />
+		<result property="photo" column="PHOTO" />
+		<result property="photo_name" column="PHOTO_NAME" />
+		<result property="auth" column="AUTH" />
+		<result property="login_type" column="LOGIN_TYPE" />
+		<result property="google_id" column="GOOGLE_ID" />
+		<result property="status" column="STATUS" />
+		<result property="withdraw_date" column="WITHDRAW_DATE" />
+		<result property="reg_date" column="REG_DATE" />
+		<result property="modify_date" column="MODIFY_DATE" />
+	</resultMap>
+
+	<!-- user_num으로 조회 -->
+	<select id="selectByUserNum" parameterType="long"
+		resultMap="usersResultMap">
+		SELECT USER_NUM, EMAIL, PASSWD, USER_NAME, REAL_NAME, PHONE,
+		BIRTH, INTRO, AUTH, LOGIN_TYPE, GOOGLE_ID, STATUS, REG_DATE, MODIFY_DATE
+		FROM USERS
+		WHERE USER_NUM = #{userNum}
+	</select>
+
+	<!-- email로 조회 -->
+	<select id="selectByEmail" parameterType="string"
+		resultMap="usersResultMap">
+		SELECT USER_NUM, EMAIL, PASSWD, USER_NAME, REAL_NAME, PHONE,
+		BIRTH, INTRO, AUTH, LOGIN_TYPE, GOOGLE_ID, STATUS, REG_DATE, MODIFY_DATE
+		FROM USERS
+		WHERE LOWER(EMAIL) = #{email}
+	</select>
+
+	<!-- 이메일 중복 확인 -->
+	<select id="countByEmail" parameterType="string"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM USERS
+		WHERE LOWER(EMAIL) = #{email}
+	</select>
+	
+	<!-- 휴대폰 번호 중복 확인 -->
+	<select id="countByPhone" parameterType="string" resultType="int">
+		SELECT COUNT(*)
+		FROM USERS
+		WHERE PHONE = #{phone}
+		 AND STATUS != 3
+	</select>
+	
+	<!-- 본인을 제외한 휴대폰 번호 중복 확인  -->
+	<select id="countByPhoneExceptUser" resultType="int">
+		SELECT COUNT(*)
+		FROM USERS
+		WHERE PHONE = #{phone}
+			AND USER_NUM != #{userNum}
+			AND STATUS != 3
+	</select>
+	
+	
+	
+
+
+	<!-- 이메일 찾기 -->
+	<select id="findEmailsByUserInfo" resultMap="usersResultMap">
+		SELECT USER_NUM, EMAIL, PASSWD, USER_NAME, REAL_NAME, PHONE, BIRTH,
+		AUTH, LOGIN_TYPE, GOOGLE_ID, STATUS, REG_DATE, MODIFY_DATE
+		FROM USERS
+		WHERE REAL_NAME = #{realName}
+		AND PHONE = #{phone}
+		AND BIRTH = #{birth}
+		AND STATUS != 3
+		ORDER BY REG_DATE DESC
+	</select>
+
+	<!-- 회원가입 -->
+	<insert id="insertUser"
+		parameterType="kr.spring.users.vo.UsersVO">
+		INSERT INTO USERS (
+		USER_NUM,
+		EMAIL,
+		PASSWD,
+		USER_NAME,
+		REAL_NAME,
+		PHONE,
+		BIRTH,
+		INTRO,
+		AUTH,
+		LOGIN_TYPE,
+		STATUS,
+		REG_DATE
+		) VALUES (
+		SEQ_USERS.NEXTVAL,
+		#{email},
+		#{passwd},
+		#{user_name},
+		#{real_name},
+		#{phone},
+		#{birth},
+		#{intro},
+		#{auth},
+		#{login_type},
+		#{status},
+		SYSDATE
+		)
+	</insert>
+	
+	<!-- 마이페이지 프로필 수정  -->
+	<update id="updateMyProfile" parameterType="kr.spring.users.vo.UsersVO">
+		UPDATE USERS
+		SET USER_NAME = #{user_name},
+			PHONE = #{phone}, 
+			INTRO = #{intro},
+			MODIFY_DATE = SYSDATE
+		WHERE USER_NUM = #{user_num}
+			AND STATUS != 3
+	</update>
+	
+
+	<!-- 비밀번호 재설정 -->
+	<update id="updatePassword">
+		UPDATE USERS
+		SET PASSWD = #{passwd},
+		    MODIFY_DATE = SYSDATE
+		WHERE LOWER(EMAIL) = #{email}
+	</update>
+</mapper>

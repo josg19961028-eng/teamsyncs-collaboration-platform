@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<th:block th:fragment="chatbot">
+<!-- data-guest: 비로그인(익명) 사용자면 true. #authentication 은 익명 사용자도 항상 존재하며
+     기본 설정에서 principal 이 문자열 "anonymousUser" 로 채워짐 -->
+<div class="ts-bot" id="tsBot"
+     th:attr="data-guest=${#authentication == null or #authentication.principal == 'anonymousUser'}">
+
+    <!-- 알림 말풍선 -->
+    <div class="ts-bot-toast" id="tsToast" onclick="openBot(event)">
+        <button class="x" onclick="dismissToast(event)" aria-label="알림 닫기">×</button>
+        <div class="row">
+            <div class="ava">
+    			<img th:src="@{/assets/images/chatbot-logo.png}" alt="TeamSync AI">
+			</div>
+            <span class="nm">TeamSync AI</span>
+            <span class="dot"></span>
+        </div>
+        <div class="msg">무엇이든 물어보세요. 회의록 요약, 일정 확인, 칸반 현황까지 도와드릴게요.</div>
+    </div>
+
+    <!-- 채팅 패널 -->
+    <div class="ts-bot-panel" id="tsPanel">
+        <div class="ts-bot-hd">
+            <div class="ava">
+    			<img th:src="@{/assets/images/chatbot-logo.png}" alt="TeamSync AI">
+			</div>
+            <div>
+                <div class="nm">TeamSync AI</div>
+                <div class="st">온라인 · 보통 몇 초 내 응답</div>
+            </div>
+            <button class="min" onclick="closeBot()" aria-label="최소화">−</button>
+        </div>
+
+        <div class="ts-bot-msgs" id="tsMsgs">
+            <div class="ts-m bot">안녕하세요! 👋<br>저는 TeamSync AI예요. 팀 데이터를 바탕으로 답변해 드려요. 아래 버튼을 누르거나 자유롭게 질문해 주세요.</div>
+        </div>
+
+        <div class="ts-typing" id="tsTyping"><span></span><span></span><span></span></div>
+
+        <div class="ts-bot-chips" id="tsChips">
+            <button class="ts-chip" onclick="ask('이번 주 일정 알려줘')">📅 이번 주 일정</button>
+            <button class="ts-chip" onclick="ask('지난 회의 결정사항 요약해줘')">📝 회의록 요약</button>
+            <button class="ts-chip" onclick="ask('내 칸반 카드 현황')">📋 내 칸반 카드</button>
+        </div>
+
+        <div class="ts-bot-input">
+            <input id="tsInput" type="text" placeholder="메시지를 입력하세요…" onkeydown="if(event.key==='Enter')send()">
+            <button onclick="send()" aria-label="보내기">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 12l16-8-6 16-3-6-7-2z" fill="currentColor"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 플로팅 런처 버튼 -->
+    <button class="ts-bot-fab" id="tsFab" onclick="toggleBot()" aria-label="챗봇 열기">
+        <span class="ts-bot-badge" id="tsBadge">1</span>
+        <img class="open-ico" th:src="@{/assets/images/chatbot-logo.png}" alt="챗봇 열기">
+<svg class="close-ico" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
+</div>
+</th:block>
+
+</html>

@@ -1,0 +1,357 @@
+/* 전체 레이아웃
+--------------------------------*/
+body{
+	margin:0;
+	padding:0;
+}
+#main{
+	width:1280px;
+	margin:0 auto;
+	font-size:10pt;
+	font-family: "맑은 고딕";
+}
+#main_header{
+	width:100%;
+	padding: 0 10px 0 0;
+}
+#main_body{
+	padding:5px 5px 30px 5px;
+	min-height: 500px;
+}
+#main_footer{
+	width:100%;
+	height:36px;
+	background-color:#c0e5fc;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+a:link{
+	text-decoration:none;
+	color:#000000;
+}
+a:visited{
+	text-decoration:none;
+	color:#000000;
+}
+a:hover{
+	text-decoration:underline;
+	color:#999999;
+}
+
+/* 페이지 기본 레이아웃
+--------------------------------*/
+.page-main{
+	width:98%;
+	margin:0 auto;
+}
+.page-one{
+	width:600px;
+	margin:0 auto;
+}
+.page-title{
+	font-family:"맑은 고딕";
+	font-size:20pt;
+	font-weight:bold;
+	text-align:center;
+	padding-bottom:10px;
+	border-bottom:1px solid #333;
+}
+/* 공통 메시지
+--------------------------------*/
+.result-display{
+	width:400px;
+	height:200px;
+	margin:50px auto;/*상하 좌우*/
+	border:1px solid #000;/*테두리*/
+	display: flex;/*하위 요소를 수직으로 쌓을 수 있는 공간을 만듬*/
+  	align-items: center;/*세로 정렬*/
+  	justify-content: center;/*가로 정렬*/
+}
+.field-error {
+    border-color: #ff0000;
+    background-color: #fff0f0;
+}
+.error-color{
+	color:#ff0000;
+}
+/* 공통 정렬
+--------------------------------*/
+.align-center{
+	text-align:center;
+}
+.align-right{
+	text-align:right;
+}
+.align-left{
+	text-align:left;
+}
+
+/* 상단 메뉴
+--------------------------------*/
+.site-logo{
+	font-family: "맑은 고딕";
+	font-size: 20pt;
+	font-weight:bold;
+	margin-top: 20px;
+	line-height: 1.1;
+}
+.site-logo a:hover{
+	text-decoration:none;
+}
+.menu-title{
+	width:40%;
+	height:70px;
+	float:left;
+}
+.menu-login{
+	width:60%;
+	height:70px;
+	float:left;
+	display:flex;
+	justify-content:flex-end;
+	align-items:center;
+}
+.menu-item{
+	width:100px;
+	margin-left:5px;
+	float:left;
+	text-align:right;
+}
+.menu-item img{
+	vertical-align:top;
+	margin-right:3px;
+}
+.menu-list{
+	width:100%;
+	height:36px;
+	clear:both;
+	background-color:#c0e5fc;
+}
+.menu-main-item{
+	font-family:"맑은 고딕";
+	font-size:12pt;
+	width:100px;
+	margin:7px 0 7px 5px;
+	float:left;
+	font-weight:bold;
+}
+.menu-main-item a:hover{
+	text-decoration:none;
+}
+
+div#main_menu ul{
+	list-style:none;
+}
+
+div#main_menu ul li{
+	margin-bottom:5px; 
+}
+.my-photo{
+	object-fit: cover;
+    object-position: top; /*정사각형이 아니라 직사각형일 경우 원 안에 보여지게 할 중심 이미지의 위치를 지정*/
+    border-radius: 50%;/*사각형의 모서리 둥근 정도를 지정하는 속성인데 50%를 지정하면 완전한 원이 됨*/
+}
+/* 공통 등록, 수정 폼
+--------------------------------*/
+form{
+	width:600px;
+	margin:0 auto;
+	border:1px solid #000;
+	padding:10px 10px 30px 10px;
+}
+
+form ul li label{
+	width:110px;
+	display:inline-block;
+}
+
+ul{
+	list-style:none;
+}
+input,select{
+	margin-top:4px;
+	padding:5px;
+}
+input[type="text"],input[type="password"],input[type="email"]{
+	width:350px;
+}
+input[type="checkbox"]{
+	margin:11px 0 10px 0;
+}
+.form-notice{
+	margin-left:116px;
+}
+/* Admin, MY페이지 공통
+--------------------------------*/
+.side-height{
+	/*사이드바의 높이가 컨텐트의 높이와 동일하게 자동 조절하기 위해 흘러넘친 배경색은 숨김*/
+	overflow: hidden;
+	margin-bottom:10px;
+}
+#page_nav{
+	float:left;
+	width:20%;
+	min-height:530px;
+}
+#page_body{
+	width:80%;
+	float:left;
+}
+.page-clear{
+	clear:both;
+}
+.side-bar{
+	margin:10px 10px 10px 0;
+	padding:10px;
+	/*사이드바의 높이가 컨텐트의 높이와 동일하게 자동 조절*/
+	margin-bottom: -9999px;
+	padding-bottom: 9999px;
+	background-color:#cecccc;
+}
+.side-bar ul{
+	margin:0;
+	padding:0;
+}
+.side-bar ul li{
+	padding:5px 10px 5px 10px;
+}
+.side-bar ul li img{
+	margin-left:3px;
+}
+/* 공통 목록
+--------------------------------*/
+form#search_form{
+	width:98%;
+	padding-bottom:0;
+	border: none;
+}
+ul.search{
+	width:380px;
+	list-style:none;
+	padding:0;
+	margin:0 auto;
+}
+ul.search li{
+	margin:0 0 9px 0;
+	padding:0;
+	display:inline;
+}
+ul.search li select{
+	height:30px;
+}
+.list-space{
+	width:700px;
+	margin:10px auto;
+}
+/* 공통 테이블
+--------------------------------*/
+table.basic-table{
+	width:100%;
+	margin:7px 0;
+	border:1px solid #000;
+	border-collapse:collapse;
+}
+table.basic-table td, table.basic-table th{
+	border:1px solid #000;
+	padding:5px;
+}
+
+table.striped-table {
+  width: 100%;
+  margin:7px 0;
+  border: 1px #FFF solid;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+table.striped-table td, table.striped-table th {
+  padding: .7em .5em;
+  vertical-align: middle;
+}
+table.striped-table th {
+	font-weight: bold;
+    background: #E1E1E1;
+}
+table.striped-table td {
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+
+table.striped-table tr:nth-child(odd){
+ 	background-color:rgb(250,250,247);
+}
+/* 공통 버튼
+--------------------------------*/
+[type="submit"],[type="button"]{
+	height:30px;
+}
+.menu-btn{
+	width:100%;
+	height:50px;
+	font-size:12pt;
+	background-color:#fcfcfc;
+	border-color:#b7b5b5;
+	border-radius:5px;
+}
+.default-btn{
+	padding: 4px 20px;
+    border: 1px solid #09aa5c;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #09aa5c;
+    font-weight: bold;
+    cursor: pointer;
+}	
+.default-btn:hover{
+	background-color: #fff;
+	color: #09aa5c;
+	transition: 0.2s ease-out;
+	height:30px;
+}
+/* 공통 다이얼로그
+--------------------------------*/
+.dialog {/* 다이얼로그 배경 */
+ display: none; /* 기본적으로 다이얼로그는 보이지 않음 */
+ position: fixed;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.dialog-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 600px;
+  height: 400px;
+  position: relative;
+}
+.close-btn {/* 닫기 버튼 */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.dialog button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dialog button:hover {
+  background-color: #45a049;
+}
+.dialog-nav{
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	width: 800px;
+}

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+    <title>팀 대시보드</title>
+    
+
+    <th:block layout:fragment="pageCss">
+    
+		<link rel="stylesheet" th:href="@{/assets/css/YJ/calendar-common.css}">
+		<link rel="stylesheet" th:href="@{/assets/css/YJ/calendar-widget.css}">
+		
+        <style>
+            :root{--primary:#6c5ce7;--violet:#8f65f6;--rose:#e46aa1;--green:#34b77b;--orange:#f0a04b;--muted:#7b7394;--line:#e8e1fb;--ink:#1e1635;--blueS:#f1edff;--greenS:#eef9f4;--orangeS:#fff5ea;--violetS:#f5f0ff;--roseS:#fff1f7;--shadow:0 16px 44px rgba(73,47,133,.12);--soft:0 8px 22px rgba(73,47,133,.08);--r:24px}
+            .panel{background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);border-radius:var(--r);overflow:hidden}
+            .pad{padding:20px}
+            .head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+            .head h2{font-size:18px;margin:0;letter-spacing:-.04em}
+            .head p{font-size:12px;color:var(--muted);margin:5px 0 0}
+            .btn{border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;font-weight:900;background:#fff;color:#42485b;cursor:pointer;transition:.15s}
+            .btn.primary{background:linear-gradient(135deg,var(--primary),#7476ff);border:0;color:#fff}
+            .btn.danger{background:var(--roseS);color:var(--rose);border-color:rgba(228,106,161,.3)}
+            .btn:hover{transform:translateY(-1px)}
+            .stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+            .stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--soft)}
+            .stat .val{font-size:28px;font-weight:950;letter-spacing:-.04em}
+            .stat .lbl{font-size:12px;color:var(--muted);font-weight:800;margin-top:4px}
+            .stat .diff{font-size:11px;font-weight:900;margin-top:3px}
+            .up{color:var(--green)}
+            .dbGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+            .calBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+            .monthNav{display:flex;align-items:center;gap:10px}
+            .monthNav h2{margin:0;font-size:20px;letter-spacing:-.05em}
+            .arrow{width:32px;height:32px;border-radius:12px;background:#fff;border:1px solid var(--line);color:#62687c;font-size:16px;display:grid;place-items:center;cursor:pointer}
+            .chipRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+            .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px;color:#5e6578;font-weight:900;font-size:11px;cursor:pointer}
+            .chip.active{background:linear-gradient(135deg,#2b2346,#46367e);border-color:#2b2346;color:#fff}
+            .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:#f7f8fc;border-bottom:1px solid var(--line)}
+            .week div{padding:10px 6px;text-align:center;color:#767c90;font-size:11px;font-weight:950}
+            .days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+            .day{min-height:80px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px;cursor:pointer}
+            .day:nth-child(7n){border-right:0}
+            .day:hover{background:#fbfcff}
+            .day.dim{background:#fafafa;color:#a3a6b3}
+            .dn{font-size:11px;font-weight:950;color:#697083;margin-bottom:5px;display:inline-flex}
+            .today .dn{background:linear-gradient(135deg,#2b2346,#46367e);color:#fff;width:24px;height:24px;border-radius:9px;align-items:center;justify-content:center}
+            .ev{display:block;font-size:10px;font-weight:900;padding:3px 6px;border-radius:7px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+            .ev.sch{background:var(--blueS);color:var(--primary)}.ev.kan{background:var(--greenS);color:var(--green)}.ev.mtg{background:var(--orangeS);color:#c46121}.ev.ddl{background:var(--roseS);color:var(--rose)}
+            .more{font-size:10px;color:var(--muted);font-weight:900}
+            .agendaItem{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;gap:10px;box-shadow:var(--soft);margin-bottom:8px;cursor:pointer}
+            .agTime{color:var(--primary);font-size:12px;font-weight:950;min-width:48px}
+            .agTitle{font-size:13px;font-weight:950}
+            .agSub{font-size:11px;color:var(--muted);margin-top:2px}
+            .noticeItem{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--soft);margin-bottom:10px;cursor:pointer}
+            .noticeItem.pinned{border-left:3px solid var(--primary)}
+            .noticeTitle{font-size:14px;font-weight:950;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+            .pinnedBadge{background:var(--blueS);color:var(--primary);border-radius:999px;padding:2px 7px;font-size:10px;font-weight:950}
+            .newBadge{background:var(--roseS);color:var(--rose);border-radius:999px;padding:2px 7px;font-size:10px;font-weight:950}
+            .noticeMeta{font-size:11px;color:var(--muted)}
+            .miniLanes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+            .lane{background:#f8f9fc;border:1px solid var(--line);border-radius:16px;padding:10px}
+            .laneHead{font-size:12px;font-weight:950;margin-bottom:8px;display:flex;justify-content:space-between}
+            .cnt{background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:10px;color:var(--muted)}
+            .kCard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px;margin-bottom:7px;font-size:12px;font-weight:900;cursor:pointer}
+            .kCard:hover{border-color:rgba(108,92,231,.3);transform:translateY(-1px)}
+            .kTag{display:inline-flex;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:950;margin-bottom:5px}
+            .deadline{font-size:10px;color:var(--muted);margin-top:5px}
+            .deadline.over{color:var(--rose);font-weight:900}
+            .memberRow{display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:8px}
+            .mAv{width:34px;height:34px;border-radius:12px;background:var(--blueS);color:var(--primary);display:grid;place-items:center;font-weight:950;font-size:14px;flex:0 0 34px}
+            .mName{font-size:13px;font-weight:950}
+            .mRole{font-size:11px;color:var(--muted);margin-top:2px}
+            .roleBadge{display:inline-flex;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:950}
+            .roleLeader{background:var(--violetS);color:var(--violet)}
+            .roleManager{background:var(--orangeS);color:#c46121}
+            .roleMember{background:var(--blueS);color:var(--primary)}
+            .progressBar{height:10px;background:#eef1f7;border-radius:999px;overflow:hidden;margin-top:6px}
+            .progressBar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--violet))}
+            .teamMain{display:flex;flex-direction:column;gap:20px}
+            .mLayer{display:none;position:fixed;inset:0;background:rgba(15,18,33,.48);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:22px}
+            .mLayer.open{display:flex}
+            .modal{width:min(680px,100%);max-height:88vh;overflow-y:auto;background:#fff;border-radius:26px;box-shadow:0 40px 100px rgba(0,0,0,.25)}
+            .mHead{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+            .mHead h3{margin:0;font-size:20px;letter-spacing:-.04em}
+            .mClose{width:34px;height:34px;border-radius:12px;background:#f4f6fb;border:1px solid var(--line);font-size:18px;display:grid;place-items:center;cursor:pointer}
+            .mBody{padding:22px}
+            .fG{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+            .f{display:flex;flex-direction:column;gap:6px;margin-bottom:2px}
+            .f.full{grid-column:1/-1}
+            .f label{font-size:12px;font-weight:950;color:#51586f}
+            .f input,.f select,.f textarea{border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-size:14px;background:#fff;outline:none;transition:.15s}
+            .f input:focus,.f select:focus,.f textarea:focus{border-color:rgba(108,92,231,.45);box-shadow:0 0 0 4px rgba(108,92,231,.08)}
+            .f textarea{min-height:90px;resize:vertical}
+            .acts{display:flex;justify-content:flex-end;gap:9px;margin-top:16px;flex-wrap:wrap}
+            #toast{position:fixed;bottom:28px;right:28px;background:#171a2b;color:#fff;border-radius:18px;padding:14px 18px;font-size:13px;font-weight:900;box-shadow:var(--shadow);z-index:9999;display:none}
+            #toast.show{display:block}
+            .emptyBox{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;font-weight:700;background:#faf9ff;border:1px dashed var(--line);border-radius:16px;padding:22px 12px}
+            .miniLanes:has(.emptyBox){grid-template-columns:1fr}
+            @media(max-width:1100px){.stats4{grid-template-columns:repeat(2,1fr)}.dbGrid{grid-template-columns:1fr}.miniLanes{grid-template-columns:repeat(2,1fr)}}
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content" th:with="currentMenu='dashboard'">
+
+    <main class="teamMain">
+
+        <!-- 통계 카드 -->
+        <div class="stats4">
+            <div class="stat"><div class="val" th:text="${thisMonthScheduleCount}">0</div><div class="lbl">이번 달 일정</div></div>
+            <div class="stat"><div class="val" th:text="${doneKanbanCount}">0</div><div class="lbl">완료 칸반 카드</div></div>
+            <div class="stat"><div class="val" th:text="${totalChannelCount}">0</div><div class="lbl">총 채팅 수</div></div>
+            <div class="stat"><div class="val" th:text="${activeMemberCount}">0</div><div class="lbl">활성 팀원 수</div></div>
+        </div>
+
+        <!-- 캘린더 + 다가오는 일정 -->
+        <div class="dbGrid">
+            <div class="panel team-calendar-widget">
+			    <div class="team-calendar-head">
+			        <div>
+			            <h2>팀 캘린더</h2>
+			            <p>팀 일정과 칸반 마감일</p>
+			        </div>
+			
+			        <div class="chipRow">
+			            <button type="button" class="chip active" data-filter="ALL">전체</button>
+			            <button type="button" class="chip" data-filter="SCHEDULE">일정</button>
+			            <button type="button" class="chip" data-filter="KANBAN">칸반</button>
+			        </div>
+			    </div>
+			
+			    <div id="teamHomeCalendar"
+				     data-events-url="/calendar/current-team-events">
+				</div>
+			</div>
+            <div class="panel pad">
+                <div class="head">
+                    <div><h2>다가오는 일정</h2><p>가까운 순서</p></div>
+                    <div style="display:flex;gap:8px">
+                        <button class="btn primary" onclick="openM('addSch')">+ 팀 일정</button>
+                        <a th:href="@{/calendar/calendar}">
+						    <button class="btn">전체 보기</button>
+						</a>
+                    </div>
+                </div>
+                <div id="upcomingList"><div class="emptyBox">예정된 일정이 없습니다</div></div>
+                <div class="head" style="margin-top:16px"><div><h2>최근 공지</h2></div><a th:href="@{/notice/list}"><button class="btn">전체 보기</button></a></div>
+                <div id="noticeList">
+                    <div th:if="${#lists.isEmpty(recentNotices)}" class="emptyBox">등록된 공지가 없습니다</div>
+                    <div th:each="n : ${recentNotices}"
+                         class="noticeItem"
+                         th:classappend="${n.is_fixed == 'Y'} ? ' pinned'"
+                         onclick="location.href='/notice/list'"
+                         style="cursor:pointer">
+                        <div class="noticeTitle">
+                            <span th:if="${n.is_fixed == 'Y'}" class="pinnedBadge">📌 고정</span>
+                            <span th:if="${n.reg_date_str != null and n.reg_date_str >= threeDaysAgo}" class="newBadge">NEW</span>
+                            <span th:text="${n.title}">공지 제목</span>
+                        </div>
+                        <div class="noticeMeta"
+                             th:text="${n.writer_name + ' · ' + n.reg_date_str + ' · 조회 ' + n.view_count}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 칸반 요약 + 팀원 -->
+        <div class="dbGrid">
+            <div class="panel pad">
+                <div class="head"><div><h2>칸반 보드 요약</h2><p id="kanbanProgressLabel">진행률 0%</p></div><a th:href="@{/kanban/board}"><button class="btn">전체 보기</button></a></div>
+                <div class="progressBar"><i id="kanbanProgressBar" style="width:0%"></i></div>
+                <div class="miniLanes" id="miniKanban">
+                    <div class="emptyBox">등록된 칸반 카드가 없습니다</div>
+                </div>
+            </div>
+            <div class="panel pad">
+                <div class="head"><div><h2>팀원 현황</h2></div><a th:href="@{/team/members}"><button class="btn">전체 보기</button></a></div>
+                <div id="memberList">
+    				<div th:if="${#lists.isEmpty(topMembers)}" class="emptyBox">팀에 팀원이 없습니다</div>
+    				<div class="memberRow" th:each="m : ${topMembers}">
+        					<div class="mAv"
+             				th:text="${m.user_name != null and !#strings.isEmpty(m.user_name)} ? ${#strings.substring(m.user_name,0,1)} : '?'">U</div>
+        			<div style="flex:1">
+            			<div class="mName" th:text="${m.user_name}">이름</div>
+            			<div class="mRole" th:text="${m.role == 3 ? '팀장' : (m.role == 2 ? '매니저' : '팀원')}">역할</div>
+        			</div>
+        			<span class="roleBadge"
+              			th:classappend="${m.role == 3 ? 'roleLeader' : (m.role == 2 ? 'roleManager' : 'roleMember')}"
+              			th:text="${m.role == 3 ? '팀장' : (m.role == 2 ? '매니저' : '팀원')}">역할</span>
+    				</div>
+    			<div th:if="${memberTotal != null and memberTotal > 5}"
+         		style="text-align:center;font-size:12px;color:var(--muted);font-weight:800;margin-top:6px"
+         		th:text="'외 ' + (${memberTotal} - 5) + '명 더 있음'"></div>
+				</div>
+            </div>
+        </div>
+
+        <!-- 차트 -->
+        <div class="dbGrid">
+            <div class="panel pad">
+                <div class="head"><div><h2>일정 수 추이</h2><p>주별 라인 차트</p></div></div>
+                <canvas id="chartLine" height="140" style="display:none"></canvas>
+                <div class="emptyBox" id="chartLineEmpty">집계할 일정이 없습니다</div>
+            </div>
+            <div class="panel pad">
+                <div class="head"><div><h2>팀원별 완료 카드</h2><p>바 차트</p></div></div>
+                <canvas id="chartBar" height="140" style="display:none"></canvas>
+                <div class="emptyBox" id="chartBarEmpty">완료된 카드가 없습니다</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 모달 -->
+    <div class="mLayer" id="mLayer" onclick="if(event.target===this)closeM()">
+        <div class="modal">
+            <div class="mHead"><h3 id="mTitle2"></h3><button class="mClose" onclick="closeM()">✕</button></div>
+            <div class="mBody" id="mBody"></div>
+        </div>
+    </div>
+    <div id="toast"></div>
+
+</div>
+
+<th:block layout:fragment="pageJs">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales-all.global.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <script th:src="@{/assets/js/YJ/team-dashboard.js}"></script>
+</th:block>
+</body>
+</html>

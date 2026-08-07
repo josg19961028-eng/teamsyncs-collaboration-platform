@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extra/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout_main}">
+<head>
+<title>kanban</title>
+<link rel="stylesheet" th:href="@{/assets/css/kanban.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/assets/css/SG/kanban_write.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/assets/css/SG/kanban_detail.css}" type="text/css">
+<script type="text/javascript" th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:inline="javascript"> const existingTagList = /*[[${tagList}]]*/ [];</script>
+<script type="text/javascript" th:src="@{/assets/js/SG/kanban_write.js}"></script>
+<script type="text/javascript" th:src="@{/assets/js/SG/kanban_detail.js}"></script>
+<script type="text/javascript" th:src="@{/assets/js/SG/kanban_drag.js}"></script>
+</head>
+<body>
+	<div layout:fragment="content" th:with="currentMenu='kanban'">
+		<input type="hidden" id="team_num" th:value="${team_num}">
+		<!-- 메인 -->
+		<main>
+			<section class="panel kanbanWrap">
+				<!-- 헤더 -->
+				<div class="kanbanTop">
+					<div class="kanbanTopLeft">
+						<h2>📋 칸반 보드</h2>
+						<br>
+						<!-- 설명 배너 -->
+						<div class="legendRow">
+								<span class="chip" style="cursor: default; background: var(--roseS); color: var(--rose); border-color: transparent">⚠️ 마감 임박</span> 
+								<span class="chip" style="cursor: default; background: var(--roseS); color: var(--rose); border-color: transparent">❗ 마감일 초과</span> 
+								<span class="chip" style="cursor: default; background: var(--greenS); color: var(--green); border-color: transparent">📅 캘린더 자동 연동</span>
+						</div>
+					</div>
+					<!-- 클릭 배너 -->
+					<div class="kanbanTopRight">
+						<button class="btn" id="myOnlyBtn" onclick="toggleMyOnly()">내 카드만</button>
+						<button class="btn" th:onclick="|location.href='@{/calendar/list(team_num=${team_num})}'|">📅 캘린더</button>
+						<button class="btn primary" sec:authorize="isAuthenticated()" onclick="openWriteModal()">+ 카드 추가</button>
+					</div>
+				</div>
+
+				<!-- 전체 진행률 -->
+				<div class="totalProg">
+					<div class="totalProgTop">
+						<span>전체 진행률</span> <span id="progText">계산 중...</span>
+					</div>
+					<div class="totalBar">
+						<div class="totalFill" id="progFill" style="width: 0%"></div>
+					</div>
+				</div>
+
+				<!-- 필터 -->
+				<div class="filterBar">
+					<span class="filterLabel">태그:</span>
+					<button type="button" class="chip allTag on" onclick="setTag(null, this)">전체</button>
+					<button type="button" class="chip filterTag"
+							th:each="tag : ${tagList}" th:text="${tag.tag}"
+							th:data-tag="${tag.tag}"
+							th:style="'background:' + ${tag.tag_color} + '22; color:' + ${tag.tag_color}"
+							onclick="setTag(this.dataset.tag, this)"></button>
+					<input class="searchBox" id="kSearch" placeholder="🔍 카드 검색..." oninput="loadKanbanBoard()">
+				</div>
+				<!-- 레인 4개 -->
+				<div class="laneGrid" id="board"></div>
+				<!-- 모달 -->
+				<div id="mLayer" class="mLayer"	onclick="if(event.target===this)closeModal()" style="display: none;">
+					<!-- 모달창 본체 박스 -->
+					<div id="modal" class="modal">
+						<!-- 모달 헤더 (상단바) -->
+						<div class="mHead">
+							<h3 id="mTitle">새로운 칸반 카드 추가</h3>
+							<button type="button" class="mClose" onclick="closeModal()">✕</button>
+						</div>
+						<!-- 폼 조각(HTML Fragment)이 동적으로 박힐 핵심 바디 구역 -->
+						<div id="mBody" class="mBody"></div>
+					</div>
+				</div>
+				<div id="toast"></div>
+				<div id="confirmLayer" class="confirmLayer">
+					<div class="confirmBox">
+						<div class="confirmMsg" id="confirmMsg">정말 진행하시겠습니까?</div>
+						<div class="confirmBtns">
+							<button type="button" class="btn sm" id="confirmCancel">취소</button>
+							<button type="button" class="btn sm danger" id="confirmOk">확인</button>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+</body>
+</html>

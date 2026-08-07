@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/assets/css/kanban.css}" type="text/css">
+<link rel="stylesheet" th:href="@{/assets/css/SG/kanban_write.css}" type="text/css">
+<script th:inline="javascript"> const existingTagList = /*[[${tagList}]]*/ [];</script>
+<div th:fragment="kanbanUpdateForm" class="ts-modal-form-wrap">
+	<form id="kanban_update_form" th:object="${kanbanCardVO}" enctype="multipart/form-data">
+		<input type="hidden" th:field="*{card_num}">
+		<input type="hidden" th:field="*{team_num}">
+	    <input type="hidden" th:field="*{filename}">
+		<div class="fGrid">
+			<div class="f full">
+				<label> 카드 제목 <span style="color: var(--rose)">*</span>
+				</label> <input type="text" th:field="*{title}" placeholder="카드 제목을 입력하세요">
+			</div>
+			<div class="f full">
+				<label for="tag">태그</label>
+				<div class="tagInputWrap">
+					<input type="text" id="tag" name="tag" maxlength="5"
+						th:value="${kanbanCardVO?.tag}" placeholder="태그를 입력하세요"> <label
+						class="tagColorPicker" for="tag_color"> <input
+						type="color" id="tag_color" name="tag_color"
+						th:value="${kanbanCardVO?.tag_color != null ? kanbanCardVO.tag_color : '#6c5ce7'}">
+						<span class="tagColorText">태그 색상</span>
+					</label>
+				</div>
+			</div>
+			<div class="f full">
+				<label>마감일 <span style="color: var(--rose)">*</span></label> <input
+					type="date" id="deadline" name="deadline"
+					th:value="${kanbanCardVO?.deadline}"
+					th:min="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
+			</div>
+			<div class="f full">
+				<label>내용</label>
+				<textarea th:field="*{content}" placeholder="카드 내용을 입력하세요"></textarea>
+			</div>
+			<div class="f full">
+				<label>파일 업로드</label>
+				<div class="fileUploadBox">
+					<input type="file" id="upload_file" name="upload_file" class="fileInput">
+					<label for="upload_file" class="fileUploadLabel"> <span
+						class="fileIcon">📎</span> <span class="fileText">파일을 선택하세요</span>
+					</label>
+				</div>
+			</div>
+			<div class="f full">
+				<label>담당자</label>
+				<div class="memberCheckWrap">
+					<label class="memberCheckItem" th:each="member : ${teamMemberList}">
+						<input type="checkbox" name="assignee_nums"	th:value="${member.user_num}"
+								th:checked="${#lists.contains(kanbanCardVO.assignee_nums, member.user_num)}">
+						<span th:text="${member.user_name}"></span>
+					</label>
+				</div>
+			</div>
+		</div>
+		<div class="acts">
+			<button type="button" class="btn" onclick="closeModal()">취소	</button>
+			<button type="button" id="btn_update_card" class="btn primary">수정 저장</button>
+		</div>
+	</form>
+</div>
+</html>

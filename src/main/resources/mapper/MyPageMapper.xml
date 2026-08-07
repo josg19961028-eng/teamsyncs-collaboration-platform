@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.spring.member.dao.MyPageMapper">
+
+    <!-- 내가 참여 중인 팀 개수 -->
+    <select id="countMyTeams" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM TEAM_MEMBER TM
+        JOIN TEAM T ON TM.TEAM_NUM = T.TEAM_NUM
+        WHERE TM.USER_NUM = #{userNum}
+          AND TM.JOIN_STATUS = 1
+          AND T.STATUS != 3
+    </select>
+
+    <!-- 내 담당 칸반 카드 개수 -->
+    <select id="countMyKanbanCards" parameterType="long" resultType="int">
+        SELECT COUNT(DISTINCT KC.CARD_NUM)
+        FROM KANBAN_ASSIGN KA
+        JOIN KANBAN_CARD KC ON KA.CARD_NUM = KC.CARD_NUM
+        WHERE KA.USER_NUM = #{userNum}
+          AND KC.STATUS = 1
+    </select>
+
+    <!-- 내가 참석자로 걸린 회의록 개수 -->
+    <select id="countMyMinutes" parameterType="long" resultType="int">
+        SELECT COUNT(DISTINCT MM.MINUTES_NUM)
+        FROM MEETING_MINUTES_ATTENDEE MMA
+        JOIN MEETING_MINUTES MM ON MMA.MINUTES_NUM = MM.MINUTES_NUM
+        WHERE MMA.USER_NUM = #{userNum}
+          AND MM.STATUS = 1
+    </select>
+
+    <resultMap id="todoCategoryResultMap" type="kr.spring.member.vo.TodoCategoryVO">
+        <id property="todo_category_num" column="TODO_CATEGORY_NUM"/>
+        <result property="user_num" column="USER_NUM"/>
+        <result property="category_name" column="CATEGORY_NAME"/>
+        <result property="color" column="COLOR"/>
+    </resultMap>
+
+    <resultMap id="personalTodoResultMap" type="kr.spring.member.vo.PersonalTodoVO">
+        <id property="todo_num" column="TODO_NUM"/>
+        <result property="user_num" column="USER_NUM"/>
+        <result property="todo_category_num" column="TODO_CATEGORY_NUM"/>
+        <result property="title" column="TITLE"/>
+        <result property="content" column="CONTENT"/>
+        <result property="deadline" column="DEADLINE"/>
+        <result property="priority" column="PRIORITY"/>
+        <result property="complete" column="COMPLETE"/>
+        <result property="category_name" column="CATEGORY_NAME"/>
+        <result property="category_color" column="CATEGORY_COLOR"/>
+    </resultMap>
+
+    <select id="selectTodoCategories" parameterType="long" resultMap="todoCategoryResultMap">
+        SELECT TODO_CATEGORY_NUM, USER_NUM, CATEGORY_NAME, COLOR
+        FROM TODO_CATEGORY
+        WHERE USER_NUM = #{userNum}
+        ORDER BY TODO_CATEGORY_NUM
+    </select>
+
+    <select id="countTodoCategoryByName" resultType="int">
+        SELECT COUNT(*)
+        FROM TODO_CATEGORY
+        WHERE USER_NUM = #{userNum}
+          AND CATEGORY_NAME = #{categoryName}
+    </select>
+
+    <select id="selectPersonalTodos" parameterType="long" resultMap="personalTodoResultMap">
+        SELECT PT.TODO_NUM, PT.USER_NUM, PT.TODO_CATEGORY_NUM,
+               PT.TITLE, PT.CONTENT, PT.DEADLINE, PT.PRIORITY, PT.COMPLETE,
+               TC.CATEGORY_NAME, TC.COLOR AS CATEGORY_COLOR
+        FROM PERSONAL_TODO PT
+        LEFT JOIN TODO_CATEGORY TC
+          ON PT.TODO_CATEGORY_NUM = TC.TODO_CATEGORY_NUM
+         AND PT.USER_NUM = TC.USER_NUM
+        WHERE PT.USER_NUM = #{userNum}
+        ORDER BY PT.COMPLETE ASC,
+        <choose>
+            <when test="sort == 'priority'">
+                 PT.PRIORITY DESC,
+                 CASE WHEN PT.DEADLINE IS NULL THEN 1 ELSE 0 END,
+                 PT.DEADLINE ASC,
+            </when>
+            <when test="sort == 'deadlineDesc'">
+                 CASE WHEN PT.DEADLINE IS NULL THEN 1 ELSE 0 END,
+                 PT.DEADLINE DESC,
+                 PT.PRIORITY DESC,
+            </when>
+            <when test="sort == 'priorityAsc'">
+                 PT.PRIORITY ASC,
+                 CASE WHEN PT.DEADLINE IS NULL THEN 1 ELSE 0 END,
+                 PT.DEADLINE ASC,
+            </when>
+            <otherwise>
+                 CASE WHEN PT.DEADLINE IS NULL THEN 1 ELSE 0 END,
+                 PT.DEADLINE ASC,
+                 PT.PRIORITY DESC,
+            </otherwise>
+        </choose>
+                 PT.TODO_NUM DESC
+    </select>
+
+    <insert id="insertTodoCategory" parameterType="kr.spring.member.vo.TodoCategoryVO">
+        INSERT INTO TODO_CATEGORY (
+            TODO_CATEGORY_NUM, USER_NUM, CATEGORY_NAME, COLOR
+        ) VALUES (
+            SEQ_TODO_CATEGORY.NEXTVAL, #{user_num}, #{category_name}, #{color}
+        )
+    </insert>
+
+    <delete id="deleteTodoCategory">
+        DELETE FROM TODO_CATEGORY
+        WHERE TODO_CATEGORY_NUM = #{todoCategoryNum}
+          AND USER_NUM = #{userNum}
+    </delete>
+
+    <insert id="insertPersonalTodo" parameterType="kr.spring.member.vo.PersonalTodoVO">
+        INSERT INTO PERSONAL_TODO (
+            TODO_NUM, USER_NUM, TODO_CATEGORY_NUM,
+            TITLE, CONTENT, DEADLINE, PRIORITY, COMPLETE
+        ) VALUES (
+            SEQ_PERSONAL_TODO.NEXTVAL, #{user_num}, #{todo_category_num, jdbcType=NUMERIC},
+            #{title}, #{content}, #{deadline, jdbcType=DATE}, #{priority}, 1
+        )
+    </insert>
+
+    <update id="updateTodoComplete">
+        UPDATE PERSONAL_TODO
+        SET COMPLETE = #{complete}
+        WHERE TODO_NUM = #{todoNum}
+          AND USER_NUM = #{userNum}
+    </update>
+
+    <update id="updatePersonalTodo" parameterType="kr.spring.member.vo.PersonalTodoVO">
+        UPDATE PERSONAL_TODO
+        SET TODO_CATEGORY_NUM = #{todo_category_num, jdbcType=NUMERIC},
+            TITLE = #{title},
+            CONTENT = #{content},
+            DEADLINE = #{deadline, jdbcType=DATE},
+            PRIORITY = #{priority}
+        WHERE TODO_NUM = #{todo_num}
+          AND USER_NUM = #{user_num}
+    </update>
+
+    <delete id="deletePersonalTodo">
+        DELETE FROM PERSONAL_TODO
+        WHERE TODO_NUM = #{todoNum}
+          AND USER_NUM = #{userNum}
+    </delete>
+
+</mapper>

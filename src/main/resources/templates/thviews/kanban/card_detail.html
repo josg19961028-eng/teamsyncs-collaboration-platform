@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" th:href="@{/assets/css/SG/kanban_detail.css}" type="text/css">
+<div th:fragment="kanbanCardDetail" class="kanban-detail-wrap">
+    <div class="detailGrid">
+        <div class="detailL">
+            <div class="detailTitleRow">
+                <h2 th:text="${card.title}">카드 제목</h2>
+                <select class="statusSel"
+                        th:classappend="' s' + ${card.kanban_status}"
+                        th:data-card-num="${card.card_num}"
+                        th:data-prev-status="${card.kanban_status}"
+                        onchange="changeKanbanStatus(this)">
+                    <option value="1" th:selected="${card.kanban_status == 1}">할 일 목록</option>
+                    <option value="2" th:selected="${card.kanban_status == 2}">진행 중</option>
+                    <option value="3" th:selected="${card.kanban_status == 3}">검토</option>
+                    <option value="4" th:selected="${card.kanban_status == 4}">완료</option>
+                </select>
+            </div>
+			<div class="detailMeta">
+				<span class="chip" th:text="${card.tag} ?: '기타'">기타</span> <span
+					class="deadline" th:text="'📅 ' + ${card.deadline}">📅
+					2026-07-02</span>
+			</div>
+			<div class="calLink">
+				첨부파일 : <a th:if="${card.file_num != null}"
+					th:href="@{/chat/download/{file_num}(file_num=${card.file_num})}"
+					class="kanbanFileLink"> <span th:text="${card.origin_name}">
+						첨부파일 </span>
+				</a> <span th:unless="${card.file_num != null}"> 첨부파일 없음 </span>
+			</div>
+			<div class="dsec">
+                <h4>내용</h4>
+                <div class="dContent" th:text="${card.content} ?: '내용 없음'" style="color: var(--muted); font-size: 13px;"></div>
+            </div>
+            
+			<div class="dsec">
+				<h4>
+					체크리스트 (<span
+						th:text="${#lists.size(card.checklistList.?[checked == 2])}">0</span>/<span
+						th:text="${#lists.size(card.checklistList)}">0</span>)
+				</h4>
+				<div class="chkList">
+					<!-- 체크리스트가 있을 경우 -->
+					<div class="chkItem" th:each="checklist : ${card.checklistList}">
+						<input type="checkbox" th:checked="${checklist.checked == 2}"
+							th:data-card-num="${card.card_num}"
+							th:data-checklist-num="${checklist.checklist_num}"
+							onchange="changeChecklistChecked(this)"> <span
+							class="chkLbl"
+							th:classappend="${checklist.checked == 2} ? ' done' : ''"
+							th:text="${checklist.content}"> </span>
+
+						<button type="button" class="chkDel"
+							th:data-card-num="${card.card_num}"
+							th:data-checklist-num="${checklist.checklist_num}"
+							onclick="deleteKanbanChecklist(this)">✕</button>
+					</div>
+					<!-- 체크리스트가 없을 경우 -->
+					<div th:if="${#lists.isEmpty(card.checklistList)}"
+						style="color: var(--muted); font-size: 13px; padding: 8px 0">
+						체크 항목 없음</div>
+				</div>
+				<div class="addRow">
+					<input th:id="'check_content_' + ${card.card_num}"
+						placeholder="체크 항목 추가 후 Enter"
+						th:onkeydown="|if(event.key === 'Enter'){
+               event.preventDefault();
+               document.getElementById('check_btn_${card.card_num}').click();
+           }|">
+
+					<button type="button" class="btn sm"
+						th:id="'check_btn_' + ${card.card_num}"
+						th:onclick="'addKanbanChecklist(' + ${card.card_num} + ', this)'">
+						추가</button>
+				</div>
+			</div>
+
+			<div class="dsec">
+				<h4>댓글 (<span th:text="${#lists.size(card.commentList)}">0</span>)</h4>
+				<div class="cmtList">
+					<!-- 댓글이 있을 경우 -->
+					<div class="cmt" th:each="comment : ${card.commentList}">
+						<div class="cmtAv" th:text="${#strings.substring(comment.user_name,0,1)}"></div>
+						<div class="cmtB">
+							<div class="cmtMeta">
+								<span class="cmtAuthor" th:text="${comment.user_name}"></span>
+								<span class="cmtDate" th:text="${comment.reg_date}"></span>
+							</div>
+							<div class="cmtText" th:text="${comment.content}"></div>
+							<div class="cmtActs"
+								th:if="${comment.user_num == #authentication.principal.usersVO.user_num}">
+								<button type="button" th:data-card-num="${card.card_num}"
+									th:data-comment-num="${comment.comment_num}"
+									onclick="openUpdateCommentForm(this)">수정</button>
+
+								<button type="button" class="cdel"
+									th:data-card-num="${card.card_num}"
+									th:data-comment-num="${comment.comment_num}"
+									onclick="deleteKanbanComment(this)">삭제</button>
+							</div>
+						</div>
+					</div>
+					<!-- 댓글이 없을 경우 -->
+					<div th:if="${#lists.isEmpty(card.commentList)}"
+						style="color: var(--muted); font-size: 13px; padding: 8px 0">
+						댓글 없음</div>
+				</div>
+				<div class="addRow">
+					<input th:id="'comment_content_' + ${card.card_num}"
+						placeholder="댓글 입력 후 Enter"
+						th:onkeydown="|if(event.key === 'Enter'){
+               event.preventDefault();
+               document.getElementById('comment_btn_${card.card_num}').click();
+           }|">
+
+					<button type="button" class="btn sm primary"
+						th:id="'comment_btn_' + ${card.card_num}"
+						th:onclick="'addKanbanComment(' + ${card.card_num} + ', this)'">
+						전송</button>
+				</div>
+			</div>
+		</div>
+
+        <div class="detailR">
+            <div class="rBox">
+                <h5>담당자</h5>
+                <div class="assignChips">
+					<div class="aChip" th:each="assign : ${card.assignList}">
+						<div class="miniAv"
+							th:text="${#strings.substring(assign.user_name,0,1)}"></div>
+						<span th:text="${assign.user_name}"></span>
+						<button type="button" class="aChipRm" th:if="${card.editable}"
+							th:data-card-num="${card.card_num}"
+							th:data-user-num="${assign.user_num}"
+							onclick="deleteKanbanAssign(this)">×</button>
+					</div>
+					<span th:if="${#lists.isEmpty(card.assignList)}"
+                          style="font-size:12px;color:var(--muted)">
+                        없음
+                    </span>
+                </div>
+				<div class="assignSelectWrap">
+				<select class="assignAddSel" th:data-card-num="${card.card_num}"
+					onchange="addKanbanAssign(this)">
+					<option value="">+ 담당자 추가</option>
+					<option th:each="member : ${teamMemberList}"
+						th:if="${!card.assignee_nums.contains(member.user_num)}"
+						th:value="${member.user_num}" th:text="${member.user_name}">
+					</option>
+				</select>
+				</div>
+			</div>
+
+            <div class="rBox">
+                <h5>작업 이력</h5>
+                <div class="histItem" th:text="'📝 ' + ${card.reg_date} + ' — ' + ${card.writer_name} +'님 카드 생성'"></div>
+                <div class="histItem" th:text="'👤 담당자 ' + ${#lists.size(card.assignList)} + '명'"></div>
+            </div>
+
+            <div class="detailActions">
+                <button class="btn" th:if="${card.editable}" th:data-card-num="${card.card_num}" onclick="openUpdateModal(this)">✏️ 카드 수정</button>
+                <button class="btn danger" th:if="${card.editable}" th:data-card-num="${card.card_num}" onclick="deleteKanbanCard(this)">🗑️ 카드 삭제</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+</html>

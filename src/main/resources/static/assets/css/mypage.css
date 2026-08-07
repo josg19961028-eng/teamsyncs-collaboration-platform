@@ -1,0 +1,83 @@
+:root{--primary:#6c5ce7;--violet:#8f65f6;--rose:#e46aa1;--green:#34b77b;--orange:#f0a04b;--muted:#7b7394;--line:#e8e1fb;--ink:#1e1635;--blueS:#f1edff;--greenS:#eef9f4;--orangeS:#fff5ea;--violetS:#f5f0ff;--roseS:#fff1f7;--shadow:0 16px 44px rgba(73,47,133,.12);--soft:0 8px 22px rgba(73,47,133,.08);--r:24px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;background:radial-gradient(circle at top left,#f4eeff 0,#efe8ff 24%,#f6f2ff 48%,#f8f6ff 70%,#fbf9ff 100%);color:var(--ink)}
+button,input,select,textarea{font-family:inherit;cursor:pointer}
+.app{max-width:1400px;margin:0 auto;padding:24px}
+.btn{border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;font-weight:950;background:#fff;color:#42485b;cursor:pointer;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--primary),#7476ff);border:0;color:#fff;box-shadow:0 12px 24px rgba(86,87,245,.2)}
+.btn.danger{background:var(--roseS);color:var(--rose);border-color:transparent}
+.btn.sm{padding:7px 11px;font-size:12px}
+.panel{background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);border-radius:var(--r);overflow:hidden}
+
+/* 마이페이지 레이아웃 */
+.myLayout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+
+/* 프로필 카드 */
+.profileCard{padding:22px;text-align:center}
+.profileAvatar{width:96px;height:96px;border-radius:28px;background:linear-gradient(135deg,var(--primary),var(--violet));color:#fff;display:grid;place-items:center;font-size:36px;font-weight:950;margin:0 auto 14px;position:relative;cursor:pointer}
+.profileAvatarEdit{position:absolute;bottom:-4px;right:-4px;width:28px;height:28px;border-radius:9px;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:14px;border:2px solid #fff}
+.profileName{font-size:20px;font-weight:950;letter-spacing:-.04em}
+.profileEmail{font-size:13px;color:var(--muted);margin-top:4px}
+.profileBadges{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}
+.badge{display:inline-flex;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:950}
+.badge.admin{background:var(--roseS);color:var(--rose)}
+.badge.normal{background:var(--blueS);color:var(--primary)}
+.badge.google{background:var(--orangeS);color:#c46121}
+.profileStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0;padding:14px;background:#f8f5ff;border-radius:16px}
+.pStat .val{font-size:20px;font-weight:950}
+.pStat .lbl{font-size:10px;color:var(--muted);font-weight:800;margin-top:2px}
+.profileNav{display:flex;flex-direction:column;gap:4px;margin-top:16px}
+.profileNav button{text-align:left;padding:11px 13px;border-radius:14px;font-size:13px;font-weight:900;border:0;background:transparent;color:#555c70;cursor:pointer;transition:.12s;display:flex;align-items:center;gap:9px}
+.profileNav button:hover,.profileNav button.active{background:linear-gradient(135deg,#2b2346,#46367e);color:#fff}
+.profileNav button .ni{width:20px;text-align:center}
+
+/* 탭 콘텐츠 */
+.tabContent{display:none}
+.tabContent.active{display:block}
+.tabPad{padding:22px}
+.tabHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.tabHead h3{margin:0;font-size:18px;font-weight:950}
+
+/* 프로필 수정 폼 */
+.fGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;font-weight:950;color:#51586f}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-size:14px;background:#fff;outline:none;transition:.15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(108,92,231,.4);box-shadow:0 0 0 3px rgba(108,92,231,.08)}
+.field input[readonly]{background:#f8f6ff;color:var(--muted)}
+.field textarea{min-height:80px;resize:vertical}
+.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px}
+
+/* To-Do */
+.todoList{display:flex;flex-direction:column;gap:8px}
+.todoItem{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:16px;cursor:pointer;transition:.12s}
+.todoItem:hover{border-color:rgba(108,92,231,.3)}
+.todoItem.done span{text-decoration:line-through;color:var(--muted)}
+
+/* 소셜 / 알림 설정 */
+.socialRow{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)}
+.socialRow:last-child{border:none}
+.socialLeft{display:flex;align-items:center;gap:12px}
+.socialIcon{width:40px;height:40px;border-radius:14px;background:#f4f6fb;display:grid;place-items:center;font-size:20px}
+.socialName{font-size:14px;font-weight:950}
+.socialStatus{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* 위험 구역 */
+.dangerSection{padding:14px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dangerSection:last-child{border:none}
+
+/* 모달 */
+.modalLayer{display:none;position:fixed;inset:0;background:rgba(15,18,33,.48);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:22px}
+.modalLayer.active{display:flex}
+.modal{width:min(560px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:26px;box-shadow:0 40px 100px rgba(0,0,0,.25)}
+.modalHead{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+.modalHead h3{margin:0;font-size:19px}
+.closeBtn{width:34px;height:34px;border-radius:12px;background:#f4f6fb;border:1px solid var(--line);font-size:18px}
+.modalBody{padding:22px}
+
+#toast{position:fixed;bottom:28px;right:28px;background:#171a2b;color:#fff;border-radius:18px;padding:14px 18px;font-size:13px;font-weight:900;box-shadow:var(--shadow);z-index:9999;display:none}
+#toast.show{display:block;animation:tup .25s ease}
+@keyframes tup{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+
+@media(max-width:960px){.myLayout{grid-template-columns:1fr}.fGrid{grid-template-columns:1fr}}

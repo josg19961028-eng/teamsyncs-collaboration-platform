@@ -1,0 +1,173 @@
+/* ================================================
+   전체 알림 페이지 (/notification/list)
+   header.css 의 --ts-* 변수를 그대로 사용
+   ================================================ */
+
+.noti-page{
+  padding:32px;
+}
+
+.noti-card{
+  background:#fff;
+  border-radius:var(--ts-r);
+  box-shadow:var(--ts-shadow);
+  overflow:hidden;
+}
+
+/* ── 상단 헤더 ── */
+.noti-page-hd{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+  padding:26px 28px 20px;flex-wrap:wrap;
+}
+.noti-page-hd .tt{
+  font-size:21px;font-weight:950;color:var(--ts-ink);letter-spacing:-.02em;
+  display:flex;align-items:center;gap:8px;
+}
+.noti-page-hd .sub{
+  font-size:13px;color:var(--ts-muted);font-weight:700;margin-top:6px;
+}
+.noti-hd-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+.noti-unread-pill{
+  padding:7px 13px;border-radius:999px;font-size:12px;font-weight:950;color:#fff;
+  background:linear-gradient(135deg,var(--ts-primary),var(--ts-violet));
+  white-space:nowrap;
+}
+.noti-unread-pill.zero{
+  background:#f1edff;color:#8a80ab;
+}
+
+.noti-btn{
+  border:1px solid var(--ts-line);background:#fff;border-radius:11px;
+  padding:7px 13px;font-size:12.5px;font-weight:900;color:#5a5274;cursor:pointer;
+  font-family:inherit;transition:.14s;white-space:nowrap;
+}
+.noti-btn:hover{background:#f4f0ff;border-color:var(--ts-violet);color:var(--ts-primary);}
+.noti-btn:disabled{opacity:.5;cursor:default;background:#fff;color:#5a5274;border-color:var(--ts-line);}
+
+.noti-btn-danger{
+  border:1px solid #fbdce6;background:#fff5f8;color:#c81e5f;
+}
+.noti-btn-danger:hover{background:#fde2ea;border-color:#f4a9c3;color:#a8104b;}
+.noti-btn-danger:disabled{opacity:.5;cursor:default;background:#fff5f8;color:#c81e5f;border-color:#fbdce6;}
+
+/* ── 카테고리 탭 ── */
+.noti-tabs{
+  display:flex;align-items:center;gap:4px;padding:0 20px;
+  border-top:1px solid var(--ts-line);border-bottom:1px solid var(--ts-line);
+  overflow-x:auto;
+}
+.noti-tab{
+  display:flex;align-items:center;gap:5px;border:none;background:transparent;
+  padding:13px 12px;font-size:13px;font-weight:850;color:#8a80ab;cursor:pointer;
+  font-family:inherit;border-bottom:2.5px solid transparent;white-space:nowrap;transition:.14s;
+}
+.noti-tab:hover{color:var(--ts-primary);}
+.noti-tab.active{color:var(--ts-primary);border-bottom-color:var(--ts-primary);}
+.noti-tab .cnt{
+  font-size:10.5px;font-weight:950;color:#a79fc0;background:#f1edff;
+  border-radius:999px;padding:1px 6px;
+}
+.noti-tab.active .cnt{color:var(--ts-primary);background:#e7dfff;}
+
+/* ── 목록 ── */
+.noti-list{padding:6px 0 10px;}
+
+.noti-date-group{
+  font-size:12px;font-weight:950;color:#a79fc0;padding:16px 24px 8px;
+  letter-spacing:.02em;
+}
+
+.noti-item{
+  display:flex;align-items:flex-start;gap:14px;padding:16px 24px;
+  position:relative;border-bottom:1px solid #f1ecfb;transition:background .14s;
+}
+.noti-item:last-child{border-bottom:none;}
+.noti-item:hover{background:#faf8ff;}
+.noti-item.unread{background:#fbf9ff;}
+
+.noti-item .ico{
+  width:42px;height:42px;border-radius:13px;flex-shrink:0;
+  display:grid;place-items:center;font-size:19px;
+}
+.noti-item.type-1 .ico{background:#eef1ff;}
+.noti-item.type-2 .ico{background:#e5f4ff;}
+.noti-item.type-3 .ico{background:#e6f9ec;}
+.noti-item.type-4 .ico{background:#fff3de;}
+.noti-item.type-5 .ico{background:#fde8f2;}
+.noti-item.type-0 .ico{background:#f1edff;}
+
+.noti-item .body{flex:1;min-width:0;padding-right:8px;}
+
+.noti-item .badge{
+  display:inline-block;font-size:11px;font-weight:950;border-radius:6px;
+  padding:2px 7px;margin-right:7px;vertical-align:middle;
+}
+.type-1 .badge{background:#eef1ff;color:#4338ca;}
+.type-2 .badge{background:#e5f4ff;color:#0284c7;}
+.type-3 .badge{background:#e6f9ec;color:#16a34a;}
+.type-4 .badge{background:#fff3de;color:#b45309;}
+.type-5 .badge{background:#fde8f2;color:#db2777;}
+.type-0 .badge{background:#f1edff;color:#6c5ce7;}
+
+.noti-item .title{
+  font-size:14px;font-weight:900;color:var(--ts-ink);vertical-align:middle;letter-spacing:-.01em;
+}
+.noti-item:not(.unread) .title{color:#6b6385;font-weight:800;}
+
+.noti-item .desc{
+  font-size:12.5px;color:var(--ts-muted);margin-top:5px;line-height:1.5;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+
+.noti-item .meta{
+  font-size:11.5px;color:#a79fc0;font-weight:800;margin-top:7px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.noti-item .meta .dvd{color:#d8d0ef;}
+.noti-item .meta .team{color:var(--ts-primary);font-weight:900;}
+
+.noti-item .actions{
+  display:flex;align-items:center;gap:6px;flex-shrink:0;margin-top:2px;
+}
+.noti-item .btn-detail{
+  border:1px solid var(--ts-line);background:#fff;border-radius:10px;
+  padding:6px 12px;font-size:11.5px;font-weight:900;color:#5a5274;
+  text-decoration:none;white-space:nowrap;transition:.14s;
+  cursor:pointer;font-family:inherit;
+}
+.noti-item .btn-detail:hover{background:#f4f0ff;border-color:var(--ts-violet);color:var(--ts-primary);}
+.noti-item .btn-delete{
+  width:28px;height:28px;border-radius:50%;border:none;background:#fdecf1;
+  color:#e0538a;font-size:13px;font-weight:900;cursor:pointer;display:grid;place-items:center;
+  transition:.14s;
+}
+.noti-item .btn-delete:hover{background:#fbd7e4;color:#c81e5f;}
+
+.noti-item .dot{
+  position:absolute;top:20px;right:24px;width:8px;height:8px;border-radius:50%;
+  background:var(--ts-violet);
+}
+.noti-item:not(.unread) .dot{display:none;}
+
+/* 필터로 인해 숨겨진 항목/그룹 */
+.noti-item.hide,
+.noti-date-group.hide{display:none;}
+
+/* ── 비어 있음 ── */
+.noti-page-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;padding:80px 20px;text-align:center;
+}
+.noti-page-empty::before{content:"🔔";font-size:40px;opacity:.4;}
+.noti-page-empty .t{font-size:15px;font-weight:900;color:#6b6385;}
+.noti-page-empty .s{font-size:12.5px;color:var(--ts-muted);}
+
+@media (max-width:640px){
+  .noti-page{padding:16px;}
+  .noti-page-hd{padding:20px 18px 16px;}
+  .noti-tabs{padding:0 12px;}
+  .noti-item{padding:14px 18px;gap:11px;}
+  .noti-item .actions{flex-direction:column;align-items:flex-end;}
+}

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.spring.users.dao.GoogleUserMapper">
+
+    <resultMap id="googleUserResultMap" type="kr.spring.users.vo.UsersVO">
+        <id property="user_num" column="USER_NUM"/>
+        <result property="email" column="EMAIL"/>
+        <result property="passwd" column="PASSWD"/>
+        <result property="user_name" column="USER_NAME"/>
+        <result property="real_name" column="REAL_NAME"/>
+        <result property="phone" column="PHONE"/>
+        <result property="birth" column="BIRTH"/>
+        <result property="intro" column="INTRO"/>
+        <result property="photo_name" column="PHOTO_NAME"/>
+        <result property="auth" column="AUTH"/>
+        <result property="login_type" column="LOGIN_TYPE"/>
+        <result property="google_id" column="GOOGLE_ID"/>
+        <result property="status" column="STATUS"/>
+        <result property="withdraw_date" column="WITHDRAW_DATE"/>
+        <result property="reg_date" column="REG_DATE"/>
+        <result property="modify_date" column="MODIFY_DATE"/>
+    </resultMap>
+
+    <select id="selectByGoogleId" parameterType="string" resultMap="googleUserResultMap">
+        SELECT USER_NUM, EMAIL, PASSWD, USER_NAME, REAL_NAME, PHONE,
+               BIRTH, INTRO, PHOTO_NAME, AUTH, LOGIN_TYPE, GOOGLE_ID,
+               STATUS, WITHDRAW_DATE, REG_DATE, MODIFY_DATE
+        FROM USERS
+        WHERE GOOGLE_ID = #{googleId}
+          AND STATUS != 3
+    </select>
+
+    <select id="selectByEmail" parameterType="string" resultMap="googleUserResultMap">
+        SELECT USER_NUM, EMAIL, PASSWD, USER_NAME, REAL_NAME, PHONE,
+               BIRTH, INTRO, PHOTO_NAME, AUTH, LOGIN_TYPE, GOOGLE_ID,
+               STATUS, WITHDRAW_DATE, REG_DATE, MODIFY_DATE
+        FROM USERS
+        WHERE LOWER(EMAIL) = #{email}
+          AND STATUS != 3
+    </select>
+
+    <select id="selectByUserNum" parameterType="long" resultMap="googleUserResultMap">
+        SELECT USER_NUM, EMAIL, PASSWD, USER_NAME, REAL_NAME, PHONE,
+               BIRTH, INTRO, PHOTO_NAME, AUTH, LOGIN_TYPE, GOOGLE_ID,
+               STATUS, WITHDRAW_DATE, REG_DATE, MODIFY_DATE
+        FROM USERS
+        WHERE USER_NUM = #{userNum}
+          AND STATUS != 3
+    </select>
+
+    <insert id="insertGoogleUser" parameterType="kr.spring.users.vo.UsersVO">
+        INSERT INTO USERS (
+            USER_NUM, EMAIL, PASSWD, USER_NAME, REAL_NAME, PHONE, BIRTH,
+            INTRO, AUTH, LOGIN_TYPE, GOOGLE_ID, STATUS, REG_DATE
+        ) VALUES (
+            SEQ_USERS.NEXTVAL, #{email}, #{passwd, jdbcType=VARCHAR},
+            #{user_name}, #{real_name, jdbcType=VARCHAR},
+            #{phone, jdbcType=VARCHAR}, #{birth, jdbcType=DATE},
+            #{intro, jdbcType=VARCHAR}, #{auth}, #{login_type},
+            #{google_id}, #{status}, SYSDATE
+        )
+    </insert>
+
+    <update id="updateGoogleAdditionalInfo" parameterType="kr.spring.users.vo.UsersVO">
+        UPDATE USERS
+        SET REAL_NAME = #{real_name},
+            PHONE = #{phone},
+            BIRTH = #{birth},
+            MODIFY_DATE = SYSDATE
+        WHERE USER_NUM = #{user_num}
+          AND LOGIN_TYPE = 2
+          AND STATUS != 3
+    </update>
+
+    <update id="linkGoogleAccount">
+        UPDATE USERS
+        SET GOOGLE_ID = #{googleId},
+            LOGIN_TYPE = 3,
+            MODIFY_DATE = SYSDATE
+        WHERE USER_NUM = #{userNum}
+          AND LOGIN_TYPE = 1
+          AND GOOGLE_ID IS NULL
+          AND STATUS != 3
+    </update>
+
+    <update id="unlinkGoogleAccount" parameterType="long">
+        UPDATE USERS
+        SET GOOGLE_ID = NULL,
+            LOGIN_TYPE = 1,
+            MODIFY_DATE = SYSDATE
+        WHERE USER_NUM = #{userNum}
+          AND LOGIN_TYPE = 3
+          AND GOOGLE_ID IS NOT NULL
+          AND STATUS != 3
+    </update>
+
+    <select id="countByPhoneExceptUser" resultType="int">
+        SELECT COUNT(*)
+        FROM USERS
+        WHERE PHONE = #{phone}
+          AND USER_NUM != #{userNum}
+          AND STATUS != 3
+    </select>
+
+</mapper>

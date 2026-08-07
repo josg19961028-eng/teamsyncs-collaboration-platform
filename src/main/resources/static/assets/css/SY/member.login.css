@@ -1,0 +1,673 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Noto Sans KR", sans-serif;
+  background: #efeaff;
+  min-height: 100vh;
+  color: #211a3f;
+}
+
+.sy-member-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.sy-member-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 28px;
+  box-shadow: 0 18px 50px rgba(97, 75, 180, 0.16);
+  padding: 28px 26px 24px;
+  position: relative;
+}
+
+.sy-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.sy-brand a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #211a3f;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.sy-brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #8158ff, #6b61ff);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 15px;
+}
+
+.sy-tabs {
+  display: flex;
+  gap: 10px;
+  background: #f0eafb;
+  border: 1px solid #e4d9ff;
+  border-radius: 16px;
+  padding: 10px 12px;
+  margin-bottom: 22px;
+}
+
+.sy-tab {
+  padding: 8px 15px;
+  border: 0;
+  background: transparent;
+  border-radius: 13px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #675d85;
+  cursor: pointer;
+}
+
+.sy-tab.sy-on {
+  background: #fff;
+  color: #6b55f5;
+  box-shadow: 0 4px 12px rgba(33, 26, 63, 0.1);
+}
+
+.sy-pane {
+  display: none;
+}
+
+.sy-pane.sy-on {
+  display: block;
+}
+
+.sy-title {
+  font-size: 30px;
+  line-height: 1.08;
+  font-weight: 900;
+  color: #111029;
+  margin-bottom: 10px;
+  letter-spacing: 0;
+}
+
+.sy-signup-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: -4px 0 10px;
+}
+
+.sy-signup-title .sy-title {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 0;
+}
+
+.sy-signup-title .sy-brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  font-size: 17px;
+}
+
+.sy-signup-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.sy-signup-brand h2 {
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 900;
+  color: #111029;
+}
+
+.sy-signup-brand .sy-brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  font-size: 17px;
+}
+
+.sy-back-icon {
+  position: absolute;
+  top: 32px;
+  left: 18px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  z-index: 2;
+}
+
+.sy-back-icon span {
+  width: 13px;
+  height: 13px;
+  border-left: 4px solid #000;
+  border-bottom: 4px solid #000;
+  transform: rotate(45deg);
+  display: block;
+}
+
+.sy-back-icon:hover span {
+  border-color: #574cff;
+}
+
+.sy-stepper {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px 1fr 32px;
+  align-items: center;
+  margin: 0 8px 8px;
+}
+
+.sy-step-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid #d8d4e9;
+  background: #fff;
+  color: #9b95b3;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.sy-step-dot.sy-active,
+.sy-step-dot.sy-done {
+  border-color: #6654f5;
+  background: #6654f5;
+  color: #fff;
+}
+
+.sy-step-line {
+  height: 1.5px;
+  background: #e3e0ee;
+}
+
+.sy-step-labels {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px 1fr 32px;
+  margin-bottom: 26px;
+  color: #918aa7;
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.sy-step-labels span {
+  width: 90px;
+  justify-self: center;
+  white-space: nowrap;
+}
+
+.sy-step-labels span:nth-child(1) {
+  grid-column: 1;
+  transform: translateX(12px);
+}
+
+.sy-step-labels span:nth-child(2) {
+  grid-column: 3;
+}
+
+.sy-step-labels span:nth-child(3) {
+  grid-column: 5;
+  transform: translateX(-12px);
+}
+
+.sy-step-labels .sy-active {
+  color: #6654f5;
+}
+
+.sy-step-head {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.sy-step-head h3 {
+  font-size: 22px;
+  line-height: 1.2;
+  color: #111029;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.sy-step-head p {
+  color: #918aa7;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 800;
+}
+
+.sy-subview-title {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 900;
+  color: #111029;
+  margin: 14px 0 8px;
+}
+
+.sy-rocket {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.sy-sub {
+  font-size: 14px;
+  color: #8d88a6;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.sy-field {
+  margin-bottom: 14px;
+}
+
+.sy-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  color: #5e547b;
+  margin-bottom: 7px;
+}
+
+.sy-required {
+  color: #ff5b92;
+}
+
+.sy-hint {
+  margin-top: 7px;
+  font-size: 11px;
+  color: #aaa1c1;
+  font-weight: 700;
+}
+
+.sy-field input,
+.sy-field textarea {
+  width: 100%;
+  padding: 0 16px;
+  border: 1.5px solid #dedbed;
+  border-radius: 14px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.15s;
+  color: #211a3f;
+}
+
+.sy-field input {
+  height: 48px;
+}
+
+.sy-field textarea {
+  min-height: 90px;
+  padding-top: 12px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.sy-field input:focus,
+.sy-field textarea:focus {
+  border-color: #7561ff;
+  box-shadow: 0 0 0 3px rgba(117, 97, 255, 0.1);
+}
+
+.sy-field input.sy-input-error,
+.sy-field textarea.sy-input-error {
+  border-color: #ff4d6d;
+  box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.12);
+}
+
+.sy-field-error {
+  margin-top: 6px;
+  color: #e46aa1;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.sy-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.sy-email-row {
+  display: grid;
+  grid-template-columns: 1fr 96px;
+  gap: 8px;
+}
+
+.sy-phone-row {
+  display: grid;
+  grid-template-columns: 1fr 88px;
+  gap: 8px;
+}
+
+.sy-phone-row .sy-btn-check {
+  height: 48px;
+  border-radius: 14px;
+  font-size: 12px;
+}
+
+.sy-field:has(> #sy-signup-phone) #sy-signup-phone {
+  display: inline-block;
+  width: calc(100% - 96px);
+  vertical-align: top;
+}
+
+.sy-field:has(> #sy-signup-phone) #sy-check-phone {
+  width: 88px;
+  height: 48px;
+  margin-left: 8px;
+  border-radius: 14px;
+  font-size: 12px;
+  vertical-align: top;
+}
+
+.sy-field:has(> #sy-signup-phone) #sy-phone-check-msg {
+  display: block;
+}
+
+.sy-btn {
+  border: 0;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.sy-btn-primary {
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(135deg, #6b4df6, #574cff);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(106, 91, 245, 0.24);
+}
+
+.sy-btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+.sy-btn-check {
+  height: 42px;
+  background: #f0eaff;
+  border: 1.5px solid #ddd1ff;
+  color: #735df5;
+  font-size: 12px;
+}
+
+.sy-btn-google {
+  width: 100%;
+  height: 48px;
+  background: #fff;
+  border: 1.5px solid #e1deeb;
+  color: #17152b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+  border-radius: 14px;
+  font-size: 14px;
+}
+
+.sy-google-logo {
+  display: block;
+  width: auto;
+  height: 36px;
+}
+
+.sy-step-next {
+  margin-top: 14px;
+}
+
+.sy-google-mark {
+  font-size: 17px;
+  font-weight: 900;
+  color: #4285f4;
+}
+
+.sy-msg {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.sy-msg-error {
+  background: #fff0f5;
+  border: 1px solid #ffd0df;
+  color: #e46aa1;
+}
+
+.sy-msg-success {
+  background: #effaf3;
+  border: 1px solid #bfe8cb;
+  color: #258b45;
+}
+
+#sy-login > .sy-msg {
+  display: none;
+}
+
+.sy-check-msg {
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 6px;
+  min-height: 16px;
+}
+
+.sy-check-msg:empty {
+  display: none;
+}
+
+.sy-check-msg.sy-ok-text,
+.sy-code-info .sy-ok-text {
+  color: #258b45;
+}
+
+.sy-check-msg.sy-err-text,
+.sy-code-info .sy-err-text {
+  color: #e46aa1;
+}
+
+.sy-verification-box {
+  display: none;
+}
+
+.sy-verification-box.sy-show {
+  display: block;
+}
+
+#sy-signup-step-email #sy-email-verification-box {
+  margin-top: -6px;
+}
+
+.sy-code-info {
+  display: none;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #7b7394;
+}
+
+.sy-code-info.sy-show {
+  display: flex;
+}
+
+#sy-email-timer,
+#sy-reset-timer {
+  color: #e46aa1;
+  white-space: nowrap;
+}
+
+.sy-terms {
+  background: #f4efff;
+  border: 1.5px solid #e1d7ff;
+  border-radius: 15px;
+  padding: 12px 14px;
+  margin: 2px 0 16px;
+}
+
+.sy-terms.sy-input-error {
+  border-color: #ff4d6d;
+  box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.12);
+}
+
+.sy-term-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 27px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #2b2540;
+}
+
+.sy-term-line input {
+  width: 13px;
+  height: 13px;
+  accent-color: #6b61ff;
+}
+
+.sy-term-all {
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #e3d9fb;
+}
+
+.sy-term-badge {
+  font-size: 10px;
+  color: #ff5b92;
+  background: #ffe7f0;
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-weight: 900;
+}
+
+.sy-term-choice {
+  color: #6b61ff;
+  background: #e9e5ff;
+}
+
+.sy-term-view {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: #6b61ff;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.sy-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 10px;
+  color: #9a95aa;
+  font-size: 13px;
+  font-weight: 800;
+}
+.sy-divider::before,
+.sy-divider::after {
+  content: "";
+  height: 1px;
+  background: #eadffb;
+  flex: 1;
+}
+
+.sy-login-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.sy-login-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #7b7394;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.sy-auth-view,
+.sy-signup-step {
+  display: none;
+}
+
+.sy-auth-view.sy-show,
+.sy-signup-step.sy-show {
+  display: block;
+}
+
+.sy-auth-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+  color: #aaa4bb;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.sy-auth-links button {
+  border: 0;
+  background: transparent;
+  color: #6553f4;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.sy-step-actions {
+  display: block;
+}
+
+@media (max-width: 420px) {
+  .sy-member-card {
+    border-radius: 24px;
+    padding: 24px 20px;
+  }
+
+  .sy-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sy-email-row {
+    grid-template-columns: 1fr 88px;
+  }
+
+  .sy-phone-row {
+    grid-template-columns: 1fr 82px;
+  }
+}

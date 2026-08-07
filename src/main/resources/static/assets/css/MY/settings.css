@@ -1,0 +1,155 @@
+@charset "UTF-8";
+/* 팀 설정 페이지 전용 스타일 (전부 .ts-settings 하위로 스코프 -> 공통 CSS와 충돌 방지) */
+
+.ts-settings{display:flex;flex-direction:column;gap:20px;width:100%;max-width:1280px}
+.ts-settings .panel{
+    background:rgba(255,255,255,.92);
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 16px 44px rgba(73,47,133,.12);
+    border-radius:24px;overflow:hidden;
+}
+.ts-settings .settingSection{padding:22px}
+.ts-settings .settingSection h3{
+    font-size:16px;font-weight:950;margin:0 0 16px;letter-spacing:-.03em;
+    color:var(--ink,#1e1635);
+}
+.ts-settings .field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.ts-settings .field label{font-size:12px;font-weight:950;color:#51586f}
+.ts-settings .field input,
+.ts-settings .field textarea{
+    border:1px solid var(--line,#e8e1fb);border-radius:14px;padding:11px 12px;
+    font-size:14px;background:#fff;outline:none;transition:.15s;font-family:inherit;
+}
+.ts-settings .field input:focus,
+.ts-settings .field textarea:focus{
+    border-color:rgba(108,92,231,.4);box-shadow:0 0 0 3px rgba(108,92,231,.08);
+}
+.ts-settings .field input[readonly],
+.ts-settings .field textarea[readonly]{background:#f7f6fb;color:#8b8499;cursor:not-allowed}
+.ts-settings .field textarea{min-height:90px;resize:vertical}
+.ts-settings .fGrid{display:grid;grid-template-columns:1fr;gap:14px}
+.ts-settings .full{grid-column:1/-1}
+
+/* 이미지 업로드 */
+.ts-settings .imgUpload{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.ts-settings .teamImgPreview{
+    width:80px;height:80px;border-radius:24px;background:#f4f6fb;
+    border:1px solid var(--line,#e8e1fb);display:flex;align-items:center;justify-content:center;
+    font-size:32px;font-weight:950;overflow:hidden;flex-shrink:0;
+}
+.ts-settings .teamImgPreview img{width:100%;height:100%;object-fit:cover}
+
+/* 색상 */
+.ts-settings .colorPicker{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;align-items:center}
+.ts-settings .colorSwatch{
+    width:36px;height:36px;border-radius:12px;border:3px solid transparent;
+    cursor:pointer;transition:.15s;
+}
+.ts-settings .colorSwatch.active{border-color:#333;transform:scale(1.1)}
+.ts-settings .colorPicker input[type=color]{
+    width:36px;height:36px;border-radius:12px;border:none;padding:0;cursor:pointer;background:none;
+}
+
+/* 버튼 */
+.ts-settings .btnRow{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.ts-settings .btn{
+    display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;
+    border:1px solid var(--line,#e8e1fb);border-radius:14px;padding:10px 16px;
+    font-size:13px;font-weight:950;background:#fff;color:#42485b;cursor:pointer;
+    transition:.15s;font-family:inherit;
+}
+.ts-settings .btn:hover{transform:translateY(-1px)}
+.ts-settings .btn.sm{padding:7px 11px;font-size:12px}
+.ts-settings .btn.primary{
+    background:linear-gradient(135deg,var(--primary,#6c5ce7),#7476ff);
+    border:0;color:#fff;box-shadow:0 12px 24px rgba(86,87,245,.2);
+}
+.ts-settings .btn.danger{background:var(--roseS,#fff1f7);color:var(--rose,#e46aa1);border-color:transparent}
+
+.ts-settings .imgHint{font-size:12px;color:var(--muted,#7b7394);margin-bottom:8px}
+.ts-settings .readonlyNote{
+    font-size:12px;color:var(--muted,#7b7394);background:#f7f6fb;
+    border-radius:12px;padding:10px 12px;margin-top:4px;
+}
+
+/* 초대 섹션 */
+.ts-settings .subLabel{font-size:14px;font-weight:950;margin-bottom:8px}
+.ts-settings .separator{border:none;border-top:1px solid var(--line,#e8e1fb);margin:20px 0}
+.ts-settings .codeBox{
+    background:#f8f5ff;border:1px solid var(--line,#e8e1fb);border-radius:18px;padding:16px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.ts-settings .codeVal{font-size:22px;font-weight:950;letter-spacing:.1em;color:var(--primary,#6c5ce7);word-break:break-all}
+.ts-settings .codeMeta{font-size:12px;color:var(--muted,#7b7394);margin-top:4px}
+.ts-settings .codeEmpty{
+    background:#f8f5ff;border:1px dashed var(--line,#e8e1fb);border-radius:18px;padding:20px;
+    text-align:center;color:var(--muted,#7b7394);font-size:13px;
+    display:flex;flex-direction:column;gap:12px;align-items:center;
+}
+.ts-settings .codeStatus{
+    display:inline-block;font-size:11px;font-weight:950;padding:2px 8px;border-radius:8px;margin-left:8px;vertical-align:middle;
+}
+.ts-settings .codeStatus.ok{background:#e7f8f0;color:#1c9d68}
+.ts-settings .codeStatus.off{background:#fdeef4;color:var(--rose,#e46aa1)}
+
+/* 이메일 초대 + 자동완성 */
+.ts-settings .inviteEmailWrap{position:relative;flex:1}
+.ts-settings .inviteEmailWrap input{
+    width:100%;border:1px solid var(--line,#e8e1fb);border-radius:14px;padding:11px 12px;
+    font-size:14px;outline:none;font-family:inherit;box-sizing:border-box;
+}
+.ts-settings .inviteEmailWrap input:focus{
+    border-color:rgba(108,92,231,.4);box-shadow:0 0 0 3px rgba(108,92,231,.08);
+}
+.ts-emailDrop{
+    position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:50;
+    background:#fff;border:1px solid var(--line,#e8e1fb);border-radius:14px;
+    box-shadow:0 16px 40px rgba(73,47,133,.16);overflow-y:auto;max-height:288px;display:none;
+}
+.ts-emailDrop.open{display:block}
+.ts-emailItem{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;transition:.12s}
+.ts-emailItem:hover,.ts-emailItem.active{background:#f4f1ff}
+.ts-emailAvatar{
+    width:30px;height:30px;border-radius:9px;flex-shrink:0;
+    background:var(--primary,#6c5ce7);color:#fff;font-weight:950;font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+}
+.ts-emailText .nm{font-size:13px;font-weight:800;color:var(--ink,#1e1635)}
+.ts-emailText .em{font-size:12px;color:var(--muted,#7b7394)}
+
+/* 위험 구역 */
+.ts-settings .dangerZone{border:1px solid rgba(228,106,161,.3)}
+.ts-settings .dangerSection{
+    padding:18px;border-bottom:1px solid rgba(228,106,161,.15);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.ts-settings .dangerSection:last-child{border-bottom:none}
+.ts-settings .dangerTitle{font-size:14px;font-weight:950}
+.ts-settings .dangerDesc{font-size:12px;color:var(--muted,#7b7394);margin-top:4px}
+.ts-settings .btn.orange{background:#fff3e6;color:#d97e2b;border-color:transparent}
+
+/* 모달 */
+.ts-modal-overlay{
+    position:fixed;inset:0;background:rgba(30,22,53,.42);z-index:100;padding:20px;
+    display:none;align-items:center;justify-content:center;
+}
+.ts-modal-overlay.open{display:flex}
+.ts-modal{
+    background:#fff;border-radius:24px;padding:24px;max-width:420px;width:100%;
+    box-shadow:0 30px 80px rgba(30,22,53,.28);
+}
+.ts-modal h4{margin:0 0 8px;font-size:17px;font-weight:950;color:var(--ink,#1e1635)}
+.ts-modal p{margin:0 0 16px;font-size:13px;color:var(--muted,#7b7394);line-height:1.5}
+.ts-modal select{
+    width:100%;border:1px solid var(--line,#e8e1fb);border-radius:14px;padding:11px 12px;
+    font-size:14px;font-family:inherit;outline:none;background:#fff;
+}
+.ts-modal .warnBox{
+    background:#fdeef4;color:var(--rose,#e46aa1);border-radius:12px;
+    padding:10px 12px;font-size:12px;font-weight:800;margin-top:14px;
+}
+.ts-modal .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+
+@media(min-width:640px){
+    .ts-settings .fGrid{grid-template-columns:1fr 1fr}
+}

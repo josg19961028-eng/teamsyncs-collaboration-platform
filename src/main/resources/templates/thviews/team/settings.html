@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+    <title>팀 설정</title>
+
+    <!-- 페이지 전용 CSS -->
+    <th:block layout:fragment="pageCss">
+    <link rel="stylesheet" th:href="@{/assets/css/MY/settings.css}">
+    </th:block>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="ts-settings">
+
+        <!-- ============ 팀 기본 정보 (TM-002) ============ -->
+        <section class="panel">
+            <div class="settingSection">
+                <h3>⚙️ 팀 기본 정보</h3>
+
+                <!-- 숨김 값 -->
+                <input type="hidden" id="teamNum" th:value="${team.team_num}">
+                <input type="hidden" id="initialColor" th:value="${team.color}">
+
+                <!-- 프로필 이미지 -->
+                <div class="imgUpload">
+                    <div class="teamImgPreview" id="teamImgPrev">
+                        <img th:if="${hasPhoto}"
+                             th:src="@{/team/photo/{n}(n=${team.team_num}, v=${#dates.createNow().time})}"
+                             alt="팀 이미지">
+                        <span th:unless="${hasPhoto}">💻</span>
+                    </div>
+                    <div>
+                        <div style="font-size:13px;font-weight:950;margin-bottom:6px">팀 프로필 이미지</div>
+                        <div class="imgHint">PNG, JPG · 최대 2MB</div>
+                        <div th:if="${isLeader}" style="display:flex;gap:8px">
+                            <button type="button" class="btn sm" onclick="tsTriggerUpload()">이미지 업로드</button>
+                            <button type="button" class="btn sm danger" onclick="tsRemoveImg()">제거</button>
+                        </div>
+                        <input type="file" id="teamImgInput" name="upload" accept="image/*"
+                               style="display:none" th:disabled="${!isLeader}">
+                    </div>
+                </div>
+
+                <!-- 이름 / 설명 / 색상 -->
+                <div class="fGrid">
+                    <div class="field full">
+                        <label>팀 이름 *</label>
+                        <input id="tName" type="text" maxlength="30"
+                               th:value="${team.team_name}" th:readonly="${!isLeader}">
+                    </div>
+                    <div class="field full">
+                        <label>팀 설명</label>
+                        <textarea id="tDesc" maxlength="200"
+                                  th:text="${team.description}" th:readonly="${!isLeader}"></textarea>
+                    </div>
+                    <div class="field full">
+                        <label>팀 색상</label>
+                        <div class="colorPicker" id="colorPicker">
+                            <div class="colorSwatch" style="background:#6c5ce7" data-color="#6c5ce7"
+                                 th:classappend="${team.color == '#6c5ce7'} ? ' active' : ''"
+                                 th:onclick="${isLeader} ? 'tsSelColor(this)' : null"></div>
+                            <div class="colorSwatch" style="background:#34b77b" data-color="#34b77b"
+                                 th:classappend="${team.color == '#34b77b'} ? ' active' : ''"
+                                 th:onclick="${isLeader} ? 'tsSelColor(this)' : null"></div>
+                            <div class="colorSwatch" style="background:#f0a04b" data-color="#f0a04b"
+                                 th:classappend="${team.color == '#f0a04b'} ? ' active' : ''"
+                                 th:onclick="${isLeader} ? 'tsSelColor(this)' : null"></div>
+                            <div class="colorSwatch" style="background:#8f65f6" data-color="#8f65f6"
+                                 th:classappend="${team.color == '#8f65f6'} ? ' active' : ''"
+                                 th:onclick="${isLeader} ? 'tsSelColor(this)' : null"></div>
+                            <div class="colorSwatch" style="background:#e46aa1" data-color="#e46aa1"
+                                 th:classappend="${team.color == '#e46aa1'} ? ' active' : ''"
+                                 th:onclick="${isLeader} ? 'tsSelColor(this)' : null"></div>
+                            <div class="colorSwatch" style="background:#37c4da" data-color="#37c4da"
+                                 th:classappend="${team.color == '#37c4da'} ? ' active' : ''"
+                                 th:onclick="${isLeader} ? 'tsSelColor(this)' : null"></div>
+                            <input type="color" id="customColor" th:value="${team.color}"
+                                   th:disabled="${!isLeader}" onchange="tsCustomColor(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 저장 / 초기화 (팀장만) -->
+                <div th:if="${isLeader}" class="btnRow">
+                    <button type="button" class="btn" onclick="tsLoadTeamInfo()">초기화</button>
+                    <button type="button" class="btn primary" onclick="tsSaveTeamInfo()">저장</button>
+                </div>
+                <div th:unless="${isLeader}" class="readonlyNote">
+                    팀 정보 수정은 팀장만 할 수 있습니다.
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ 팀 초대 (TM-004 초대코드 / TM-005 이메일) : 전체 팀원 조회 가능, 발급·초대는 매니저 이상 ============ -->
+        <section class="panel">
+            <div class="settingSection">
+                <h3>🔗 팀 초대</h3>
+
+                <!-- 초대코드 (페이지 로드 시 GET /team/invite/code 로 채움) -->
+                <div style="margin-bottom:4px">
+                    <div class="subLabel">초대코드</div>
+                    <div id="codeArea" th:data-can-manage="${isManagerUp}">
+                        <div class="codeEmpty">불러오는 중…</div>
+                    </div>
+                </div>
+
+                <!-- 이메일 초대 (매니저 이상만) -->
+                <th:block th:if="${isManagerUp}">
+                    <hr class="separator">
+                    <div class="subLabel">이메일로 초대</div>
+                    <div style="display:flex;gap:8px">
+                        <div class="inviteEmailWrap">
+                            <input id="inviteEmail" type="email" autocomplete="off"
+                                   placeholder="team@example.com">
+                            <div class="ts-emailDrop" id="emailDrop"></div>
+                        </div>
+                        <button type="button" class="btn primary" onclick="tsSendInvite()">초대 발송</button>
+                    </div>
+                    <div style="font-size:12px;color:var(--muted,#7b7394);margin-top:8px">
+                        이메일 초대 후 7일 내 수락 시 팀에 합류됩니다.
+                    </div>
+                </th:block>
+            </div>
+        </section>
+
+        <!-- ============ 위험 구역 (TM-011 위임 / TM-010 탈퇴 / TM-003 삭제) ============ -->
+        <section class="panel dangerZone">
+            <div class="settingSection" style="padding:0">
+
+                <!-- 팀장 위임 (팀장만) -->
+                <div class="dangerSection" th:if="${isLeader}">
+                    <div>
+                        <div class="dangerTitle">팀장 위임</div>
+                        <div class="dangerDesc">다른 팀원에게 팀장 권한을 넘깁니다. 위임 후 나는 일반 팀원이 됩니다.</div>
+                    </div>
+                    <button type="button" class="btn orange" onclick="tsOpenDelegate()">팀장 위임</button>
+                </div>
+
+                <!-- 팀 탈퇴 (전원) -->
+                <div class="dangerSection">
+                    <div>
+                        <div class="dangerTitle">팀 탈퇴</div>
+                        <div class="dangerDesc">이 팀에서 나갑니다. 팀장은 위임 후에만 탈퇴할 수 있습니다.</div>
+                    </div>
+                    <button type="button" class="btn danger" onclick="tsLeaveTeam()">팀 탈퇴</button>
+                </div>
+
+                <!-- 팀 삭제 (팀장만) -->
+                <div class="dangerSection" th:if="${isLeader}">
+                    <div>
+                        <div class="dangerTitle" style="color:var(--rose,#e46aa1)">팀 삭제</div>
+                        <div class="dangerDesc">팀과 모든 데이터가 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</div>
+                    </div>
+                    <button type="button" class="btn danger" onclick="tsDeleteTeam()">팀 삭제</button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 팀장 위임 모달 (팀장만) -->
+        <div class="ts-modal-overlay" id="delegateModal" th:if="${isLeader}">
+        <div class="ts-modal">
+            <h4>팀장 위임</h4>
+            <p>새 팀장을 선택하세요. 위임 후 나는 일반 팀원이 되며, 이 작업은 되돌릴 수 없습니다.</p>
+            <select id="delegateTarget">
+                <option value="" disabled selected>위임할 팀원 선택</option>
+                <option th:each="m : ${members}" th:if="${m.user_num != myUserNum}"
+                        th:value="${m.user_num}" th:text="${m.user_name}"></option>
+            </select>
+            <div class="warnBox">⚠️ 위임 후에는 되돌릴 수 없습니다.</div>
+            <div class="actions">
+                <button type="button" class="btn" onclick="tsCloseDelegate()">취소</button>
+                <button type="button" class="btn orange" onclick="tsDoDelegate()">위임 확정</button>
+            </div>
+        </div>
+    </div>
+    <!-- /팀장 위임 모달 -->
+    </div>
+</div>
+
+<th:block layout:fragment="pageJs">
+<script th:src="@{/assets/js/MY/settings.js}"></script>
+</th:block>
+
+</body>
+</html>

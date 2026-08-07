@@ -1,0 +1,1169 @@
+@charset "UTF-8";
+
+/* ==========================================
+   TeamSync Kanban Write Modal
+========================================== */
+
+.ts-modal-form-wrap{
+    width:100%;
+    max-width:100%;
+}
+
+.ts-modal-form-wrap h2{
+    margin:0 0 22px;
+    font-size:22px;
+    font-weight:900;
+    color:var(--ink);
+    letter-spacing:-.03em;
+}
+
+/* Form Grid */
+.fGrid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:16px;
+    width:100%;
+    max-width:100%;
+    border:none !important;
+}
+
+.f{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-width:0;
+}
+
+.f.full{
+    grid-column:1 / -1;
+}
+
+.f label{
+    font-size:13px;
+    font-weight:900;
+    color:#555c70;
+}
+
+/* Input */
+.f input[type=text],
+.f input[type=date],
+.f textarea,
+.f select{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+    background:#fff;
+    color:var(--ink);
+    font-size:14px;
+    outline:none;
+    transition:.18s;
+}
+
+.f input:focus,
+.f textarea:focus,
+.f select:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(108,92,231,.12);
+}
+
+.f textarea{
+    min-height:130px;
+    resize:vertical;
+    line-height:1.6;
+}
+
+.f input::placeholder,
+.f textarea::placeholder{
+    color:#b0b0b0;
+}
+
+/* 담당자 체크박스 pill */
+.memberCheckWrap{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:#faf8ff;
+}
+
+.memberCheckItem{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex-direction:row !important;
+    gap:7px !important;
+    width:auto !important;
+    min-width:88px !important;
+    padding:8px 13px !important;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:#fff;
+    color:#51586f;
+    font-size:13px;
+    font-weight:900;
+    line-height:1;
+    white-space:nowrap !important;
+    word-break:keep-all !important;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.memberCheckItem:hover{
+    border-color:var(--primary);
+    color:var(--primary);
+}
+
+.memberCheckItem input[type="checkbox"]{
+    flex:0 0 auto;
+    width:14px !important;
+    height:14px !important;
+    margin:0 !important;
+    accent-color:var(--primary);
+}
+
+.memberCheckItem span{
+    display:inline-block !important;
+    white-space:nowrap !important;
+    line-height:1 !important;
+}
+
+/* Validation */
+.error-color{
+    color:var(--rose);
+    font-size:12px;
+    font-weight:800;
+}
+
+.f input.input-error,
+.f textarea.input-error,
+.f select.input-error{
+    border-color:var(--rose) !important;
+    box-shadow:0 0 0 3px rgba(228,106,161,.15);
+    animation:shake .25s ease;
+}
+
+@keyframes shake{
+    0%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    50%{transform:translateX(4px);}
+    75%{transform:translateX(-3px);}
+    100%{transform:translateX(0);}
+}
+
+/* Button Area */
+.acts{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:10px;
+    margin-top:24px;
+    flex-wrap:wrap;
+}
+
+.acts .btn{
+    min-width:auto;
+    height:42px;
+    padding:0 22px;
+    border-radius:16px;
+    font-size:14px;
+    font-weight:950;
+}
+
+.acts .btn:not(.primary){
+    background:#fff;
+    border:1px solid var(--line);
+    color:#42485b;
+}
+
+.acts .btn.primary{
+    background:linear-gradient(135deg,var(--primary),#7476ff);
+    color:#fff;
+    border:0;
+    box-shadow:0 10px 22px rgba(108,92,231,.25);
+}
+
+/* Toast */
+#toast{
+    position:fixed;
+    left:50%;
+    bottom:32px;
+    transform:translateX(-50%);
+    min-width:320px;
+    max-width:520px;
+    padding:16px 22px;
+    border-radius:16px;
+    background:#22253b;
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    line-height:1.6;
+    text-align:left;
+    box-shadow:0 12px 32px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.08);
+    display:none;
+    opacity:0;
+    z-index:99999;
+    pointer-events:none;
+}
+
+#toast.on{
+    display:block;
+    animation:toastUp .28s ease forwards;
+}
+
+@keyframes toastUp{
+    0%{
+        opacity:0;
+        transform:translate(-50%,20px) scale(.96);
+    }
+    100%{
+        opacity:1;
+        transform:translate(-50%,0) scale(1);
+    }
+}
+
+#toast.success{
+    background:linear-gradient(135deg,#24b36b,#2ecc71);
+}
+
+#toast.error{
+    background:linear-gradient(135deg,#f14d5d,#ff6b81);
+}
+
+#toast.info{
+    background:linear-gradient(135deg,#5c6cf5,#7b61ff);
+}
+
+/* Modal */
+#kanban_card_form{
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+}
+
+#kanban_card_form .fGrid{
+    width:100%;
+    max-width:100%;
+    padding:0;
+    border:0;
+    box-sizing:border-box;
+}
+
+#kanban_card_form .f{
+    min-width:0;
+}
+
+#kanban_card_form input,
+#kanban_card_form textarea,
+#kanban_card_form select{
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+}
+
+.mBody{
+    overflow-x:hidden;
+}
+
+.modal{
+    width:min(640px,94vw);
+    overflow-x:hidden;
+}
+
+.modal.writeModal{
+    width:min(640px,94vw);
+}
+
+.modal.detailModal{
+    width:min(980px,96vw);
+}
+
+.ts-modal-form-wrap,
+#kanban_card_form{
+    border:none !important;
+}
+
+/* ==========================================
+   Kanban Board Card
+========================================== */
+
+.kanbanCard{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:13px;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(31,36,58,.05);
+    transition:.15s;
+    user-select:none;
+    overflow:hidden;
+}
+
+.kanbanCard:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--soft);
+    border-color:rgba(108,92,231,.25);
+}
+
+.kanbanCard.drag{
+    opacity:.4;
+    transform:rotate(1.5deg) scale(.97);
+}
+
+.cardTag{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-bottom:8px;
+}
+
+.cardTag .chip{
+    padding:3px 8px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:950;
+    background:var(--blueS);
+    color:var(--primary);
+    border-color:transparent;
+}
+
+.cardTitle{
+    font-size:13px;
+    font-weight:950;
+    line-height:1.4;
+    margin:0 0 10px;
+    color:var(--ink);
+}
+
+/* 카드 하단 */
+.cardFooter{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    min-width:0;
+}
+
+.cardDeadlineBox{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    min-width:0;
+    flex:1;
+}
+
+.cardDeadlineBox .deadline{
+    font-size:11px;
+    color:var(--muted);
+    font-weight:800;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.urgentIcon,
+.overdueIcon{
+    width:20px;
+    height:20px;
+    flex:0 0 20px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:7px;
+    font-size:12px;
+    font-weight:950;
+}
+
+.urgentIcon{
+    background:var(--orangeS);
+    color:var(--orange);
+}
+
+.overdueIcon{
+    background:var(--roseS);
+    color:var(--rose);
+}
+
+/* 담당자 아바타 */
+.cardAssignList{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    flex-shrink:0;
+    max-width:96px;
+    overflow:visible;
+}
+
+.cardAssignAv,
+.cardAssignMore{
+    width:24px;
+    height:24px;
+    flex:0 0 24px;
+    border-radius:8px;
+    display:grid;
+    place-items:center;
+    font-size:10px;
+    font-weight:950;
+    border:2px solid #fff;
+    margin-left:-5px;
+    box-shadow:0 3px 8px rgba(31,36,58,.12);
+}
+
+.cardAssignAv:first-child,
+.cardAssignMore:first-child{
+    margin-left:0;
+}
+
+.cardAssignAv{
+    background:var(--primary);
+    color:#fff;
+}
+
+.cardAssignMore{
+    background:var(--muted);
+    color:#fff;
+}
+
+/* 체크리스트 진행률 */
+.cardProg{
+    margin-top:9px;
+}
+
+.cardProg .cProgBar{
+    height:4px;
+    background:#eee8ff;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.cardProg .cProgFill{
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--primary),var(--violet));
+}
+
+.cardProg .cProgLbl{
+    margin-top:3px;
+    font-size:10px;
+    font-weight:800;
+    color:var(--muted);
+    text-align:right;
+}
+
+/* Responsive */
+@media(max-width:768px){
+    .fGrid{
+        grid-template-columns:1fr;
+    }
+
+    .acts{
+        justify-content:stretch;
+    }
+
+    .acts .btn{
+        width:100%;
+    }
+
+    #toast{
+        width:92%;
+        min-width:auto;
+        max-width:none;
+        bottom:20px;
+        font-size:13px;
+    }
+}
+
+/* Glassmorphism Kanban */
+.laneGrid{
+    background:
+        radial-gradient(circle at 10% 0%, rgba(108,92,231,.16), transparent 30%),
+        radial-gradient(circle at 90% 10%, rgba(116,118,255,.14), transparent 28%);
+    border-radius:24px;
+}
+
+/* 유리 레인 */
+.kanbanLane{
+    background:rgba(255,255,255,.42) !important;
+    border:1px solid rgba(255,255,255,.55) !important;
+    box-shadow:
+        0 18px 45px rgba(31,36,58,.12),
+        inset 0 1px 0 rgba(255,255,255,.75);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+}
+
+.kanbanLane.todo{
+    background:linear-gradient(180deg, rgba(255,255,255,.52), rgba(241,245,249,.36)) !important;
+}
+
+.kanbanLane.inprogress{
+    background:linear-gradient(180deg, rgba(245,243,255,.58), rgba(238,242,255,.36)) !important;
+}
+
+.kanbanLane.feedback{
+    background:linear-gradient(180deg, rgba(255,247,237,.58), rgba(255,255,255,.34)) !important;
+}
+
+.kanbanLane.done{
+    background:linear-gradient(180deg, rgba(240,253,244,.58), rgba(255,255,255,.34)) !important;
+}
+
+/* 유리 헤더 */
+.laneHeader{
+    background:rgba(255,255,255,.48);
+    border:1px solid rgba(255,255,255,.62);
+    border-radius:16px;
+    padding:11px 12px;
+    box-shadow:0 8px 22px rgba(31,36,58,.07);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+}
+
+/* 유리 카드 */
+.kanbanCard{
+    background:rgba(255,255,255,.62);
+    border:1px solid rgba(255,255,255,.68);
+    box-shadow:
+        0 10px 26px rgba(31,36,58,.10),
+        inset 0 1px 0 rgba(255,255,255,.78);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+}
+
+.kanbanCard:hover{
+    background:rgba(255,255,255,.76);
+    transform:translateY(-3px);
+    box-shadow:
+        0 18px 38px rgba(31,36,58,.16),
+        inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+
+/* 담당자 아바타 */
+.cardAssignAv{
+    box-shadow:0 6px 14px rgba(108,92,231,.22);
+}
+
+.cardAssignMore{
+    background:rgba(81,88,111,.85);
+    color:#fff;
+}
+
+/* 드래그 오버 */
+.kanbanLane.hov{
+    border-color:rgba(108,92,231,.55) !important;
+    box-shadow:
+        0 20px 45px rgba(108,92,231,.18),
+        0 0 0 4px rgba(108,92,231,.12),
+        inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+/* ==========================================
+   Kanban Tag
+========================================== */
+
+/* 카드 태그 */
+.cardTag .chip{
+    padding:4px 9px;
+    border:none;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:950;
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        filter .15s ease;
+
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+
+/* ==========================================
+   Filter Tag
+========================================== */
+
+/* 필터 태그 */
+.filterBar .filterTag{
+    padding:6px 11px;
+    border:none;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:900;
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        filter .15s ease;
+
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+/* 필터 hover */
+.filterBar .filterTag:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 14px rgba(31,36,58,.13);
+    filter:brightness(.96);
+}
+
+/* 선택된 필터 */
+.filterBar .filterTag.on{
+    transform:translateY(-1px);
+
+    box-shadow:
+        0 7px 16px rgba(31,36,58,.14),
+        inset 0 0 0 1px currentColor;
+
+    font-weight:950;
+}
+
+
+/* ==========================================
+   All Tag
+========================================== */
+
+.filterBar .allTag{
+    padding:6px 11px;
+    border:none;
+    border-radius:999px;
+
+    background:#f1f3f5;
+    color:#6b7280;
+
+    font-size:11px;
+    font-weight:900;
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+}
+
+.filterBar .allTag:hover{
+    transform:translateY(-2px);
+    background:#e9ecef;
+    box-shadow:0 6px 14px rgba(31,36,58,.12);
+}
+
+.filterBar .allTag.on{
+    transform:translateY(-1px);
+    background:#e2e5e9;
+
+    box-shadow:
+        0 7px 16px rgba(31,36,58,.14),
+        inset 0 0 0 1px #adb5bd;
+}
+
+/* ==========================================
+   Tag Input + Color Picker
+========================================== */
+
+.tagInputWrap{
+    display:flex;
+    align-items:stretch;
+    gap:8px;
+    width:100%;
+    min-width:0;
+}
+
+/* 태그명 입력 */
+.tagInputWrap input[type="text"]{
+    flex:1;
+    min-width:0;
+}
+
+/* 색상 선택 박스 */
+.tagColorPicker{
+    position:relative;
+
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+
+    flex:0 0 auto;
+
+    min-width:88px;
+    padding:0 12px;
+
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+
+    cursor:pointer;
+
+    font-size:12px !important;
+    font-weight:900 !important;
+    color:#62697c !important;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+}
+
+/* hover */
+.tagColorPicker:hover{
+    transform:translateY(-1px);
+
+    background:#fafaff;
+
+    box-shadow:
+        0 6px 14px rgba(31,36,58,.08);
+}
+
+/* 실제 color input */
+.tagColorPicker input[type="color"]{
+    width:24px !important;
+    height:24px !important;
+
+    flex:0 0 24px;
+
+    padding:0 !important;
+    margin:0;
+
+    border:none !important;
+    border-radius:7px;
+
+    background:transparent;
+
+    cursor:pointer;
+
+    box-shadow:none !important;
+}
+
+/* Chrome */
+.tagColorPicker input[type="color"]::-webkit-color-swatch-wrapper{
+    padding:0;
+}
+
+.tagColorPicker input[type="color"]::-webkit-color-swatch{
+    border:none;
+    border-radius:7px;
+}
+
+/* Firefox */
+.tagColorPicker input[type="color"]::-moz-color-swatch{
+    border:none;
+    border-radius:7px;
+}
+
+/* 색상 글자 */
+.tagColorText{
+    white-space:nowrap;
+    pointer-events:none;
+}
+
+/* ==========================================
+   Global Button Hover Effects
+========================================== */
+
+/* ------------------------------------------
+   작성 / 수정폼 하단 버튼 공통
+------------------------------------------ */
+
+.acts .btn{
+    cursor:pointer;
+
+    transition:
+        transform .16s ease,
+        box-shadow .16s ease,
+        background .16s ease,
+        color .16s ease,
+        filter .16s ease;
+}
+
+/* 일반 버튼 */
+.acts .btn:not(.primary):hover{
+    transform:translateY(-2px);
+
+    background:#f8f8fc;
+
+    box-shadow:
+        0 8px 18px rgba(31,36,58,.10);
+}
+
+/* 등록 / 수정 primary 버튼 */
+.acts .btn.primary:hover{
+    transform:translateY(-2px);
+
+    filter:brightness(1.06);
+
+    box-shadow:
+        0 14px 28px rgba(108,92,231,.32);
+}
+
+/* 버튼 클릭 */
+.acts .btn:active{
+    transform:translateY(0) scale(.97);
+}
+
+
+/* ------------------------------------------
+   담당자 선택 버튼
+------------------------------------------ */
+
+.memberCheckItem{
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease,
+        color .15s ease;
+}
+
+.memberCheckItem:hover{
+    transform:translateY(-2px);
+
+    border-color:var(--primary);
+    color:var(--primary);
+
+    background:rgba(108,92,231,.06);
+
+    box-shadow:
+        0 7px 16px rgba(108,92,231,.12);
+}
+
+/* 체크된 담당자 */
+.memberCheckItem:has(input:checked){
+    color:var(--primary);
+
+    background:rgba(108,92,231,.10);
+
+    border-color:rgba(108,92,231,.30);
+
+    box-shadow:
+        0 5px 14px rgba(108,92,231,.10);
+}
+
+.memberCheckItem:has(input:checked):hover{
+    transform:translateY(-2px);
+
+    background:rgba(108,92,231,.15);
+
+    box-shadow:
+        0 8px 18px rgba(108,92,231,.18);
+}
+
+
+/* ------------------------------------------
+   태그 색상 선택 버튼
+------------------------------------------ */
+
+.tagColorPicker{
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+}
+
+.tagColorPicker:hover{
+    transform:translateY(-2px);
+
+    background:#f8f7ff;
+
+    box-shadow:
+        0 8px 18px rgba(108,92,231,.14);
+}
+
+.tagColorPicker:active{
+    transform:translateY(0) scale(.98);
+}
+
+
+/* ------------------------------------------
+   카드 태그
+------------------------------------------ */
+
+.cardTag .chip{
+    padding:4px 9px;
+    border:none;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:950;
+    cursor:default;
+    pointer-events:none;
+
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+.cardTag .chip:hover{
+    transform:translateY(-2px);
+
+    filter:brightness(.95);
+
+    box-shadow:
+        0 7px 16px rgba(31,36,58,.13);
+}
+
+
+/* ------------------------------------------
+   필터 태그
+------------------------------------------ */
+
+.filterBar .filterTag:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 14px rgba(31,36,58,.13);
+    filter:brightness(.96);
+}
+.filterBar .filterTag:hover{
+    transform:translateY(-2px);
+
+    filter:brightness(.92);
+
+    box-shadow:
+        0 8px 18px rgba(31,36,58,.14);
+}
+
+.filterBar .filterTag:active{
+    transform:translateY(0) scale(.96);
+}
+
+
+/* ------------------------------------------
+   전체 태그 버튼
+------------------------------------------ */
+
+.filterBar .allTag{
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+}
+
+.filterBar .allTag:hover{
+    transform:translateY(-2px);
+
+    background:#e7e9ed;
+
+    box-shadow:
+        0 8px 18px rgba(31,36,58,.13);
+}
+
+.filterBar .allTag:active{
+    transform:translateY(0) scale(.96);
+}
+
+
+/* ------------------------------------------
+   칸반 카드
+------------------------------------------ */
+
+.kanbanCard{
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease,
+        border-color .18s ease;
+}
+
+.kanbanCard:hover{
+    transform:translateY(-4px);
+
+    background:rgba(255,255,255,.82);
+
+    box-shadow:
+        0 20px 42px rgba(31,36,58,.17),
+        inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.kanbanCard:active{
+    transform:translateY(-1px) scale(.99);
+}
+
+
+/* ------------------------------------------
+   담당자 아바타
+------------------------------------------ */
+
+.cardAssignAv,
+.cardAssignMore{
+    width:24px;
+    height:24px;
+    flex:0 0 24px;
+    border-radius:8px;
+    display:grid;
+    place-items:center;
+    font-size:10px;
+    font-weight:950;
+    border:2px solid #fff;
+    margin-left:-5px;
+    box-shadow:0 3px 8px rgba(31,36,58,.12);
+
+    /* hover 방지 */
+    cursor:default;
+    pointer-events:none;
+}
+
+
+/* ------------------------------------------
+   검색창
+------------------------------------------ */
+
+.searchBox{
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        border-color .15s ease;
+}
+
+.searchBox:hover{
+    border-color:rgba(108,92,231,.28);
+
+    box-shadow:
+        0 5px 14px rgba(31,36,58,.07);
+}
+
+.searchBox:focus{
+    transform:translateY(-1px);
+
+    border-color:var(--primary);
+
+    box-shadow:
+        0 0 0 3px rgba(108,92,231,.10),
+        0 7px 18px rgba(31,36,58,.08);
+}
+
+
+/* ------------------------------------------
+   작성 / 수정폼 input
+------------------------------------------ */
+
+.f input[type="text"],
+.f input[type="date"],
+.f textarea,
+.f select{
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        border-color .15s ease,
+        background .15s ease;
+}
+
+.f input[type="text"]:hover,
+.f input[type="date"]:hover,
+.f textarea:hover,
+.f select:hover{
+    border-color:rgba(108,92,231,.30);
+
+    background:#fefeff;
+
+    box-shadow:
+        0 5px 14px rgba(31,36,58,.05);
+}
+
+
+/* ------------------------------------------
+   키보드 접근성
+------------------------------------------ */
+
+.acts .btn:focus-visible,
+.memberCheckItem:focus-visible,
+.filterBar .filterTag:focus-visible,
+.filterBar .allTag:focus-visible,
+.tagColorPicker:focus-visible{
+    outline:none;
+
+    box-shadow:
+        0 0 0 3px rgba(108,92,231,.18),
+        0 8px 18px rgba(31,36,58,.10);
+}
+
+/* ==========================================
+   File Upload
+========================================== */
+
+.fileUploadBox{
+    width:100%;
+}
+
+.fileInput{
+    display:none;
+}
+
+.fileUploadLabel{
+    display:flex !important;
+    align-items:center;
+    gap:10px;
+
+    width:100%;
+    min-height:52px;
+    padding:12px 14px;
+
+    border:1.5px dashed var(--line);
+    border-radius:16px;
+    background:rgba(255,255,255,.75);
+
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        border-color .15s ease,
+        background .15s ease,
+        box-shadow .15s ease;
+}
+
+.fileUploadLabel:hover{
+    transform:translateY(-2px);
+    border-color:rgba(108,92,231,.45);
+    background:#fbfaff;
+    box-shadow:0 8px 18px rgba(108,92,231,.10);
+}
+
+.fileIcon{
+    width:34px;
+    height:34px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:12px;
+    background:rgba(108,92,231,.10);
+
+    font-size:17px;
+}
+
+.fileText{
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+
+    color:#51586f;
+    font-size:13px;
+    font-weight:900;
+}
+
+.fileBtn{
+    flex:0 0 auto;
+
+    padding:7px 11px;
+    border-radius:999px;
+
+    background:linear-gradient(135deg,var(--primary),#7476ff);
+    color:#fff;
+
+    font-size:11px;
+    font-weight:950;
+
+    box-shadow:0 7px 14px rgba(108,92,231,.20);
+}
+
+.fileName{
+    margin-top:7px;
+
+    color:var(--muted);
+    font-size:12px;
+    font-weight:800;
+}

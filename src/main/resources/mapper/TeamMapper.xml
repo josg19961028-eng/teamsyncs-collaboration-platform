@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.team.dao.TeamMapper">
+
+    <!-- resultMap -->
+    <resultMap id="teamResultMap" type="kr.spring.team.vo.TeamVO">
+        <id     property="team_num"        column="TEAM_NUM"/>
+        <result property="team_name"       column="TEAM_NAME"/>
+        <result property="description"     column="DESCRIPTION"/>
+        <result property="team_photo"      column="TEAM_PHOTO"/>
+        <result property="team_photo_name" column="TEAM_PHOTO_NAME"/>
+        <result property="color"           column="COLOR"/>
+        <result property="status"          column="STATUS"/>
+        <result property="created_at"      column="CREATED_AT"/>
+        <result property="updated_at"      column="UPDATED_AT"/>
+        <result property="deleted_at"      column="DELETED_AT"/>
+        <result property="creator_num"     column="CREATOR_NUM"/>
+    </resultMap>
+
+    <!-- 팀 생성 -->
+    <insert id="insertTeam" parameterType="kr.spring.team.vo.TeamVO">
+        <selectKey keyProperty="team_num" resultType="long" order="BEFORE">
+            SELECT SEQ_TEAM.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TEAM (
+            TEAM_NUM, TEAM_NAME, DESCRIPTION,
+            TEAM_PHOTO, TEAM_PHOTO_NAME, COLOR,
+            STATUS, CREATED_AT, CREATOR_NUM
+        ) VALUES (
+            #{team_num}, #{team_name}, #{description, jdbcType=VARCHAR},
+            #{team_photo, jdbcType=BLOB}, #{team_photo_name, jdbcType=VARCHAR}, #{color},
+            1, SYSDATE, #{creator_num}
+        )
+    </insert>
+
+    <!-- 팀 단건 조회 -->
+    <select id="selectTeamByNum" parameterType="long" resultMap="teamResultMap">
+        SELECT TEAM_NUM, TEAM_NAME, DESCRIPTION,
+               TEAM_PHOTO, TEAM_PHOTO_NAME, COLOR,
+               STATUS, CREATED_AT, UPDATED_AT, DELETED_AT, CREATOR_NUM
+        FROM TEAM
+        WHERE TEAM_NUM = #{teamNum}
+          AND STATUS != 3
+    </select>
+
+    <!-- 유저가 만든 팀 목록 -->
+    <select id="selectTeamsByCreator" parameterType="long" resultMap="teamResultMap">
+        SELECT TEAM_NUM, TEAM_NAME, DESCRIPTION,
+               TEAM_PHOTO, TEAM_PHOTO_NAME, COLOR,
+               STATUS, CREATED_AT, UPDATED_AT, CREATOR_NUM
+        FROM TEAM
+        WHERE CREATOR_NUM = #{userNum}
+          AND STATUS != 3
+        ORDER BY CREATED_AT DESC
+    </select>
+
+    <!-- 팀 정보 수정 -->
+    <update id="updateTeam" parameterType="kr.spring.team.vo.TeamVO">
+        UPDATE TEAM
+        SET TEAM_NAME       = #{team_name},
+            DESCRIPTION     = #{description, jdbcType=VARCHAR},
+            TEAM_PHOTO      = #{team_photo, jdbcType=BLOB},
+            TEAM_PHOTO_NAME = #{team_photo_name, jdbcType=VARCHAR},
+            COLOR           = #{color},
+            UPDATED_AT      = SYSDATE
+        WHERE TEAM_NUM = #{team_num}
+    </update>
+
+    <!-- 팀 삭제 (soft delete) -->
+    <!-- TEAM_NAME UK 제약이 STATUS와 무관하게 걸려있어, 삭제해도 이름이 영구 점유되는 걸 막기 위해
+         삭제 시점에 이름 뒤에 팀번호를 붙여 원래 이름을 재사용 가능하게 함 -->
+    <update id="deleteTeam" parameterType="long">
+        UPDATE TEAM
+        SET TEAM_NAME  = SUBSTR(TEAM_NAME, 1, 20) || '_DEL_' || TEAM_NUM,
+            STATUS     = 3,
+            DELETED_AT = SYSDATE
+        WHERE TEAM_NUM = #{teamNum}
+    </update>
+
+	<!-- 팀명 중복 체크 (TM-001) -->
+	<!-- 소프트 삭제(status=3)된 팀도 DB의 TEAM_NAME UK 제약상 이름 재사용이 막히므로 status 조건 없이 전체 조회 -->
+	<select id="selectTeamByName" parameterType="string" resultType="kr.spring.team.vo.TeamVO">
+	    SELECT
+	        team_num, team_name, description, color, status,
+	        creator_num, created_at, updated_at, deleted_at
+	    FROM TEAM
+	    WHERE team_name = #{teamName}
+	</select>
+	
+	<!-- 사이드바용 경량 조회 (TEAM_PHOTO BLOB 제외) -->
+    <select id="selectTeamSidebar" parameterType="long" resultType="java.util.Map">
+        SELECT TEAM_NAME, COLOR, NVL2(TEAM_PHOTO, 1, 0) AS HAS_PHOTO
+        FROM TEAM
+        WHERE TEAM_NUM = #{teamNum}
+          AND STATUS != 3
+    </select>
+	
+	
+</mapper>

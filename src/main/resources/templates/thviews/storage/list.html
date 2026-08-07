@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout_main}">
+<head>
+<meta charset="UTF-8">
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+<title>TeamSync - 보관함</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" th:href="@{/assets/css/storage/storage.css}">
+</head>
+<body>
+	<div layout:fragment="content" th:with="currentMenu='storage'">
+
+		<input type="hidden" id="teamNum" th:value="${session.teamNum}">
+
+		<div class="storage-layout">
+
+			<!-- 좌측 폴더 트리 -->
+			<aside class="folder-panel">
+				<div class="folder-panel-header">
+					<h2>보관함</h2>
+					<button class="btn-create-folder"
+						onclick="openCreateFolderModal(null)" title="폴더 생성">
+						<i class="fa-solid fa-folder-plus"></i>
+					</button>
+				</div>
+
+				<div class="folder-tree-scroll">
+					<!-- 전체 보기 -->
+					<div class="folder-item active" onclick="loadAllFiles(this)">
+						<i class="fa-solid fa-box-archive"></i> <span>전체 파일</span>
+					</div>
+
+					<!-- 폴더 트리 -->
+					<div id="folderTree">
+						<th:block th:each="folder : ${folderTree}">
+							<div class="folder-item"
+								th:style="'padding-left:' + (${folder.folder_level} * 16) + 'px'"
+								th:attr="data-folder-num=${folder.folder_num},
+                                      data-folder-name=${folder.folder_name},
+                                      data-level=${folder.folder_level}"
+								th:onclick="'loadFolderFiles(' + ${folder.folder_num} + ', this)'">
+								<i
+									th:class="${folder.is_leaf == 1} ? 'fa-regular fa-folder' : 'fa-regular fa-folder-open'"></i>
+								<span th:text="${folder.folder_name}"></span>
+								<div class="folder-actions">
+									<button class="btn-folder-action"
+										th:onclick="'openCreateFolderModal(' + ${folder.folder_num} + '); event.stopPropagation();'"
+										title="하위 폴더 생성">
+										<i class="fa-solid fa-plus"></i>
+									</button>
+									<button th:if="${folder.is_chat_folder == 'N'}"
+										class="btn-folder-action"
+										th:onclick="'deleteFolder(' + ${folder.folder_num} + '); event.stopPropagation();'"
+										title="폴더 삭제">
+										<i class="fa-solid fa-trash"></i>
+									</button>
+								</div>
+							</div>
+						</th:block>
+					</div>
+				</div>
+			</aside>
+
+			<!-- 우측 파일 목록 -->
+			<main class="file-workspace">
+				<header class="file-header">
+					<div class="file-header-left">
+						<h3 id="currentFolderName">전체 파일</h3>
+						<span id="fileCount" class="file-count"></span>
+					</div>
+					<div class="file-header-right">
+						<!-- 탭 -->
+						<div class="file-tabs">
+							<button class="tab-btn active"
+								onclick="filterByType('ALL', this)">전체</button>
+							<button class="tab-btn" onclick="filterByType('IMAGE', this)">이미지</button>
+							<button class="tab-btn" onclick="filterByType('FILE', this)">파일</button>
+						</div>
+						<!-- 파일 업로드 버튼 -->
+						<label for="uploadFileInput" class="btn-upload" title="파일 업로드">
+							<i class="fa-solid fa-upload"></i> 파일 올리기
+						</label> <input type="file" id="uploadFileInput" style="display: none"
+							multiple>
+					</div>
+				</header>
+
+				<!-- 파일 목록 -->
+				<section class="file-list" id="fileListContainer">
+					<!-- JS로 렌더링 -->
+				</section>
+			</main>
+		</div>
+
+		<!-- 폴더 생성 모달 -->
+		<div class="modal-overlay" id="createFolderModal">
+			<div class="modal-box">
+				<div class="modal-head">
+					<h3>폴더 만들기</h3>
+					<button type="button" class="modal-close"
+						onclick="closeCreateFolderModal()">
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="parentFolderNum" value="">
+					<div class="form-group">
+						<label>폴더 이름 <span style="color: #e46aa1">*</span></label> <input
+							type="text" id="newFolderName" class="form-control"
+							placeholder="폴더 이름을 입력하세요" required>
+					</div>
+				</div>
+				<div class="modal-foot">
+					<button type="button" class="btn-modal btn-modal-cancel"
+						onclick="closeCreateFolderModal()">취소</button>
+					<button type="button" class="btn-modal btn-modal-submit"
+						onclick="createFolder()">만들기</button>
+				</div>
+			</div>
+		</div>
+
+		<script th:src="@{/assets/js/storage/storage.js}"></script>
+	</div>
+</body>
+</html>

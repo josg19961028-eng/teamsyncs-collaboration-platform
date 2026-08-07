@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="csrf-header" th:content="${_csrf.headerName}">
+<meta name="csrf-token" th:content="${_csrf.token}">
+<title>TeamSync - 마이페이지</title>
+<!-- <link rel="stylesheet" th:href="@{/assets/css/common.css}"> -->
+<link rel="stylesheet" th:href="@{/assets/css/header.css}">
+<link rel="stylesheet" th:href="@{/assets/css/JW/notification-empty.css}">
+<link rel="stylesheet" th:href="@{/assets/css/JW/notification-detail.css}">
+<link rel="stylesheet" th:href="@{/assets/css/mypage.css}" type="text/css">
+</head>
+<body>
+<!-- 공통 헤더 -->
+<th:block th:insert="~{fragments/header::header}"></th:block>
+
+<div class="app">
+<div class="myLayout">
+
+  <!-- 왼쪽 프로필 -->
+  <aside class="panel profileCard">
+    <div class="profileAvatar" onclick="changePhoto()">
+      <span th:text="${user.firstChar}">홍</span>
+      <div class="profileAvatarEdit">✏️</div>
+    </div>
+    <div class="profileName" th:text="${user.user_name}">이름</div>
+    <div class="profileEmail" th:text="${user.email}">이메일</div>
+    <div class="profileBadges">
+      <span class="badge admin" th:if="${isAdmin}">관리자</span>
+      <span class="badge normal" th:unless="${isAdmin}">일반 회원</span>
+      <span class="badge google" th:if="${isGoogleLinked}">Google 연동</span>
+    </div>
+    <div class="profileStats">
+      <div class="pStat"><div class="val" th:text="${teamCount}">0</div><div class="lbl">참여팀</div></div>
+      <div class="pStat"><div class="val">-</div><div class="lbl">칸반카드</div></div>
+      <div class="pStat"><div class="val">-</div><div class="lbl">회의록</div></div>
+    </div>
+    <div class="profileNav">
+      <button class="active" id="navProfile" onclick="showTab('profile')"><span class="ni">👤</span>프로필 수정</button>
+      <button id="navPw" onclick="showTab('pw')"><span class="ni">🔑</span>비밀번호 변경</button>
+      <button id="navTodo" onclick="showTab('todo')"><span class="ni">✅</span>개인 To-Do</button>
+      <button id="navSocial" onclick="showTab('social')"><span class="ni">🔗</span>소셜 연동</button>
+      <button id="navAlarm" onclick="showTab('alarm')"><span class="ni">🔔</span>알림 설정</button>
+      <button id="navDanger" onclick="showTab('danger')"><span class="ni">⚠️</span>계정 관리</button>
+    </div>
+  </aside>
+
+  <!-- 오른쪽 탭 -->
+  <div>
+
+    <!-- 프로필 수정 -->
+    <section class="panel tabContent active" id="tabProfile">
+      <div class="tabPad">
+        <div class="tabHead"><h3>👤 프로필 수정</h3></div>
+        <div class="fGrid">
+          <div class="field full">
+            <label>닉네임</label><input id="pNickname" th:value="${user.user_name}">
+          </div>
+          <div class="field"><label>이메일 (변경 불가)</label><input th:value="${user.email}" readonly></div>
+          <div class="field"><label>전화번호</label><input id="pPhone" th:value="${user.phone}" type="tel"></div>
+          <div class="field"><label>생년월일</label><input id="pBirth" type="date" th:value="${user.birth}"></div>
+          <div class="field full"><label>자기소개</label><textarea id="pIntro" th:text="${user.intro}"></textarea></div>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="location.reload()">초기화</button>
+          <button class="btn primary" onclick="saveProfile()">저장</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 비밀번호 변경 -->
+    <section class="panel tabContent" id="tabPw">
+      <div class="tabPad">
+        <div class="tabHead"><h3>🔑 비밀번호 변경</h3></div>
+        <div th:if="${isGoogleLinked}" style="background:var(--blueS);border-radius:14px;padding:13px;font-size:13px;color:var(--primary);margin-bottom:18px;font-weight:850">
+          Google 계정으로 연동된 경우, Google 비밀번호를 변경하세요.
+        </div>
+        <div class="fGrid">
+          <div class="field full"><label>현재 비밀번호</label><input type="password" id="pwCur"></div>
+          <div class="field full"><label>새 비밀번호</label><input type="password" id="pwNew"></div>
+          <div class="field full"><label>새 비밀번호 확인</label><input type="password" id="pwNew2"></div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" onclick="changePassword()">변경</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 개인 To-Do -->
+    <section class="panel tabContent" id="tabTodo">
+      <div class="tabPad">
+        <div class="tabHead"><h3>✅ 개인 To-Do</h3>
+          <button class="btn sm primary" onclick="openAddTodo()">+ 추가</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:-8px 0 16px">
+          ※ To-Do 영구 저장은 백엔드 연동 후 반영됩니다. (현재는 임시 저장, 새로고침 시 초기화)
+        </p>
+        <div class="todoList" id="todoListMy"></div>
+      </div>
+    </section>
+
+    <!-- 소셜 연동 -->
+    <section class="panel tabContent" id="tabSocial">
+      <div class="tabPad">
+        <div class="tabHead"><h3>🔗 소셜 연동</h3></div>
+        <div class="socialRow">
+          <div class="socialLeft">
+            <div class="socialIcon">🔵</div>
+            <div>
+              <div class="socialName">Google</div>
+              <div class="socialStatus" th:text="${isGoogleLinked} ? '연동됨' : '연동 안 됨'">상태</div>
+            </div>
+          </div>
+          <button class="btn sm danger" th:if="${isGoogleLinked}" onclick="unlinkGoogle()">연동 해제</button>
+          <button class="btn sm" th:unless="${isGoogleLinked}" onclick="linkGoogle()">연동하기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 알림 설정 -->
+    <section class="panel tabContent" id="tabAlarm">
+      <div class="tabPad">
+        <div class="tabHead"><h3>🔔 알림 설정</h3></div>
+        <div class="socialRow">
+          <div class="socialLeft"><div class="socialIcon">✉️</div><div class="socialName">이메일 알림 수신</div></div>
+          <input type="checkbox" id="alarmEmail" checked style="width:20px;height:20px">
+        </div>
+        <div class="socialRow">
+          <div class="socialLeft"><div class="socialIcon">👁️</div><div class="socialName">프로필 공개</div></div>
+          <input type="checkbox" id="alarmProfile" checked style="width:20px;height:20px">
+        </div>
+        <div class="actions">
+          <button class="btn primary" onclick="saveAlarm()">저장</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 계정 관리 -->
+    <section class="panel tabContent" id="tabDanger">
+      <div class="tabPad">
+        <div class="tabHead"><h3>⚠️ 계정 관리</h3></div>
+        <div class="dangerSection">
+          <div>
+            <div class="socialName">데이터 내보내기</div>
+            <div class="socialStatus">내 정보를 JSON 파일로 내려받습니다.</div>
+          </div>
+          <button class="btn sm" onclick="exportData()">내보내기</button>
+        </div>
+        <div class="dangerSection">
+          <div>
+            <div class="socialName">회원 탈퇴</div>
+            <div class="socialStatus">탈퇴 시 팀장인 팀이 있다면 먼저 팀장 위임 또는 팀 삭제가 필요합니다.</div>
+          </div>
+          <button class="btn sm danger" onclick="withdraw()">탈퇴하기</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</div>
+
+<!-- 모달 -->
+<div class="modalLayer" id="modalLayer">
+  <div class="modal">
+    <div class="modalHead"><h3 id="modalTitle"></h3><button class="closeBtn" onclick="closeModal()">×</button></div>
+    <div class="modalBody" id="modalBody"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/assets/js/mypage.js}"></script>
+</body>
+</html>

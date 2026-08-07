@@ -1,0 +1,314 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+
+    color: #2f2940;
+    font-family:
+        "Pretendard",
+        "Noto Sans KR",
+        Arial,
+        sans-serif;
+
+    background: #f1eff6;
+}
+
+
+/* 상단 버튼 */
+
+.print-toolbar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 18px;
+}
+
+.print-toolbar button {
+    height: 40px;
+    padding: 0 18px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.print-btn {
+    color: #ffffff;
+
+    background: #6c5ce7;
+    border: 1px solid #6c5ce7;
+}
+
+.close-btn {
+    color: #625970;
+
+    background: #ffffff;
+    border: 1px solid #dcd6e7;
+}
+
+
+/* A4 본문 */
+
+.minutes-print-page {
+    width: 210mm;
+    min-height: 297mm;
+
+    margin: 0 auto 30px;
+    padding: 18mm 17mm;
+
+    background: #ffffff;
+
+    box-shadow: 0 12px 35px rgba(45, 35, 75, 0.14);
+}
+
+
+/* 헤더 */
+
+.print-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-bottom: 15px;
+
+    border-bottom: 2px solid #6c5ce7;
+}
+
+.print-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+
+    background: #6c5ce7;
+    border-radius: 10px;
+}
+
+.brand-name {
+    color: #3d3458;
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.print-type {
+    color: #8f87a2;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+
+/* 제목 */
+
+.print-title-section {
+    padding: 26px 0 21px;
+}
+
+.print-title-section h1 {
+    margin: 0 0 18px;
+
+    color: #2d2545;
+    font-size: 25px;
+    line-height: 1.4;
+
+    overflow-wrap: anywhere;
+}
+
+.print-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    border-top: 1px solid #e8e3f0;
+    border-left: 1px solid #e8e3f0;
+}
+
+.print-meta > div {
+    display: flex;
+    min-height: 42px;
+
+    border-right: 1px solid #e8e3f0;
+    border-bottom: 1px solid #e8e3f0;
+}
+
+.meta-label {
+    display: inline-flex;
+    align-items: center;
+
+    width: 90px;
+    padding: 0 12px;
+
+    color: #615777;
+    font-size: 11px;
+    font-weight: 900;
+
+    background: #f7f5fb;
+}
+
+.print-meta > div > span:last-child {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 0 13px;
+
+    color: #494157;
+    font-size: 12px;
+}
+
+
+/* 공통 섹션 */
+
+.print-section {
+    margin-top: 25px;
+
+    page-break-inside: avoid;
+}
+
+.print-section h2 {
+    margin: 0 0 10px;
+
+    color: #3d3454;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.section-count {
+    color: #91889f;
+    font-size: 11px;
+}
+
+.print-schedule-box {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 13px 15px;
+
+    color: #51466e;
+    font-size: 12px;
+    font-weight: 700;
+
+    background: #f3efff;
+    border: 1px solid #ded6fb;
+    border-radius: 10px;
+}
+
+.schedule-icon {
+    font-size: 15px;
+}
+
+
+/* 참석자 */
+
+.print-attendee-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.print-attendee {
+    padding: 6px 11px;
+
+    color: #51476a;
+    font-size: 11px;
+    font-weight: 800;
+
+    background: #faf9fc;
+    border: 1px solid #dfdae8;
+    border-radius: 999px;
+}
+
+.print-empty {
+    color: #9991a5;
+    font-size: 11px;
+}
+
+
+/* 내용 */
+
+.print-content {
+    min-height: 80px;
+    padding: 15px 16px;
+
+    color: #40394d;
+    font-size: 12px;
+    line-height: 1.8;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    background: #fbfafc;
+    border: 1px solid #e8e4ed;
+    border-radius: 10px;
+}
+
+.action-content {
+    background: #faf8ff;
+}
+
+
+/* 푸터 */
+
+.print-footer {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 35px;
+    padding-top: 12px;
+
+    color: #9991a4;
+    font-size: 9px;
+
+    border-top: 1px solid #e5e1e9;
+}
+
+
+/* 실제 인쇄 */
+
+@page {
+    size: A4;
+    margin: 12mm;
+}
+
+@media print {
+
+    body {
+        background: #ffffff;
+    }
+
+    .print-toolbar {
+        display: none;
+    }
+
+    .minutes-print-page {
+        width: auto;
+        min-height: auto;
+
+        margin: 0;
+        padding: 0;
+
+        box-shadow: none;
+    }
+
+    .print-section {
+        break-inside: avoid;
+    }
+}

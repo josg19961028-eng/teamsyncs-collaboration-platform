@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Eclipse / IntelliJ / VS Code
+.metadata/
+.settings/
+.classpath
+.project
+.idea/
+*.iml
+.vscode/
+bin/
+out/
+
+# Gradle 빌드 결과
+.gradle/
+build/
+*.class
+*.log
+
+# 로컬 비밀 설정
+/src/main/resources/data-config.yml
+.env
+.env.*
+*.local
+
+# 사용자 업로드 파일
+/src/main/webapp/assets/upload/
+/src/main/resources/static/assets/upload/
+
+# 임시 파일
+/tmp/

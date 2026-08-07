@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+    <title>팀원 목록</title>
+    <th:block layout:fragment="pageCss">
+    <link rel="stylesheet" th:href="@{/assets/css/MY/members.css}" type="text/css">
+    </th:block>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+<section class="panel memberMain" id="memberMain"
+          th:data-myrole="${myRole}" th:data-myusernum="${myUserNum}">
+
+    <div class="memberToolbar">
+        <h2>👥 팀원 목록</h2>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="memberFilters">
+                <button class="chip active" id="f_all" onclick="setFilter('all')">전체</button>
+                <button class="chip" id="f_active" onclick="setFilter('active')">소속중</button>
+            </div>
+            <button th:if="${myRole == 3}" onclick="openInviteModal()"
+                    style="border:0;border-radius:14px;padding:8px 14px;font-size:12px;font-weight:950;
+                           background:linear-gradient(135deg,#6c5ce7,#7476ff);color:#fff;cursor:pointer;
+                           box-shadow:0 8px 18px rgba(86,87,245,.25)">+ 팀원 초대</button>
+        </div>
+    </div>
+
+    <!-- 통계 -->
+    <div class="memberStats">
+        <div class="statCard"><div class="val" th:text="${statTotal}">0</div><div class="lbl">전체 팀원</div></div>
+        <div class="statCard"><div class="val" th:text="${statActive}">0</div><div class="lbl">활동 중</div></div>
+        <div class="statCard"><div class="val" th:text="${statLeader}">0</div><div class="lbl">팀장·매니저</div></div>
+        <div class="statCard"><div class="val" th:text="${statMember}">0</div><div class="lbl">팀원</div></div>
+    </div>
+
+    <!-- 팀원 카드 그리드 -->
+    <div class="memberGrid" id="memberGrid">
+        <div th:if="${#lists.isEmpty(members)}"
+             style="grid-column:1/-1;padding:30px;text-align:center;color:var(--muted);font-size:13px">
+            팀원이 없습니다.
+        </div>
+
+        <div class="memberCard" th:each="m, stat : ${members}"
+             th:data-usernum="${m.user_num}"
+             th:data-role="${m.role}"
+             th:data-name="${m.user_name}"
+             th:data-join="${m.join_status}">
+
+            <!-- 상단: 아바타 + 이름 -->
+            <div class="cardTop">
+                <div class="memberAv"
+                     th:style="'background:' + ${{'#6c5ce7','#34b77b','#f0a04b','#8f65f6','#e46aa1','#37c4da'}.get(stat.count % 6)}"
+                     th:text="${#strings.substring(m.user_name,0,1)}">홍</div>
+                <div style="min-width:0">
+                    <div class="memberName">
+                        <span th:text="${m.user_name}">이름</span>
+                        <span th:if="${m.user_num == myUserNum}"
+                              style="font-size:11px;color:var(--muted);font-weight:800">(나)</span>
+                    </div>
+                    <div style="display:flex;gap:6px;margin-top:5px;flex-wrap:wrap">
+                        <span class="roleBadge"
+                              th:classappend="${m.role == 3 ? 'roleLeader' : (m.role == 2 ? 'roleManager' : 'roleMember')}"
+                              th:text="${m.role == 3 ? '팀장' : (m.role == 2 ? '매니저' : '팀원')}">역할</span>
+                        <span class="joinBadge join1">소속중</span>
+                    </div>
+                    <div class="memberIntro" th:text="${m.intro != null and !#strings.isEmpty(m.intro) ? m.intro : '소개글 없음'}">소개</div>
+                </div>
+            </div>
+
+            <!-- 활동 통계 (MB-002, 실시간 쿼리 집계) -->
+            <div class="memberStats2">
+                <div class="statItem"><div class="sv" th:text="${m.card_cnt}">0</div><div class="sl">칸반 카드</div></div>
+                <div class="statItem"><div class="sv" th:text="${m.done_cnt}">0</div><div class="sl">완료</div></div>
+                <div class="statItem"><div class="sv" th:text="${m.file_cnt}">0</div><div class="sl">파일</div></div>
+            </div>
+
+            <!-- 가입/최근 활동 -->
+            <div class="memberMeta">
+                <span>📅 가입 <span th:text="${#dates.format(m.joined_at, 'yyyy-MM-dd')}">-</span></span>
+                <span style="margin-left:6px;color:var(--green);font-weight:900">● 소속중</span>
+            </div>
+
+            <!-- 액션 버튼 -->
+            <div class="cardActions">
+                <th:block th:if="${m.user_num != myUserNum and myRole >= 3}">
+                    <button class="btn sm" th:onclick="'openRoleModal(' + ${m.user_num} + ')'">역할 변경</button>
+                </th:block>
+                <th:block th:if="${m.user_num != myUserNum and myRole == 3}">
+                    <button class="btn sm orange" th:onclick="'openDelegateModal(' + ${m.user_num} + ')'">팀장 위임</button>
+                </th:block>
+                <!-- 강퇴: 팀장은 전원 대상 가능, 매니저는 일반 팀원(role==1)만 대상 가능 -->
+                <th:block th:if="${m.user_num != myUserNum and (myRole == 3 or (myRole == 2 and m.role == 1))}">
+                    <button class="btn sm danger"
+                            th:attr="onclick=|kickMember(${m.user_num}, '${m.user_name}')|">강퇴</button>
+                </th:block>
+                <th:block th:if="${m.user_num == myUserNum}">
+                    <button class="btn sm danger" onclick="leaveTeam()">팀 탈퇴</button>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 모달 -->
+<div id="modalLayer" class="modalLayer">
+    <div class="modal">
+        <div class="modalHead"><h3 id="modalTitle"></h3><button class="closeBtn" onclick="closeModal()">×</button></div>
+        <div id="modalBody" class="modalBody"></div>
+    </div>
+</div>
+
+</th:block>
+
+<th:block layout:fragment="pageJs">
+<script type="text/javascript" th:src="@{/assets/js/MY/members.js}"></script>
+</th:block>
+
+</body>
+</html>

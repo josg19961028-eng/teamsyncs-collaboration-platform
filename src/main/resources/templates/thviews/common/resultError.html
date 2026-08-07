@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>안내</title>
+<link rel="stylesheet" th:href="@{/assets/css/common.css}">
+</head>
+<body>
+<div class="page-one">
+	<h2>안내</h2>
+	<div class="result-display">
+		<div class="align-center">
+			<th:block th:if="${not #strings.isEmpty(accessMsg)}" th:text="${accessMsg}"></th:block>
+			<th:block th:if="${#strings.isEmpty(accessMsg)}">
+				오류가 있습니다.
+			</th:block>
+			<p>
+			<th:block th:if="${not #strings.isEmpty(accessUrl)}">
+			<input type="button" value="이동"
+			          th:onclick="|location.href='@{${accessUrl}}'|">
+			</th:block>
+			<th:block th:if="${#strings.isEmpty(accessUrl)}">
+			<input type="button" value="홈으로"
+			          th:onclick="|location.href='@{/main/home}'|">
+			</th:block>
+		</div>
+	</div>
+</div>
+</body>
+</html>

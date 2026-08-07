@@ -1,0 +1,115 @@
+/* assets/css/YJ/calendar-widget.css */
+
+.calendar-widget-card {
+    padding: 18px;
+    border: 1px solid #eee8ff;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 16px 44px rgba(73, 47, 133, 0.10);
+}
+
+.calendar-widget-card #calendar {
+    min-height: 460px;
+}
+
+.calendar-widget-card .fc .fc-toolbar {
+    margin-bottom: 14px;
+}
+
+.calendar-widget-card .fc .fc-toolbar-title {
+    font-size: 18px;
+}
+
+.calendar-widget-card .fc .fc-button,
+#teamHomeCalendar .fc-button {
+    min-height: 30px;
+    height: 30px;
+
+    padding: 0 10px !important;
+
+    font-size: 12px !important;
+    line-height: 1 !important;
+}
+.calendar-widget-card .fc .fc-daygrid-day-frame {
+    min-height: 74px;
+    padding: 4px;
+}
+
+.calendar-widget-card .fc .fc-daygrid-day-number {
+    font-size: 12px;
+}
+
+.calendar-widget-card .fc .fc-event {
+    padding: 2px 6px !important;
+    font-size: 11px !important;
+}
+
+
+/* =========================
+   팀 대시보드 캘린더
+========================= */
+
+.team-calendar-widget {
+    padding: 18px;
+}
+
+.team-calendar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.team-calendar-head h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 950;
+}
+
+.team-calendar-head p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+#teamHomeCalendar {
+    min-height: 430px;
+}
+
+#teamHomeCalendar .fc-toolbar {
+    margin-bottom: 12px;
+}
+
+#teamHomeCalendar .fc-toolbar-title {
+    font-size: 18px;
+    font-weight: 950;
+}
+
+#teamHomeCalendar .fc-daygrid-day-frame {
+    min-height: 72px;
+    padding: 4px;
+}
+
+#teamHomeCalendar .fc-event {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+}
+
+
+/* =========================
+   팀 대시보드 시간 입력 표시/숨김
+   공통 스위치 스타일은 calendar-common.css 사용
+========================= */
+
+.schedule-time-field[hidden],
+.team-edit-time-field[hidden] {
+    display: none !important;
+}
+
+.schedule-time-field:not([hidden]),
+.team-edit-time-field:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+}

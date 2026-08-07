@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+<head>
+    <title>TeamSync 캘린더</title>
+
+    <th:block layout:fragment="pageCss">
+        <link rel="stylesheet" th:href="@{/assets/css/YJ/calendar-common.css}">
+        <link rel="stylesheet" th:href="@{/assets/css/YJ/calendar-page.css}">
+    </th:block>
+</head>
+
+<body>
+<div layout:fragment="content" th:with="currentMenu='calendar'">
+
+    <div class="calendar-page">
+
+        <div class="calendar-page-header">
+            <div class="calendar-page-title">
+                <h2>캘린더</h2>
+                <p>팀 일정과 칸반 마감일을 한눈에 확인하세요.</p>
+            </div>
+
+            <button type="button"
+                    class="calendar-action-btn"
+                    onclick="openPageScheduleCreateModal()">
+                + 일정 등록
+            </button>
+        </div>
+
+        <div class="calendar-page-card">
+            <div id="calendar"
+                 th:data-team-num="${team_num}"
+                 th:data-events-url="@{/calendar/events(team_num=${team_num})}">
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 일정 등록·상세·수정 공통 모달 -->
+    <div class="mLayer"
+         id="mLayer"
+         onclick="if(event.target===this) closeCalendarModal()">
+
+        <div class="modal">
+            <div class="mHead">
+                <h3 id="mTitle2"></h3>
+
+                <button type="button"
+                        class="mClose"
+                        onclick="closeCalendarModal()">
+                    ✕
+                </button>
+            </div>
+
+            <div class="mBody" id="mBody"></div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+</div>
+
+<th:block layout:fragment="pageJs">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales-all.global.min.js"></script>
+
+    <script th:src="@{/assets/js/YJ/calendar-page.js}"></script>
+</th:block>
+
+</body>
+</html>

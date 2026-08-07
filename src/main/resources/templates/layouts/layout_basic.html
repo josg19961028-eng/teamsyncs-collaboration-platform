@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="UTF-8">
+	<meta name="csrf-header" th:content="${_csrf.headerName}" />
+	<meta name="csrf-token" th:content="${_csrf.token}">
+	<title layout:title-pattern="$LAYOUT_TITLE > $CONTENT_TITLE">SpringPage</title>
+	<link rel="stylesheet" th:href="@{/assets/css/common.css}" type="text/css">
+</head>
+<body>
+<div id="main">
+	<!-- header 시작 -->
+	<div id="main_header" th:insert="fragments/header::header"></div>
+	<!-- header 끝 -->
+	<!-- 중앙 컨텐츠 시작 -->
+    <div id="main_body" layout:fragment="content"></div>
+    <!-- 중앙 컨텐츠 끝 -->
+    <!-- footer 시작 -->
+    <div id="main_footer" th:insert="fragments/footer::footer"></div>
+    <!-- footer 끝 -->
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

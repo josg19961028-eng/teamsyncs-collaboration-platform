@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="sidebar">
+<style>
+    .ts-sidebar-home{
+        display:inline-flex;align-items:center;gap:6px;
+        margin:0 0 10px;padding:5px 9px;
+        font-size:13px;font-weight:800;color:#7b7394;
+        text-decoration:none;border-radius:12px;transition:.15s;
+    }
+    .ts-sidebar-home:hover{background:#f4f1ff;color:#6c5ce7}
+</style>
+<aside class="ts-sidebar">
+
+    <!-- 팀 정보 -->
+    <div class="ts-sidebar-head">
+        <!-- 홈으로 돌아가기 (이미지 바로 위) -->
+        <a class="ts-sidebar-home" th:href="@{/main/home}">← 홈으로</a>
+        <div class="ts-team-icon"
+             th:style="|background:${teamColor != null ? teamColor : '#f1edff'};overflow:hidden;|">
+            <!-- 팀 이미지가 있으면 실제 이미지, 없으면 색상 타일 + 이모지 -->
+            <img th:if="${teamHasPhoto}"
+                 th:src="@{/team/photo/{n}(n=${teamNum})}" alt="팀 이미지"
+                 style="width:100%;height:100%;object-fit:cover;display:block">
+            <span th:unless="${teamHasPhoto}"
+                  th:text="${teamEmoji != null} ? ${teamEmoji} : '💻'">💻</span>
+        </div>
+        <div class="ts-team-name"
+             th:text="${teamName != null} ? ${teamName} : '팀 이름'">팀 이름</div>
+        <div class="ts-team-meta">
+            <span th:if="${teamMemberCount != null}" th:text="${teamMemberCount} + '명'"></span>
+            <span th:if="${teamLeaderName != null}" th:text="' · 팀장 ' + ${teamLeaderName}"></span>
+        </div>
+    </div>
+
+    <!-- 네비게이션 -->
+    <nav class="ts-nav">
+        <a th:href="@{/team/dashboard}"
+           th:classappend="${currentMenu == 'dashboard'} ? ' active' : ''">
+            <span class="ts-nav-icon">🏠</span>팀 홈
+        </a>
+        <a th:href="@{/calendar/list}"
+           th:classappend="${currentMenu == 'calendar'} ? ' active' : ''">
+            <span class="ts-nav-icon">📅</span>캘린더/일정
+        </a>
+        <a th:href="@{/minutes/list}"
+           th:classappend="${currentMenu == 'minutes'} ? ' active' : ''">
+            <span class="ts-nav-icon">📝</span>회의록
+        </a>
+        <a th:href="@{/chat/list}"
+           th:classappend="${currentMenu == 'chat'} ? ' active' : ''">
+            <span class="ts-nav-icon">💬</span>채팅
+            <span class="ts-nav-badge ts-badge-rose"
+                  th:if="${unreadChatCount != null and unreadChatCount > 0}"
+                  th:text="${unreadChatCount}"></span>
+        </a>
+        <a th:href="@{/storage/list}"
+           th:classappend="${currentMenu == 'storage'} ? ' active' : ''">
+            <span class="ts-nav-icon">📁</span>보관함
+        </a>
+        <a th:href="@{/kanban/board}"
+           th:classappend="${currentMenu == 'kanban'} ? ' active' : ''">
+            <span class="ts-nav-icon">📋</span>칸반 보드
+        </a>
+        <a th:href="@{/notice/list}"
+           th:classappend="${currentMenu == 'notice'} ? ' active' : ''">
+            <span class="ts-nav-icon">📢</span>공지사항
+            <span class="ts-nav-badge ts-badge-primary"
+                  th:if="${hasNewNotice}">NEW</span>
+        </a>
+        <a th:href="@{/team/members}"
+           th:classappend="${currentMenu == 'members'} ? ' active' : ''">
+            <span class="ts-nav-icon">👥</span>팀원 목록
+        </a>
+        <a th:href="@{/team/settings}"
+           th:classappend="${currentMenu == 'settings'} ? ' active' : ''">
+            <span class="ts-nav-icon">⚙️</span>팀 설정
+        </a>
+    </nav>
+
+</aside>
+</th:block>
+
+</html>

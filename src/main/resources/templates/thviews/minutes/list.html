@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+	layout:decorate="~{layouts/layout_main}">
+
+<head>
+<meta charset="UTF-8">
+<title>회의록</title>
+
+<th:block layout:fragment="pageCss">
+	<link rel="stylesheet" th:href="@{/assets/css/YJ/minutes.css}">
+</th:block>
+</head>
+
+<body>
+
+	<div layout:fragment="content" class="minutes-page">
+
+		<div class="minutes-container">
+
+			<!-- =====================================
+             왼쪽 회의록 목록
+        ====================================== -->
+			<aside class="minutes-list-panel">
+
+				<div class="minutes-list-header">
+					<div>
+						<h2>📝 회의록 목록</h2>
+						<span class="minutes-count"
+							th:text="${minutesList != null ? #lists.size(minutesList) : 0} + '건'">
+							0건 </span>
+					</div>
+
+					<a class="minutes-write-btn" th:href="@{/minutes/write}"> + 작성
+					</a>
+				</div>
+
+				<div class="minutes-search-wrap">
+					<input type="text" id="minutesSearch" class="minutes-search"
+						placeholder="회의록 검색..." autocomplete="off">
+				</div>
+
+				<div class="minutes-list" id="minutesList">
+
+					<!-- 회의록이 없을 때 -->
+					<div class="minutes-list-empty"
+						th:if="${minutesList == null or #lists.isEmpty(minutesList)}">
+
+						<div class="empty-icon">🗒️</div>
+						<strong>등록된 회의록이 없습니다.</strong>
+						<p>첫 번째 회의록을 작성해보세요.</p>
+
+						<a th:href="@{/minutes/write}"> 회의록 작성 </a>
+					</div>
+
+					<!-- 회의록 반복 -->
+					<a class="minutes-list-item" th:each="item : ${minutesList}"
+						th:href="@{/minutes/list(minutes_num=${item.minutes_num})}"
+						th:attr="data-title=${item.title}"
+						th:classappend="${minutes != null and
+                                    minutes.minutes_num == item.minutes_num}
+                                    ? ' is-active' : ''">
+
+						<div class="minutes-item-top">
+							<strong th:text="${item.title}"> 회의록 제목 </strong> <span
+								class="minutes-schedule-badge"
+								th:if="${item.schedule_title != null}" th:text="'일정 연결'">
+								일정 연결 </span>
+						</div>
+
+						<div class="minutes-item-meta">
+							<span th:if="${item.meeting_date != null}"
+								th:text="${#dates.format(
+                                      item.meeting_date,
+                                      'yyyy-MM-dd HH:mm')}">
+								2026-07-10 10:00 </span> <span class="meta-dot">•</span> <span
+								th:text="${item.writer_name}"> 작성자 </span>
+						</div>
+
+						<p class="minutes-item-preview"
+							th:text="${item.content != null
+                               ? #strings.abbreviate(item.content, 75)
+                               : '작성된 회의 내용이 없습니다.'}">
+							회의록 미리보기</p>
+
+					</a>
+
+				</div>
+			</aside>
+
+
+			<!-- =====================================
+             오른쪽 상세 영역
+        ====================================== -->
+			<section class="minutes-detail-panel">
+
+				<!-- 선택된 회의록이 없을 때 -->
+				<div class="minutes-detail-empty" th:if="${minutes == null}">
+
+					<div class="empty-icon">📄</div>
+					<h3>확인할 회의록을 선택해주세요.</h3>
+					<p>왼쪽 목록에서 회의록을 선택하거나 새로운 회의록을 작성할 수 있습니다.</p>
+
+					<a th:href="@{/minutes/write}"> + 새 회의록 작성 </a>
+				</div>
+
+
+				<!-- 회의록 상세 -->
+				<article class="minutes-detail" th:if="${minutes != null}">
+
+					<!-- 상세 상단 -->
+					<div class="minutes-detail-top">
+
+						<div class="minutes-title-area">
+							<h1 th:text="${minutes.title}">회의록 제목</h1>
+
+							<div class="minutes-main-meta">
+
+								<span> 📅 <th:block
+										th:if="${minutes.meeting_date != null}"
+										th:text="${#dates.format(
+                                                  minutes.meeting_date,
+                                                  'yyyy-MM-dd HH:mm')}">
+									</th:block>
+								</span> <span class="meta-divider">•</span> <span> ✍️ <th:block
+										th:text="${minutes.writer_name}">
+                                    작성자
+                                </th:block> 작성
+								</span> <span class="meta-divider">•</span> <span> 등록일 <th:block
+										th:if="${minutes.reg_date != null}"
+										th:text="${#dates.format(
+                                                  minutes.reg_date,
+                                                  'yyyy-MM-dd')}">
+									</th:block>
+								</span>
+
+							</div>
+						</div>
+
+
+						<!-- 작성자 전용 버튼 -->
+						<div class="minutes-detail-actions"
+							sec:authorize="isAuthenticated()"
+							th:if="${minutes.writer_num ==
+              #authentication.principal.usersVO.user_num}">
+
+							<a class="minutes-action-btn"
+								th:href="@{/minutes/modify(minutes_num=${minutes.minutes_num})}">
+								✏️ 수정 </a> <a class="minutes-action-btn print"
+								th:href="@{/minutes/print(minutes_num=${minutes.minutes_num})}"
+								target="_blank"> 🖨️ PDF/인쇄 </a>
+
+							<form th:action="@{/minutes/delete}" method="post"
+								class="minutes-delete-form"
+								onsubmit="return confirm('회의록을 삭제하시겠습니까?');">
+
+								<input type="hidden" name="minutes_num"
+									th:value="${minutes.minutes_num}">
+
+								<button type="submit" class="minutes-action-btn delete">
+									삭제</button>
+							</form>
+						</div>
+
+						<!-- 작성자가 아니어도 인쇄 가능 -->
+						<div sec:authorize="isAuthenticated()"
+							th:unless="${minutes.writer_num ==
+                                    #authentication.principal.usersVO.user_num}">
+
+							<a class="minutes-action-btn print"
+								th:href="@{/minutes/print(
+                               minutes_num=${minutes.minutes_num})}"
+								target="_blank"> 🖨️ PDF/인쇄 </a>
+						</div>
+
+					</div>
+
+
+					<!-- 연결 일정 -->
+					<div class="minutes-linked-schedule"
+						th:if="${minutes.schedule_num != null}">
+
+						<div>
+							<span class="linked-icon">📅</span> <strong>연결된 일정</strong> <span
+								class="linked-title" th:text="${minutes.schedule_title}">
+								일정 제목 </span>
+						</div>
+
+						<a th:href="@{/calendar/list}"> 캘린더에서 보기 → </a>
+
+					</div>
+
+
+					<!-- 참석자 -->
+					<section class="minutes-section attendee-section">
+
+						<h3>
+							참석자 <span th:text="${'(' +
+										(attendeeList != null
+										? #lists.size(attendeeList) : 0)
+										+ '명)'}">
+									(0명)
+								 </span>
+						</h3>
+
+						<div class="minutes-attendee-list">
+
+							<div class="minutes-attendee"
+								th:each="attendee : ${attendeeList}">
+
+								<span class="attendee-avatar"> 👤 </span> <span
+									th:text="${attendee.user_name}"> 참석자 </span>
+
+							</div>
+
+							<span class="minutes-no-data"
+								th:if="${attendeeList == null or
+                                      #lists.isEmpty(attendeeList)}">
+								등록된 참석자가 없습니다. </span>
+
+						</div>
+
+					</section>
+
+
+					<!-- 회의 내용 -->
+					<section class="minutes-section">
+
+						<h3>📝 회의 내용</h3>
+
+						<div class="minutes-content-box"
+							th:text="${minutes.content != null
+                                 ? minutes.content
+                                 : '작성된 회의 내용이 없습니다.'}">
+							회의 내용</div>
+
+					</section>
+
+
+					<!-- 결정 사항 -->
+					<section class="minutes-section">
+
+						<h3>✅ 결정 사항</h3>
+
+						<div class="minutes-content-box"
+							th:text="${minutes.decision_content != null
+                                 and !#strings.isEmpty(
+                                     minutes.decision_content)
+                                 ? minutes.decision_content
+                                 : '작성된 결정 사항이 없습니다.'}">
+							결정 사항</div>
+
+					</section>
+
+
+					<!-- 액션 아이템 -->
+					<section class="minutes-section">
+
+						<h3>📌 액션 아이템</h3>
+
+						<div class="minutes-content-box action-item"
+							th:text="${minutes.action_item != null
+                                 and !#strings.isEmpty(
+                                     minutes.action_item)
+                                 ? minutes.action_item
+                                 : '작성된 액션 아이템이 없습니다.'}">
+							액션 아이템</div>
+
+					</section>
+
+				</article>
+
+			</section>
+
+		</div>
+
+	</div>
+
+
+	<th:block layout:fragment="pageJs">
+		<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('minutesSearch');
+    const items = document.querySelectorAll('.minutes-list-item');
+
+    if (!searchInput) {
+        return;
+    }
+
+    searchInput.addEventListener('input', function () {
+        const keyword = this.value.trim().toLowerCase();
+
+        items.forEach(function (item) {
+            const title = (item.dataset.title || '').toLowerCase();
+
+            item.style.display =
+                title.includes(keyword) ? '' : 'none';
+        });
+    });
+});
+</script>
+	</th:block>
+
+</body>
+</html>

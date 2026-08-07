@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.team.dao.EmailInvitationMapper">
+
+    <resultMap id="invitationResultMap" type="kr.spring.team.vo.EmailInvitationVO">
+        <id     property="invitation_num" column="INVITATION_NUM"/>
+        <result property="team_num"       column="TEAM_NUM"/>
+        <result property="inviter_num"    column="INVITER_NUM"/>
+        <result property="invitee_email"  column="INVITEE_EMAIL"/>
+        <result property="status"         column="STATUS"/>
+        <result property="sent_at"        column="SENT_AT"/>
+        <result property="responsed_at"   column="RESPONSED_AT"/>
+        <result property="expired_at"     column="EXPIRED_AT"/>
+    </resultMap>
+
+    <insert id="insertInvitation" parameterType="kr.spring.team.vo.EmailInvitationVO">
+        <selectKey keyProperty="invitation_num" resultType="long" order="BEFORE">
+            SELECT SEQ_EMAIL_INVITATION.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO EMAIL_INVITATION (
+            INVITATION_NUM, TEAM_NUM, INVITER_NUM, INVITEE_EMAIL, STATUS, SENT_AT, EXPIRED_AT
+        ) VALUES (
+            #{invitation_num}, #{team_num}, #{inviter_num}, #{invitee_email}, 1, SYSDATE, SYSDATE + 3
+        )
+    </insert>
+
+    <select id="selectByTeamAndEmail" resultMap="invitationResultMap">
+        SELECT * FROM (
+            SELECT INVITATION_NUM, TEAM_NUM, INVITER_NUM, INVITEE_EMAIL, STATUS, SENT_AT, RESPONSED_AT, EXPIRED_AT
+            FROM EMAIL_INVITATION
+            WHERE TEAM_NUM = #{teamNum}
+              AND INVITEE_EMAIL = #{email}
+            ORDER BY SENT_AT DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
+
+    <select id="selectByNum" parameterType="long" resultMap="invitationResultMap">
+        SELECT INVITATION_NUM, TEAM_NUM, INVITER_NUM, INVITEE_EMAIL, STATUS, SENT_AT, RESPONSED_AT, EXPIRED_AT
+        FROM EMAIL_INVITATION
+        WHERE INVITATION_NUM = #{invitationNum}
+    </select>
+
+    <update id="updateToPending" parameterType="long">
+        UPDATE EMAIL_INVITATION
+        SET STATUS       = 1,
+            SENT_AT       = SYSDATE,
+            EXPIRED_AT    = SYSDATE + 3,
+            RESPONSED_AT  = NULL
+        WHERE INVITATION_NUM = #{invitationNum}
+    </update>
+
+    <update id="respondInvitation">
+        UPDATE EMAIL_INVITATION
+        SET STATUS       = #{status},
+            RESPONSED_AT = SYSDATE
+        WHERE INVITATION_NUM = #{invitationNum}
+    </update>
+
+    <update id="updateStatusOnly">
+        UPDATE EMAIL_INVITATION
+        SET STATUS = #{status}
+        WHERE INVITATION_NUM = #{invitationNum}
+    </update>
+
+    <update id="cancelPendingByTeam" parameterType="long">
+        UPDATE EMAIL_INVITATION
+        SET STATUS = 5
+        WHERE TEAM_NUM = #{teamNum}
+          AND STATUS = 1
+    </update>
+
+</mapper>

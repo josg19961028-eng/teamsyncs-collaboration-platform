@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="${accessTitle}"></title>
+<link rel="stylesheet" th:href="@{/assets/css/common.css}"> 
+</head>
+<body>
+<div class="page-one">
+	<h2 th:text="${accessTitle}"></h2>
+	<div class="result-display">
+		<div class="align-center">
+			<span th:text="${accessMsg}"></span>
+			<p>
+			<input type="button" th:value="${accessBtn}" th:onclick="|location.href='@{${accessUrl}}'|">
+		</div>
+	</div>
+</div>
+</body>
+</html>

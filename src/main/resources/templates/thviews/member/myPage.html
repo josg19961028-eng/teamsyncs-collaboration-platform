@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <title>마이페이지</title>
+    <link rel="stylesheet" th:href="@{/assets/css/header.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/JW/notification-empty.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/JW/notification-detail.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/chatbot.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/SY/member.mypage.css(v=2)}">
+</head>
+<body>
+<div class="sy-mypage" th:with="currentMenu='mypage'">
+    <th:block th:insert="~{fragments/header::header}"></th:block>
+
+    <div class="sy-mypage-wrap">
+        <aside class="sy-mypage-card sy-mypage-side">
+            <div class="sy-mypage-avatar" th:text="${user.firstChar}">U</div>
+
+            <div class="sy-mypage-name" th:text="${user.user_name}">닉네임</div>
+            <div class="sy-mypage-real-name" th:text="${user.real_name}">이름</div>
+
+            <div class="sy-mypage-badges">
+                <span class="sy-mypage-badge"
+                      th:text="${user.auth == 'USER_ADMIN' ? '관리자' : '유저'}">유저</span>
+
+                <span class="sy-mypage-badge"
+                      th:classappend="${user.google_id != null and !#strings.isEmpty(user.google_id)} ? ' sy-mypage-badge-google-linked' : ' sy-mypage-badge-muted'"
+                      th:text="${user.google_id != null and !#strings.isEmpty(user.google_id) ? 'Google 연동' : 'Google 비연동'}">
+                    Google 비연동
+                </span>
+            </div>
+
+            <div class="sy-mypage-stats">
+                <div class="sy-mypage-stat">
+                    <strong th:text="${teamCount}">0</strong>
+                    <span>참여팀</span>
+                </div>
+                <div class="sy-mypage-stat">
+                    <strong th:text="${kanbanCount}">0</strong>
+                    <span>칸반카드</span>
+                </div>
+                <div class="sy-mypage-stat">
+                    <strong th:text="${minutesCount}">0</strong>
+                    <span>회의록</span>
+                </div>
+            </div>
+
+            <nav class="sy-mypage-menu">
+                <a class="active" th:href="@{/member/myPage}">
+                    <span>👤</span>
+                    프로필 수정
+                </a>
+                <a th:href="@{/member/todos}">
+                    <span>✅</span>
+                    개인 To-Do
+                </a>
+                <a th:href="@{/member/notifications}">
+                    <span>🔔</span>
+                    알림관리
+                </a>
+                <a href="#">
+                    <span>⚠</span>
+                    계정 관리
+                </a>
+            </nav>
+        </aside>
+
+        <section class="sy-mypage-card sy-mypage-main">
+            <div class="sy-mypage-main-head">
+                <h2 class="sy-mypage-title">프로필 수정</h2>
+            </div>
+
+            <div class="sy-mypage-alert success" th:if="${profileSuccess}" th:text="${profileSuccess}">
+                프로필이 수정되었습니다.
+            </div>
+
+            <div class="sy-mypage-alert error" th:if="${profileError}" th:text="${profileError}">
+                프로필 수정에 실패했습니다.
+            </div>
+
+            <form th:action="@{/member/myPage}" method="post" class="sy-mypage-form">
+                <div class="sy-mypage-field">
+                    <label for="sy-real-name">이름</label>
+                    <input type="text"
+                           id="sy-real-name"
+                           th:value="${user.real_name}"
+                           readonly>
+                </div>
+
+                <div class="sy-mypage-field">
+                    <label for="sy-user-name">닉네임</label>
+                    <input type="text"
+                           id="sy-user-name"
+                           name="user_name"
+                           th:value="${user.user_name}"
+                           maxlength="30"
+                           autocomplete="off">
+                </div>
+
+                <div class="sy-mypage-field">
+                    <label for="sy-email">이메일</label>
+                    <input type="email"
+                           id="sy-email"
+                           th:value="${user.email}"
+                           readonly>
+                </div>
+
+                <div class="sy-mypage-field">
+                    <label for="sy-phone">전화번호</label>
+                    <input type="text"
+                           id="sy-phone"
+                           name="phone"
+                           th:value="${user.phone}"
+                           maxlength="11"
+                           inputmode="numeric"
+                           autocomplete="off">
+                </div>
+
+                <div class="sy-mypage-field">
+                    <label for="sy-birth">생년월일</label>
+                    <input type="text"
+                           id="sy-birth"
+                           th:value="${user.birth}"
+                           readonly>
+                </div>
+
+                <div class="sy-mypage-field">
+                    <label>소셜 연동</label>
+                    <a class="sy-mypage-btn sy-mypage-google-btn"
+                       th:if="${user.google_id == null or #strings.isEmpty(user.google_id)}"
+                       th:href="@{/users/google/link}">Google 연동</a>
+                    <button type="submit"
+                            form="sy-google-unlink-form"
+                            class="sy-mypage-btn sy-mypage-google-btn"
+                            th:unless="${user.google_id == null or #strings.isEmpty(user.google_id)}"
+                            onclick="return confirm('Google 연동을 해제하시겠습니까?');">Google 연동 해제</button>
+                </div>
+
+                <div class="sy-mypage-field full">
+                    <label for="sy-intro">자기소개</label>
+                    <textarea id="sy-intro"
+                              name="intro"
+                              maxlength="500"
+                              th:text="${user.intro}"></textarea>
+                </div>
+
+                <div class="sy-mypage-actions">
+                    <div class="sy-mypage-action-left">
+                        <a class="sy-mypage-btn" th:href="@{/member/changePassword}">비밀번호 변경</a>
+                    </div>
+
+                    <div class="sy-mypage-action-right">
+                        <button type="reset" class="sy-mypage-btn">초기화</button>
+                        <button type="submit" class="sy-mypage-btn primary">저장</button>
+                    </div>
+                </div>
+            </form>
+
+            <form id="sy-google-unlink-form" th:action="@{/users/google/unlink}" method="post"></form>
+        </section>
+    </div>
+
+    <th:block th:insert="~{fragments/chatbot::chatbot}"></th:block>
+</div>
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/chatbot.js}"></script>
+</body>
+</html>

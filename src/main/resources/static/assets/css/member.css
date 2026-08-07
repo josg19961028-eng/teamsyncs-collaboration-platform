@@ -1,0 +1,121 @@
+@charset "UTF-8";
+/* 회원 등록, 수정, 삭제 폼
+--------------------------------*/
+#member_register{
+	width:800px;
+}
+#member_register ul,#member_modify ul{
+	padding-left:120px;
+}
+
+#member_register input[id="id"]{
+	width:255px;
+}
+#member_register input[id="zipcode"],#member_modify input[id="zipcode"]{
+	width:226px;
+}
+#member_register select,#member_modify select{
+	width:364px;
+}
+#member_modify{
+	width:96%;
+}
+
+#member_delete input[id="id"],#member_delete input[id="passwd"]{
+	width:240px;
+}
+
+/* 로그인
+--------------------------------*/
+#member_login{
+	width:320px;
+	padding:0;
+	margin:0 auto;
+	border:none;
+}
+#member_login ul{
+	margin-top:0;
+	padding:0;
+}
+.floating-label {/*floating label 설정*/
+  position: relative;
+}
+.floating-label > .form-input{
+  width:300px;	
+  height: 32px;
+  padding: 0.55rem 0.55rem;
+}
+.floating-label > label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1.25rem 0.65rem;
+  transition: all 0.25s;
+}
+.floating-label > .form-input::placeholder{
+  color: transparent;
+}
+.floating-label > .form-input:focus, .floating-label > .form-input:not(:placeholder-shown){
+  padding-top: 1.125rem;
+  padding-bottom: 0.125rem;
+}
+.floating-label > .form-input:focus + label,
+.floating-label > .form-input:not(:placeholder-shown) + label{/*선택자A+선택자B : 선택자A 바로 뒤에 위치하는 선택자B만 선택*/
+  opacity: 0.65;
+  transform: scale(0.85) translateY(-0.5rem) translateX(-0.5rem);
+}
+#member_login .login-btn{
+	width:320px;
+}
+/* 프로필
+--------------------------------*/
+.photo-area{
+	position: relative;
+}
+.camera{
+	width: 50px;
+    height: 50px;
+    border-radius: 100%;
+    background-color: #d3bb72;
+    position: absolute;
+    top: 130px;
+    left: 150px;
+    border: 2px solid #fff;
+    cursor: pointer;
+    padding:13px 0 0 10px;
+}
+#photo_choice{
+	text-align: center;
+	position: absolute;
+    top: 150px;
+    left: 75px;
+}
+/* 비밀번호 찾기
+--------------------------------*/
+#member_find{
+	position:relative;
+}
+div#loading{
+	width:100%;
+	height:100%;
+	position:absolute;
+	top:0;
+	left:0;
+	background-color:rgba(227,227,227,.3);
+	
+}
+div#loading img{
+	width: 30px;
+  	height: 30px;
+  	position: absolute;
+ 	top: 50%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+}
+/* 회원권한 수정 폼
+--------------------------*/
+#admin_modify .span-title{
+	display:inline-block;
+	width:110px;
+}
+

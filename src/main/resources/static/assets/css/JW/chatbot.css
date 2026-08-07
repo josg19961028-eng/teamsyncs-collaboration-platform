@@ -1,0 +1,163 @@
+@charset "UTF-8";
+
+/* ================================================
+   TeamSync Chatbot Widget
+   전역 변수(--ts-primary 등)는 보통 MY/layout.css 에서 상속받지만,
+   챗봇을 로그인 전 페이지(랜딩/로그인)에도 넣기 위해 폴백 값을 여기서도 선언합니다.
+   (layout.css 가 이미 로드된 페이지에서는 나중에 로드되는 이 값이 그대로 덮어써도 동일한 값이라 문제 없음)
+   ================================================ */
+:root {
+    --ts-primary: #6c5ce7;
+    --ts-violet:  #8f65f6;
+    --ts-line:    #e8e1fb;
+    --ts-ink:     #1e1635;
+    --ts-muted:   #7b7394;
+    --ts-shadow:  0 16px 44px rgba(73,47,133,.12);
+}
+
+.ts-bot{
+    position:fixed;right:28px;bottom:28px;z-index:900;
+    display:flex;flex-direction:column;align-items:flex-end;gap:14px;
+}
+
+/* 1) 플로팅 런처 버튼 (FAB) */
+.ts-bot-fab{
+    width:64px;height:64px;border:none;cursor:pointer;border-radius:20px;
+    background:linear-gradient(135deg,var(--ts-primary),var(--ts-violet));
+    box-shadow:0 14px 34px rgba(108,92,231,.42);
+    display:grid;place-items:center;color:#fff;position:relative;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
+}
+.ts-bot-fab:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 20px 44px rgba(108,92,231,.5);}
+.ts-bot-fab:active{transform:translateY(-1px) scale(.99);}
+.ts-bot-fab svg{width:30px;height:30px;}
+.ts-bot-fab .close-ico{display:none;}
+.ts-bot.open .ts-bot-fab .open-ico{display:none;}
+.ts-bot.open .ts-bot-fab .close-ico{display:block;}
+
+/* 미읽음 배지 */
+.ts-bot-badge{
+    position:absolute;top:-5px;right:-5px;min-width:22px;height:22px;padding:0 6px;
+    border-radius:999px;background:#e46aa1;color:#fff;font-size:11px;font-weight:950;
+    display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(228,106,161,.5);
+}
+.ts-bot.open .ts-bot-badge{display:none;}
+
+/* 펄스 링 */
+.ts-bot-fab::after{
+    content:"";position:absolute;inset:0;border-radius:20px;
+    border:2px solid var(--ts-violet);opacity:0;animation:botPulse 2.6s ease-out infinite;
+}
+.ts-bot.open .ts-bot-fab::after{animation:none;}
+@keyframes botPulse{0%{opacity:.55;transform:scale(1);}70%{opacity:0;transform:scale(1.5);}100%{opacity:0;}}
+
+/* 2) 알림 말풍선 */
+.ts-bot-toast{
+    max-width:268px;background:rgba(255,255,255,.95);backdrop-filter:blur(18px);
+    border:1px solid var(--ts-line);border-radius:18px;border-bottom-right-radius:6px;
+    box-shadow:var(--ts-shadow);padding:14px 16px;cursor:pointer;position:relative;
+    transform-origin:bottom right;animation:toastIn .42s cubic-bezier(.34,1.56,.64,1) both;
+}
+.ts-bot-toast.hide{display:none;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.92);}to{opacity:1;transform:none;}}
+.ts-bot-toast .row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.ts-bot-toast .ava{
+    width:26px;height:26px;border-radius:9px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--ts-primary),var(--ts-violet));display:grid;place-items:center;
+}
+.ts-bot-toast .ava svg{width:15px;height:15px;color:#fff;}
+.ts-bot-toast .nm{font-size:12px;font-weight:950;color:var(--ts-ink);}
+.ts-bot-toast .dot{width:6px;height:6px;border-radius:50%;background:#2ecc71;margin-left:auto;}
+.ts-bot-toast .msg{font-size:13px;line-height:1.55;color:#4a4360;font-weight:600;}
+.ts-bot-toast .x{
+    position:absolute;top:8px;right:10px;width:18px;height:18px;border:none;background:none;
+    cursor:pointer;color:#bcb4d0;font-size:15px;line-height:1;padding:0;
+}
+.ts-bot-toast .x:hover{color:var(--ts-muted);}
+
+/* 3) 채팅 패널 */
+.ts-bot-panel{
+    position:fixed;right:28px;bottom:108px;z-index:899;
+    width:380px;height:560px;max-height:calc(100vh - 140px);
+    background:rgba(255,255,255,.97);backdrop-filter:blur(24px);
+    border:1px solid rgba(255,255,255,.9);border-radius:26px;
+    box-shadow:0 28px 70px rgba(73,47,133,.28);
+    display:flex;flex-direction:column;overflow:hidden;
+    opacity:0;transform:translateY(16px) scale(.97);pointer-events:none;
+    transition:opacity .26s ease,transform .26s cubic-bezier(.34,1.4,.64,1);
+}
+.ts-bot.open .ts-bot-panel{opacity:1;transform:none;pointer-events:auto;}
+
+/* 패널 헤더 */
+.ts-bot-hd{
+    background:linear-gradient(135deg,#5b4bd6,#8f65f6);color:#fff;
+    padding:18px 20px;display:flex;align-items:center;gap:12px;
+}
+.ts-bot-hd .ava{
+    width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.18);
+    display:grid;place-items:center;flex-shrink:0;
+}
+.ts-bot-hd .ava svg{width:24px;height:24px;}
+.ts-bot-hd .nm{font-size:16px;font-weight:950;letter-spacing:-.02em;}
+.ts-bot-hd .st{font-size:11.5px;opacity:.85;font-weight:700;display:flex;align-items:center;gap:5px;margin-top:2px;}
+.ts-bot-hd .st::before{content:"";width:6px;height:6px;border-radius:50%;background:#5dffb0;box-shadow:0 0 0 3px rgba(93,255,176,.25);}
+.ts-bot-hd .min{
+    margin-left:auto;width:32px;height:32px;border:none;border-radius:10px;cursor:pointer;
+    background:rgba(255,255,255,.15);color:#fff;display:grid;place-items:center;font-size:18px;
+}
+.ts-bot-hd .min:hover{background:rgba(255,255,255,.28);}
+
+/* 메시지 영역 */
+.ts-bot-msgs{flex:1;overflow-y:auto;padding:18px 18px 8px;display:flex;flex-direction:column;gap:12px;}
+.ts-bot-msgs::-webkit-scrollbar{width:6px;}
+.ts-bot-msgs::-webkit-scrollbar-thumb{background:#dcd4f0;border-radius:99px;}
+.ts-m{max-width:80%;font-size:13.5px;line-height:1.6;padding:11px 14px;border-radius:16px;font-weight:600;}
+.ts-m.bot{background:#f2eefc;color:#352b54;align-self:flex-start;border-bottom-left-radius:5px;}
+.ts-m.me{
+    background:linear-gradient(135deg,var(--ts-primary),var(--ts-violet));color:#fff;
+    align-self:flex-end;border-bottom-right-radius:5px;
+}
+.ts-m .src{
+    display:block;margin-top:7px;padding-top:7px;border-top:1px solid #e3dcf6;
+    font-size:11px;color:var(--ts-muted);font-weight:800;
+}
+.ts-m .src::before{content:"📎 ";}
+
+/* 타이핑 인디케이터 */
+.ts-typing{
+    align-self:flex-start;background:#f2eefc;border-radius:16px;border-bottom-left-radius:5px;
+    padding:13px 16px;display:none;gap:4px;margin:0 18px;
+}
+.ts-typing.show{display:flex;}
+.ts-typing span{width:7px;height:7px;border-radius:50%;background:#b3a6e0;animation:botBlink 1.2s infinite;}
+.ts-typing span:nth-child(2){animation-delay:.2s;}
+.ts-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes botBlink{0%,60%,100%{opacity:.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-3px);}}
+
+/* 빠른 답변 칩 */
+.ts-bot-chips{display:flex;flex-wrap:wrap;gap:7px;padding:4px 18px 12px;}
+.ts-chip{
+    border:1px solid var(--ts-line);background:#fff;border-radius:12px;padding:7px 12px;
+    font-size:12px;font-weight:850;color:#5a5274;cursor:pointer;font-family:inherit;transition:.14s;
+}
+.ts-chip:hover{background:#f4f0ff;border-color:var(--ts-violet);color:var(--ts-primary);}
+
+/* 입력 영역 */
+.ts-bot-input{display:flex;gap:9px;padding:14px 16px;border-top:1px solid var(--ts-line);background:rgba(255,255,255,.6);}
+.ts-bot-input input{
+    flex:1;border:1px solid var(--ts-line);border-radius:14px;padding:11px 14px;
+    font-size:13.5px;font-family:inherit;background:#fff;color:var(--ts-ink);outline:none;font-weight:600;
+}
+.ts-bot-input input:focus{border-color:var(--ts-violet);box-shadow:0 0 0 3px rgba(143,101,246,.14);}
+.ts-bot-input button{
+    width:44px;height:44px;border:none;border-radius:14px;cursor:pointer;flex-shrink:0;
+    background:linear-gradient(135deg,var(--ts-primary),var(--ts-violet));color:#fff;display:grid;place-items:center;
+}
+.ts-bot-input button:hover{filter:brightness(1.06);}
+.ts-bot-input button svg{width:19px;height:19px;}
+
+/* 반응형 */
+@media (max-width:520px){
+    .ts-bot-panel{right:14px;left:14px;width:auto;bottom:100px;height:calc(100vh - 130px);}
+    .ts-bot{right:18px;bottom:18px;}
+}

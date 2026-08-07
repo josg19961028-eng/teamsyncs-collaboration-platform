@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<head>
+    <script th:inline="javascript">
+        let size = /*[[${size}]]*/ ''; 
+        let max_size = /*[[${max_size}]]*/ '';
+
+        alert(`파일 사이즈(${size})가 최대 업로드 사이즈(${max_size})를 초과했습니다.`);
+        history.go(-1);
+    </script>
+</head>
+<body>
+</body>
+</html>

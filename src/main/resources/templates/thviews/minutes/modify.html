@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout_main}">
+
+<head>
+<meta charset="UTF-8">
+<title>회의록 수정</title>
+
+<th:block layout:fragment="pageCss">
+    <link rel="stylesheet"
+          th:href="@{/assets/css/YJ/minutes.css}">
+</th:block>
+</head>
+
+<body>
+
+<div layout:fragment="content" class="minutes-page">
+
+    <div class="minutes-container">
+
+        <!-- 왼쪽 목록 -->
+        <aside class="minutes-list-panel">
+
+            <div class="minutes-list-header">
+                <div>
+                    <h2>📝 회의록 목록</h2>
+
+                    <span class="minutes-count"
+                          th:text="${minutesList != null
+                                  ? #lists.size(minutesList) : 0} + '건'">
+                        0건
+                    </span>
+                </div>
+
+                <a class="minutes-write-btn"
+                   th:href="@{/minutes/write}">
+                    + 작성
+                </a>
+            </div>
+
+            <div class="minutes-search-wrap">
+                <input type="text"
+                       id="minutesSearch"
+                       class="minutes-search"
+                       placeholder="회의록 검색..."
+                       autocomplete="off">
+            </div>
+
+            <div class="minutes-list">
+
+                <a class="minutes-list-item"
+                   th:each="item : ${minutesList}"
+                   th:href="@{/minutes/list(
+                       minutes_num=${item.minutes_num})}"
+                   th:attr="data-title=${item.title}"
+                   th:classappend="${minutesVO.minutes_num
+                                   == item.minutes_num}
+                                   ? ' is-active' : ''">
+
+                    <div class="minutes-item-top">
+                        <strong th:text="${item.title}">
+                            회의록 제목
+                        </strong>
+
+                        <span class="minutes-schedule-badge"
+                              th:if="${item.schedule_title != null}">
+                            일정 연결
+                        </span>
+                    </div>
+
+                    <div class="minutes-item-meta">
+
+                        <span th:if="${item.meeting_date != null}"
+                              th:text="${#dates.format(
+                                  item.meeting_date,
+                                  'yyyy-MM-dd HH:mm')}">
+                        </span>
+
+                        <span class="meta-dot">•</span>
+
+                        <span th:text="${item.writer_name}">
+                            작성자
+                        </span>
+                    </div>
+
+                    <p class="minutes-item-preview"
+                       th:text="${item.content != null
+                           ? #strings.abbreviate(item.content, 75)
+                           : '작성된 회의 내용이 없습니다.'}">
+                    </p>
+
+                </a>
+
+            </div>
+        </aside>
+
+
+        <!-- 오른쪽 수정 폼 -->
+        <section class="minutes-detail-panel">
+
+            <div class="minutes-tab-header">
+                <a class="minutes-tab"
+                   th:href="@{/minutes/list(
+                       minutes_num=${minutesVO.minutes_num})}">
+                    회의록 상세
+                </a>
+
+                <span class="minutes-tab is-active">
+                    회의록 수정
+                </span>
+            </div>
+
+            <div class="minutes-form-wrap">
+
+                <div class="minutes-form-notice">
+                    ✏️ 회의록 내용을 수정하고 저장해주세요.
+                </div>
+
+                <form th:action="@{/minutes/update}"
+                      th:object="${minutesVO}"
+                      method="post"
+                      class="minutes-write-form">
+
+                    <input type="hidden"
+                           th:field="*{minutes_num}">
+
+
+                    <!-- 연결 일정 -->
+                    <div class="minutes-form-group">
+
+                        <label for="schedule_num">
+                            연결 일정
+                            <span class="form-help">선택 사항</span>
+                        </label>
+
+                        <select id="schedule_num"
+                                th:field="*{schedule_num}"
+                                class="minutes-form-control">
+
+                            <option value="">일정 없이 작성</option>
+
+                            <option th:each="schedule : ${scheduleList}"
+                                    th:value="${schedule.schedule_num}"
+                                    th:text="${schedule.title
+                                        + ' · '
+                                        + schedule.start_date}">
+                                일정
+                            </option>
+
+                        </select>
+                    </div>
+
+
+                    <!-- 제목 -->
+                    <div class="minutes-form-group">
+
+                        <label for="title">
+                            회의록 제목
+                            <span class="required">*</span>
+                        </label>
+
+                        <input type="text"
+                               id="title"
+                               th:field="*{title}"
+                               class="minutes-form-control"
+                               maxlength="200"
+                               required>
+
+                    </div>
+
+
+                    <!-- 회의 일시 -->
+                    <div class="minutes-form-group">
+
+                        <label for="meeting_date">
+                            회의 일시
+                            <span class="required">*</span>
+                        </label>
+
+                        <input type="datetime-local"
+                               id="meeting_date"
+                               th:field="*{meeting_date}"
+                               class="minutes-form-control"
+                               required>
+
+                    </div>
+
+
+                    <!-- 참석자 -->
+                    <div class="minutes-form-group">
+
+                        <label>
+                            참석자
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="minutes-member-select">
+
+                            <label class="minutes-member-chip"
+                                   th:each="member : ${teamMemberList}">
+
+                                <input type="checkbox"
+                                       th:field="*{attendeeNums}"
+                                       th:value="${member.user_num}">
+
+                                <span class="member-check">✓</span>
+
+                                <span class="member-avatar"
+                                      th:text="${#strings.substring(
+                                          member.user_name, 0, 1)}">
+                                    홍
+                                </span>
+
+                                <span class="member-name"
+                                      th:text="${member.user_name}">
+                                    팀원
+                                </span>
+
+                                <span class="member-role"
+                                      th:text="${member.roleName}">
+                                    MEMBER
+                                </span>
+
+                            </label>
+
+                        </div>
+                    </div>
+
+
+                    <!-- 회의 내용 -->
+                    <div class="minutes-form-group">
+
+                        <label for="content">
+                            회의 내용
+                            <span class="required">*</span>
+                        </label>
+
+                        <textarea id="content"
+                                  th:field="*{content}"
+                                  class="minutes-form-textarea"
+                                  rows="6"
+                                  required></textarea>
+
+                    </div>
+
+
+                    <!-- 결정 사항 -->
+                    <div class="minutes-form-group">
+
+                        <label for="decision_content">
+                            결정 사항
+                        </label>
+
+                        <textarea id="decision_content"
+                                  th:field="*{decision_content}"
+                                  class="minutes-form-textarea"
+                                  rows="4"></textarea>
+
+                    </div>
+
+
+                    <!-- 액션 아이템 -->
+                    <div class="minutes-form-group">
+
+                        <label for="action_item">
+                            액션 아이템
+                            <span class="form-help">다음 할 일</span>
+                        </label>
+
+                        <textarea id="action_item"
+                                  th:field="*{action_item}"
+                                  class="minutes-form-textarea"
+                                  rows="4"></textarea>
+
+                    </div>
+
+
+                    <!-- 버튼 -->
+                    <div class="minutes-form-actions">
+
+                        <a class="minutes-form-btn reset"
+                           th:href="@{/minutes/list(
+                               minutes_num=${minutesVO.minutes_num})}">
+                            취소
+                        </a>
+
+                        <button type="submit"
+                                class="minutes-form-btn submit">
+                            💾 수정 저장
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </section>
+
+    </div>
+</div>
+
+
+<th:block layout:fragment="pageJs">
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput =
+        document.getElementById('minutesSearch');
+
+    const items =
+        document.querySelectorAll('.minutes-list-item');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const keyword =
+                this.value.trim().toLowerCase();
+
+            items.forEach(function (item) {
+                const title =
+                    (item.dataset.title || '').toLowerCase();
+
+                item.style.display =
+                    title.includes(keyword) ? '' : 'none';
+            });
+        });
+    }
+
+    const form =
+        document.querySelector('.minutes-write-form');
+
+    if (form) {
+        form.addEventListener('submit', function (event) {
+            const checked =
+                form.querySelectorAll(
+                    'input[name="attendeeNums"]:checked'
+                );
+
+            if (checked.length === 0) {
+                event.preventDefault();
+                alert('참석자를 한 명 이상 선택해주세요.');
+            }
+        });
+    }
+});
+</script>
+</th:block>
+
+</body>
+</html>

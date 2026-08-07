@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title th:text="${minutes.title + ' - 회의록'}">회의록</title>
+
+<link rel="stylesheet"
+      th:href="@{/assets/css/YJ/minutes-print.css}">
+</head>
+
+<body>
+
+<div class="print-toolbar">
+    <button type="button"
+            class="print-btn"
+            onclick="window.print()">
+        PDF로 저장 / 인쇄
+    </button>
+
+    <button type="button"
+            class="close-btn"
+            onclick="window.close()">
+        닫기
+    </button>
+</div>
+
+
+<main class="minutes-print-page">
+
+    <!-- 상단 -->
+    <header class="print-header">
+
+        <div class="print-brand">
+            <span class="brand-mark">TS</span>
+            <span class="brand-name">TeamSync</span>
+        </div>
+
+        <div class="print-type">MEETING MINUTES</div>
+
+    </header>
+
+
+    <!-- 제목 -->
+    <section class="print-title-section">
+
+        <h1 th:text="${minutes.title}">
+            회의록 제목
+        </h1>
+
+        <div class="print-meta">
+
+            <div>
+                <span class="meta-label">팀</span>
+                <span th:text="${minutes.team_name != null
+                               ? minutes.team_name
+                               : '-'}">
+                    팀 이름
+                </span>
+            </div>
+
+            <div>
+                <span class="meta-label">회의 일시</span>
+                <span th:if="${minutes.meeting_date != null}"
+                      th:text="${#dates.format(
+                          minutes.meeting_date,
+                          'yyyy년 MM월 dd일 HH:mm')}">
+                    회의 일시
+                </span>
+            </div>
+
+            <div>
+                <span class="meta-label">작성자</span>
+                <span th:text="${minutes.writer_name}">
+                    작성자
+                </span>
+            </div>
+
+            <div>
+                <span class="meta-label">작성일</span>
+                <span th:if="${minutes.reg_date != null}"
+                      th:text="${#dates.format(
+                          minutes.reg_date,
+                          'yyyy년 MM월 dd일')}">
+                    작성일
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- 연결 일정 -->
+    <section class="print-section"
+             th:if="${minutes.schedule_num != null}">
+
+        <h2>연결된 일정</h2>
+
+        <div class="print-schedule-box">
+
+            <span class="schedule-icon">📅</span>
+
+            <span th:text="${minutes.schedule_title}">
+                연결된 일정 제목
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- 참석자 -->
+    <section class="print-section">
+
+        <h2>
+            참석자
+            <span class="section-count"
+                  th:text="${'(' +
+                      (attendeeList != null
+                      ? #lists.size(attendeeList)
+                      : 0)
+                      + '명)'}">
+                (0명)
+            </span>
+        </h2>
+
+        <div class="print-attendee-list">
+
+            <span class="print-attendee"
+                  th:each="attendee : ${attendeeList}"
+                  th:text="${attendee.user_name}">
+                참석자
+            </span>
+
+            <span class="print-empty"
+                  th:if="${attendeeList == null
+                          or #lists.isEmpty(attendeeList)}">
+                등록된 참석자가 없습니다.
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- 회의 내용 -->
+    <section class="print-section">
+
+        <h2>회의 내용</h2>
+
+        <div class="print-content"
+             th:text="${minutes.content != null
+                       ? minutes.content
+                       : '작성된 회의 내용이 없습니다.'}">
+            회의 내용
+        </div>
+
+    </section>
+
+
+    <!-- 결정 사항 -->
+    <section class="print-section">
+
+        <h2>결정 사항</h2>
+
+        <div class="print-content"
+             th:text="${minutes.decision_content != null
+                       and !#strings.isEmpty(minutes.decision_content)
+                       ? minutes.decision_content
+                       : '작성된 결정 사항이 없습니다.'}">
+            결정 사항
+        </div>
+
+    </section>
+
+
+    <!-- 액션 아이템 -->
+    <section class="print-section">
+
+        <h2>액션 아이템</h2>
+
+        <div class="print-content action-content"
+             th:text="${minutes.action_item != null
+                       and !#strings.isEmpty(minutes.action_item)
+                       ? minutes.action_item
+                       : '작성된 액션 아이템이 없습니다.'}">
+            액션 아이템
+        </div>
+
+    </section>
+
+
+    <!-- 하단 -->
+    <footer class="print-footer">
+
+        <span>TeamSync Meeting Minutes</span>
+
+        <span th:text="${#dates.format(
+            #dates.createNow(),
+            'yyyy-MM-dd HH:mm')}">
+            출력 일시
+        </span>
+
+    </footer>
+
+</main>
+
+</body>
+</html>

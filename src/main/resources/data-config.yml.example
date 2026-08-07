@@ -1,0 +1,10 @@
+dataconfig:
+  db-url: jdbc:oracle:thin:@DB_HOST:1521:SERVICE_NAME
+  db-username: YOUR_DB_USERNAME
+  db-password: YOUR_DB_PASSWORD
+  rememberme-key: YOUR_REMEMBER_ME_KEY
+  mail-username: YOUR_MAIL_USERNAME
+  mail-password: YOUR_MAIL_APP_PASSWORD
+  groq-api-key: YOUR_GROQ_API_KEY
+  google-client-id: YOUR_GOOGLE_CLIENT_ID
+  google-client-secret: YOUR_GOOGLE_CLIENT_SECRET

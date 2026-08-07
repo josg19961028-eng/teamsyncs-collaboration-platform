@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <title>알림관리</title>
+    <link rel="stylesheet" th:href="@{/assets/css/header.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/JW/notification-empty.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/JW/notification-detail.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/chatbot.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/SY/member.mypage.css(v=2)}">
+</head>
+<body>
+<div class="sy-mypage" th:with="currentMenu='mypage'">
+    <th:block th:insert="~{fragments/header::header}"></th:block>
+
+    <div class="sy-mypage-wrap">
+        <aside class="sy-mypage-card sy-mypage-side">
+            <div class="sy-mypage-avatar" th:text="${user.firstChar}">U</div>
+
+            <div class="sy-mypage-name" th:text="${user.user_name}">닉네임</div>
+            <div class="sy-mypage-real-name" th:text="${user.real_name}">이름</div>
+
+            <div class="sy-mypage-badges">
+                <span class="sy-mypage-badge"
+                      th:text="${user.auth == 'USER_ADMIN' ? '관리자' : '유저'}">유저</span>
+
+                <span class="sy-mypage-badge sy-mypage-badge-muted"
+                      th:text="${user.google_id != null and !#strings.isEmpty(user.google_id) ? 'Google 연동' : 'Google 비연동'}">
+                    Google 비연동
+                </span>
+            </div>
+
+            <div class="sy-mypage-stats">
+                <div class="sy-mypage-stat">
+                    <strong th:text="${teamCount}">0</strong>
+                    <span>참여팀</span>
+                </div>
+                <div class="sy-mypage-stat">
+                    <strong th:text="${kanbanCount}">0</strong>
+                    <span>칸반카드</span>
+                </div>
+                <div class="sy-mypage-stat">
+                    <strong th:text="${minutesCount}">0</strong>
+                    <span>회의록</span>
+                </div>
+            </div>
+
+            <nav class="sy-mypage-menu">
+                <a th:href="@{/member/myPage}">
+                    <span>👤</span>
+                    프로필 수정
+                </a>
+                <a th:href="@{/member/todos}">
+                    <span>✅</span>
+                    개인 To-Do
+                </a>
+                <a class="active" th:href="@{/member/notifications}">
+                    <span>🔔</span>
+                    알림관리
+                </a>
+                <a href="#">
+                    <span>⚠</span>
+                    계정 관리
+                </a>
+            </nav>
+        </aside>
+
+        <section class="sy-mypage-card sy-mypage-main sy-noti-card">
+            <div class="sy-noti-head">
+                <div>
+                    <h2 class="sy-mypage-title">🔔 알림관리</h2>
+                    <p class="sy-noti-sub">받은 알림 및 주요 이벤트 알림을 확인하세요.</p>
+                </div>
+                <div class="sy-noti-actions">
+                    <span class="sy-noti-unread-pill"
+                          id="sy-noti-unread-pill"
+                          th:classappend="${syUnreadNotiCount == 0} ? ' zero' : ''"
+                          th:text="${syUnreadNotiCount} + '개 미읽음'">0개 미읽음</span>
+                    <button class="sy-noti-btn"
+                            id="sy-noti-read-all"
+                            type="button"
+                            th:disabled="${syUnreadNotiCount == 0}">모두 읽음</button>
+                    <button class="sy-noti-btn sy-noti-btn-danger"
+                            id="sy-noti-delete-all"
+                            type="button"
+                            th:disabled="${#lists.isEmpty(syNotifications)}">전체 삭제</button>
+                </div>
+            </div>
+
+            <div class="sy-noti-tabs" id="sy-noti-tabs">
+                <button class="sy-noti-tab active" type="button" data-filter="all">전체</button>
+                <button class="sy-noti-tab" type="button" data-filter="1">📅 일정</button>
+                <button class="sy-noti-tab" type="button" data-filter="2">💬 채팅</button>
+                <button class="sy-noti-tab" type="button" data-filter="3">📋 칸반</button>
+                <button class="sy-noti-tab" type="button" data-filter="4">👥 팀</button>
+                <button class="sy-noti-tab" type="button" data-filter="5">📢 공지</button>
+                <button class="sy-noti-tab" type="button" data-filter="unread">🔴 미읽음</button>
+            </div>
+
+            <div class="sy-noti-list" id="sy-noti-list">
+                <th:block th:each="n, iter : ${syNotifications}">
+                    <div class="sy-noti-date-group"
+                         th:if="${iter.index == 0 or n.dateLabel != syNotifications[iter.index - 1].dateLabel}"
+                         th:text="${n.dateLabel}">오늘</div>
+
+                    <article class="sy-noti-item"
+                             th:classappend="${(n.read ? '' : 'unread') + ' ' + n.typeClass}"
+                             th:attr="data-sy-noti-num=${n.noti_num},data-sy-type=${n.noti_type},data-sy-read=${n.read}">
+                        <div class="sy-noti-ico" th:text="${n.icon}">🔔</div>
+                        <div class="sy-noti-body">
+                            <div class="sy-noti-line">
+                                <span class="sy-noti-badge" th:text="${n.typeLabel}">알림</span>
+                                <strong class="sy-noti-title" th:text="${n.title}">제목</strong>
+                            </div>
+                            <p class="sy-noti-desc" th:text="${n.content}">내용</p>
+                            <div class="sy-noti-meta">
+                                <span th:text="${n.timeText}">방금 전</span>
+                                <span class="sy-noti-dot-text">·</span>
+                                <span th:text="${n.senderName}">발신자</span>
+                                <th:block th:if="${n.teamName != null}">
+                                    <span class="sy-noti-dot-text">·</span>
+                                    <span class="sy-noti-team" th:text="${n.teamName}">팀</span>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="sy-noti-item-actions">
+                            <button class="sy-noti-detail-btn" type="button">상세</button>
+                            <button class="sy-noti-delete-btn" type="button" title="알림 삭제">×</button>
+                        </div>
+                        <span class="sy-noti-read-dot"></span>
+                    </article>
+                </th:block>
+
+                <div class="sy-noti-empty" id="sy-noti-page-empty" th:if="${#lists.isEmpty(syNotifications)}">
+                    <div class="sy-noti-empty-title">받은 알림이 없습니다.</div>
+                    <div class="sy-noti-empty-sub">새로운 이벤트가 있으면 여기에 표시됩니다.</div>
+                </div>
+
+                <div class="sy-noti-empty" id="sy-noti-filter-empty" style="display:none;">
+                    <div class="sy-noti-empty-title">해당 조건의 알림이 없습니다.</div>
+                    <div class="sy-noti-empty-sub">다른 분류를 선택해 보세요.</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <th:block th:insert="~{fragments/chatbot::chatbot}"></th:block>
+</div>
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/chatbot.js}"></script>
+<script>
+    (function () {
+        var list = document.getElementById('sy-noti-list');
+        var tabs = document.getElementById('sy-noti-tabs');
+        var readAllBtn = document.getElementById('sy-noti-read-all');
+        var deleteAllBtn = document.getElementById('sy-noti-delete-all');
+        var unreadPill = document.getElementById('sy-noti-unread-pill');
+        var pageEmpty = document.getElementById('sy-noti-page-empty');
+        var filterEmpty = document.getElementById('sy-noti-filter-empty');
+        if (!list || !tabs) return;
+
+        function csrfOptions(method) {
+            var headerMeta = document.querySelector('meta[name="csrf-header"]');
+            var tokenMeta = document.querySelector('meta[name="csrf-token"]');
+            var opts = { method: method || 'POST' };
+            if (headerMeta && tokenMeta) {
+                opts.headers = {};
+                opts.headers[headerMeta.content] = tokenMeta.content;
+            }
+            return opts;
+        }
+
+        function items() {
+            return Array.prototype.slice.call(list.querySelectorAll('.sy-noti-item'));
+        }
+
+        function updateUnreadState() {
+            var unreadCount = items().filter(function (item) {
+                return item.getAttribute('data-sy-read') === 'false';
+            }).length;
+
+            if (unreadPill) {
+                unreadPill.textContent = unreadCount + '개 미읽음';
+                unreadPill.classList.toggle('zero', unreadCount === 0);
+            }
+            if (readAllBtn) readAllBtn.disabled = unreadCount === 0;
+
+            var headerBadge = document.getElementById('notiBadge');
+            var headerCnt = document.getElementById('notiCnt');
+            if (headerBadge) {
+                headerBadge.textContent = unreadCount;
+                headerBadge.classList.toggle('hide', unreadCount === 0);
+            }
+            if (headerCnt) headerCnt.textContent = unreadCount + '개 미읽음';
+        }
+
+        function updateEmptyState() {
+            var total = items().length;
+            if (deleteAllBtn) deleteAllBtn.disabled = total === 0;
+            if (pageEmpty) pageEmpty.style.display = total === 0 ? '' : 'none';
+        }
+
+        function currentFilter() {
+            var active = tabs.querySelector('.sy-noti-tab.active');
+            return active ? active.getAttribute('data-filter') : 'all';
+        }
+
+        function applyFilter(filter) {
+            var children = Array.prototype.slice.call(list.children);
+            var currentGroup = null;
+            var groupHasVisible = false;
+            var anyVisible = false;
+
+            function closeGroup() {
+                if (currentGroup) currentGroup.classList.toggle('hide', !groupHasVisible);
+            }
+
+            children.forEach(function (el) {
+                if (el.classList.contains('sy-noti-date-group')) {
+                    closeGroup();
+                    currentGroup = el;
+                    groupHasVisible = false;
+                    return;
+                }
+
+                if (el.classList.contains('sy-noti-item')) {
+                    var show = true;
+                    if (filter === 'unread') {
+                        show = el.getAttribute('data-sy-read') === 'false';
+                    } else if (filter !== 'all') {
+                        show = el.getAttribute('data-sy-type') === filter;
+                    }
+
+                    el.classList.toggle('hide', !show);
+                    if (show) {
+                        groupHasVisible = true;
+                        anyVisible = true;
+                    }
+                }
+            });
+            closeGroup();
+
+            if (filterEmpty) {
+                filterEmpty.style.display = items().length > 0 && !anyVisible ? '' : 'none';
+            }
+        }
+
+        tabs.addEventListener('click', function (event) {
+            var button = event.target.closest('.sy-noti-tab');
+            if (!button) return;
+
+            tabs.querySelectorAll('.sy-noti-tab').forEach(function (tab) {
+                tab.classList.remove('active');
+            });
+            button.classList.add('active');
+            applyFilter(button.getAttribute('data-filter'));
+        });
+
+        list.addEventListener('click', function (event) {
+            var detailBtn = event.target.closest('.sy-noti-detail-btn');
+            if (!detailBtn) return;
+
+            var item = detailBtn.closest('.sy-noti-item');
+            if (!item) return;
+
+            var num = item.getAttribute('data-sy-noti-num');
+            if (window.TSNotiModal) window.TSNotiModal.open(num);
+        });
+
+        document.addEventListener('ts:notification-read', function (event) {
+            var num = event.detail && event.detail.notiNum;
+            if (!num) return;
+
+            var item = list.querySelector('.sy-noti-item[data-sy-noti-num="' + num + '"]');
+            if (item && item.getAttribute('data-sy-read') === 'false') {
+                item.classList.remove('unread');
+                item.setAttribute('data-sy-read', 'true');
+                updateUnreadState();
+                applyFilter(currentFilter());
+            }
+        });
+
+        list.addEventListener('click', function (event) {
+            var deleteBtn = event.target.closest('.sy-noti-delete-btn');
+            if (!deleteBtn) return;
+
+            var item = deleteBtn.closest('.sy-noti-item');
+            if (!item) return;
+
+            var num = item.getAttribute('data-sy-noti-num');
+            fetch('/notification/delete/' + num, csrfOptions('POST'))
+                .then(function () {
+                    var prevGroup = item.previousElementSibling;
+                    var next = item.nextElementSibling;
+                    item.remove();
+
+                    if (prevGroup && prevGroup.classList.contains('sy-noti-date-group')) {
+                        var stillHasItem = next && next.classList.contains('sy-noti-item');
+                        if (!stillHasItem) prevGroup.remove();
+                    }
+
+                    updateUnreadState();
+                    updateEmptyState();
+                    applyFilter(currentFilter());
+                })
+                .catch(function (error) {
+                    console.error('알림 삭제 실패', error);
+                });
+        });
+
+        if (readAllBtn) {
+            readAllBtn.addEventListener('click', function () {
+                fetch('/notification/readAll', csrfOptions('POST'))
+                    .then(function () {
+                        items().forEach(function (item) {
+                            item.classList.remove('unread');
+                            item.setAttribute('data-sy-read', 'true');
+                        });
+                        updateUnreadState();
+                        applyFilter(currentFilter());
+                    })
+                    .catch(function (error) {
+                        console.error('전체 읽음 처리 실패', error);
+                    });
+            });
+        }
+
+        if (deleteAllBtn) {
+            deleteAllBtn.addEventListener('click', function () {
+                if (!confirm('모든 알림을 삭제할까요? 삭제한 알림은 복구할 수 없습니다.')) return;
+
+                fetch('/notification/deleteAll', csrfOptions('POST'))
+                    .then(function () {
+                        list.querySelectorAll('.sy-noti-item, .sy-noti-date-group').forEach(function (el) {
+                            el.remove();
+                        });
+                        if (filterEmpty) filterEmpty.style.display = 'none';
+                        updateUnreadState();
+                        updateEmptyState();
+                    })
+                    .catch(function (error) {
+                        console.error('전체 알림 삭제 실패', error);
+                    });
+            });
+        }
+    })();
+</script>
+</body>
+</html>

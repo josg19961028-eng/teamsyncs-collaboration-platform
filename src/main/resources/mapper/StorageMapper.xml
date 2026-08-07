@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.storage.dao.StorageMapper">
+	<select id="selectFolderTree" parameterType="long" resultType="FileFolderVO">
+		select
+			folder_num,
+			team_num,
+			folder_name,
+			parent_folder_num,
+			is_chat_folder,
+			create_date,
+			level as folder_level,
+			connect_by_isleaf as is_leaf,
+			sys_connect_by_path(folder_name,'/') as folder_path
+		from file_folder
+		where team_num = #{team_num}
+		start with parent_folder_num is null
+		connect by prior folder_num = parent_folder_num
+		order siblings by create_date asc
+	</select>
+	
+	<select id="selectFileListByFolder" parameterType="long" resultType="ChatFileVO">
+		select
+			f.file_num,
+			f.folder_num,
+			f.channel_num,
+			f.team_num,
+			f.origin_name,
+			f.save_name,
+			f.file_path,
+			f.file_size,
+			f.file_type,
+			f.file_source,
+			f.upload_date,
+			u.user_name as uploaderName,
+			c.channel_name
+		from chat_file f
+		join users u on f.uploader_num = u.user_num
+		left join chat_channel c on f.channel_num = c.channel_num
+		where f.folder_num = #{folder_num}
+		order by f.upload_date desc
+	</select>
+	
+	<select id="selectFileListByTeam" parameterType="long" resultType="ChatFileVO">
+		select
+			f.file_num,
+			f.folder_num,
+			f.channel_num,
+			f.team_num,
+			f.origin_name,
+			f.save_name,
+			f.file_path,
+			f.file_size,
+			f.file_type,
+			f.file_source,
+			f.upload_date,
+			u.user_name as uploaderName,
+			c.channel_name
+		from chat_file f
+		join users u on f.uploader_num = u.user_num
+		left join chat_channel c on f.channel_num = c.channel_num
+		where f.team_num = #{team_num}
+		order by f.upload_date desc
+	</select>
+	
+	<insert id="insertFile" parameterType="ChatFileVO">
+		insert into chat_file(
+			file_num,folder_num,team_num,uploader_num,
+			origin_name,save_name,file_path,
+			file_size,file_type,file_source,
+			channel_num,upload_date
+	)   values (
+			seq_chat_file.nextval, #{folder_num, jdbcType=NUMERIC}, #{team_num}, #{uploader_num},
+	        #{origin_name}, #{save_name}, #{file_path},
+	        #{file_size}, #{file_type}, #{file_source},
+	        #{channel_num, jdbcType=NUMERIC}, SYSDATE
+	)
+	</insert>
+</mapper>
+
+
+
+
+
+
+

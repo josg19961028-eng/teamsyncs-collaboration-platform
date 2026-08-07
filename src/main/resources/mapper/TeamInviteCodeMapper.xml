@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.spring.team.dao.TeamInviteCodeMapper">
+
+    <resultMap id="inviteCodeResultMap" type="kr.spring.team.vo.TeamInviteCodeVO">
+        <id     property="invite_code_num" column="INVITE_CODE_NUM"/>
+        <result property="team_num"        column="TEAM_NUM"/>
+        <result property="code"            column="CODE"/>
+        <result property="status"          column="STATUS"/>
+        <result property="issued_at"       column="ISSUED_AT"/>
+        <result property="expired_at"      column="EXPIRED_AT"/>
+        <result property="issuer_num"      column="ISSUER_NUM"/>
+    </resultMap>
+
+    <select id="selectByTeamNum" parameterType="long" resultMap="inviteCodeResultMap">
+        SELECT INVITE_CODE_NUM, TEAM_NUM, CODE, STATUS, ISSUED_AT, EXPIRED_AT, ISSUER_NUM
+        FROM TEAM_INVITE_CODE
+        WHERE TEAM_NUM = #{teamNum}
+    </select>
+
+    <select id="selectByCode" parameterType="string" resultMap="inviteCodeResultMap">
+        SELECT INVITE_CODE_NUM, TEAM_NUM, CODE, STATUS, ISSUED_AT, EXPIRED_AT, ISSUER_NUM
+        FROM TEAM_INVITE_CODE
+        WHERE CODE = #{code}
+    </select>
+
+    <!-- 신규 발급: 팀당 최초 1회 -->
+    <insert id="insertInviteCode" parameterType="kr.spring.team.vo.TeamInviteCodeVO">
+        <selectKey keyProperty="invite_code_num" resultType="long" order="BEFORE">
+            SELECT SEQ_TEAM_INVITE_CODE.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TEAM_INVITE_CODE (
+            INVITE_CODE_NUM, TEAM_NUM, CODE, STATUS, ISSUED_AT, EXPIRED_AT, ISSUER_NUM
+        ) VALUES (
+            #{invite_code_num}, #{team_num}, #{code}, 1, SYSDATE, SYSDATE + 1, #{issuer_num}
+        )
+    </insert>
+
+    <!-- 재발급: TEAM_NUM UK 제약 때문에 기존 row 덮어쓰기 -->
+    <update id="updateInviteCode" parameterType="kr.spring.team.vo.TeamInviteCodeVO">
+        UPDATE TEAM_INVITE_CODE
+        SET CODE       = #{code},
+            STATUS     = 1,
+            ISSUED_AT  = SYSDATE,
+            EXPIRED_AT = SYSDATE + 1,
+            ISSUER_NUM = #{issuer_num}
+        WHERE TEAM_NUM = #{team_num}
+    </update>
+
+    <update id="expireInviteCode" parameterType="long">
+        UPDATE TEAM_INVITE_CODE
+        SET STATUS = 2
+        WHERE INVITE_CODE_NUM = #{inviteCodeNum}
+    </update>
+
+    <update id="disableInviteCodeByTeam" parameterType="long">
+        UPDATE TEAM_INVITE_CODE
+        SET STATUS = 3
+        WHERE TEAM_NUM = #{teamNum}
+    </update>
+
+</mapper>

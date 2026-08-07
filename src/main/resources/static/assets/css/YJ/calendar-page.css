@@ -1,0 +1,149 @@
+/* assets/css/calendar/calendar-page.css */
+
+.calendar-page {
+    padding: 32px;
+    min-height: calc(100vh - 80px);
+    background: linear-gradient(180deg, #f8f5ff 0%, #ffffff 45%);
+}
+
+.calendar-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.calendar-page-title h2 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #2f2750;
+    margin: 0 0 8px 0;
+}
+
+.calendar-page-title p {
+    font-size: 14px;
+    color: #8b83a7;
+    margin: 0;
+}
+
+.calendar-page-card {
+    background: #fff;
+    border: 1px solid #eee8ff;
+    border-radius: 28px;
+    padding: 26px;
+    box-shadow: 0 18px 50px rgba(73, 47, 133, 0.13);
+}
+
+.calendar-page-card #calendar {
+    min-height: 780px;
+}
+
+.calendar-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    min-width: 104px;
+    height: 38px;
+    box-sizing: border-box;
+
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: #6c5ce7;
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(108, 92, 231, 0.28);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+
+    white-space: nowrap;
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease;
+}
+
+.calendar-action-btn.sub {
+    background: #fff;
+    color: #6c5ce7;
+    border: 1px solid #e4ddff;
+    box-shadow: none;
+}
+
+/* 월간 날짜 칸 높이 */
+.calendar-page-card #calendar .fc-daygrid-day-frame {
+    min-height: 125px;
+    padding: 8px;
+}
+
+/* 날짜 숫자와 일정 사이 여백 */
+.calendar-page-card #calendar .fc-daygrid-day-top {
+    padding-bottom: 6px;
+}
+
+/* 일정 뱃지 간격 */
+.calendar-page-card #calendar .fc-daygrid-event {
+    margin-top: 4px;
+    padding: 3px 8px;
+}
+
+/* 캘린더 상단 버튼/제목과 표 사이 여백 */
+.calendar-page-card #calendar .fc-toolbar {
+    margin-bottom: 20px;
+}
+/* =========================
+   큰 캘린더 상호작용
+========================= */
+#calendar .fc-daygrid-day,
+#calendar .fc-daygrid-day-frame,
+#calendar .fc-daygrid-day-number,
+#calendar .fc-event {
+    cursor: pointer;
+}
+
+#calendar .fc-daygrid-day:hover {
+    background: #f8f5ff;
+}
+
+.calendar-action-btn:hover {
+    filter: brightness(0.97);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+    .calendar-page {
+        padding: 18px;
+    }
+
+    .calendar-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+    .calendar-action-btn {
+        width: 100%;
+    }
+
+    .calendar-page-card {
+        padding: 16px;
+        border-radius: 20px;
+    }
+}
+
+.calendar-page-card #calendar .fc-button {
+    min-height: 36px;
+    height: 36px;
+
+    padding: 0 13px !important;
+
+    line-height: 1 !important;
+}

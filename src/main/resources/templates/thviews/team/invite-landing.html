@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <title>팀 초대 - TeamSync</title>
+    <style>
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        body{
+            margin:0;font-family:'Noto Sans KR',sans-serif;
+            background:
+                radial-gradient(1200px 700px at 12% -10%, #efeaff 0%, transparent 60%),
+                radial-gradient(1000px 600px at 108% 105%, #fdeef6 0%, transparent 55%),
+                linear-gradient(160deg,#f7f6fb 0%, #f1edff 100%);
+            min-height:100vh;
+            position:relative;
+            overflow-x:hidden;
+        }
+        /* 은은한 도트 그리드 텍스처 */
+        body::before{
+            content:'';position:fixed;inset:0;pointer-events:none;
+            background-image:radial-gradient(rgba(108,92,231,.10) 1.4px, transparent 1.4px);
+            background-size:28px 28px;
+        }
+        /* 떠다니는 블러 orb 3개 */
+        .bgOrb{position:fixed;border-radius:50%;filter:blur(70px);pointer-events:none;z-index:0}
+        .bgOrb1{width:440px;height:440px;background:#8f65f6;opacity:.35;top:-140px;left:-120px;animation:floatA 16s ease-in-out infinite}
+        .bgOrb2{width:400px;height:400px;background:#e46aa1;opacity:.30;bottom:-160px;right:-100px;animation:floatB 18s ease-in-out infinite}
+        .bgOrb3{width:320px;height:320px;background:#37c4da;opacity:.22;top:45%;left:68%;animation:floatC 20s ease-in-out infinite}
+        @keyframes floatA{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,25px) scale(1.06)}}
+        @keyframes floatB{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-25px,-30px) scale(1.05)}}
+        @keyframes floatC{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-20px,20px) scale(1.08)}}
+
+        /* 헤더 대신 작은 브랜드 마크 */
+        .brandMark{
+            position:relative;z-index:1;display:flex;align-items:center;gap:9px;
+            padding:26px 0 0 30px;
+        }
+        .brandMark .mark{
+            width:34px;height:34px;border-radius:10px;
+            background:linear-gradient(135deg,var(--primary,#6c5ce7),#8f65f6);
+            color:#fff;font-weight:950;font-size:14px;display:flex;align-items:center;justify-content:center;
+            box-shadow:0 8px 18px rgba(108,92,231,.3);
+        }
+        .brandMark .name{font-weight:950;font-size:16px;color:var(--ink,#1e1635);letter-spacing:-.02em}
+
+        .inviteWrap{
+            position:relative;z-index:1;
+            display:flex;align-items:center;justify-content:center;
+            padding:40px 20px;min-height:calc(100vh - 86px);
+        }
+        .inviteCard{
+            background:rgba(255,255,255,.86);
+            backdrop-filter:blur(16px);
+            -webkit-backdrop-filter:blur(16px);
+            border:1px solid rgba(255,255,255,.9);
+            border-radius:28px;
+            box-shadow:0 30px 80px rgba(73,47,133,.18), 0 0 0 1px rgba(255,255,255,.4) inset;
+            padding:44px 34px;max-width:440px;width:100%;text-align:center;
+        }
+        .inviteIcon{
+            width:72px;height:72px;border-radius:22px;margin:0 auto 20px;
+            background:linear-gradient(135deg,var(--primary,#6c5ce7),#8f65f6);
+            box-shadow:0 14px 30px rgba(108,92,231,.32);
+            display:flex;align-items:center;justify-content:center;font-size:34px;
+        }
+        .inviteCard h1{font-size:22px;font-weight:950;margin:0 0 10px;color:var(--ink,#1e1635);letter-spacing:-.03em}
+        .inviteCard h1 span{color:var(--primary,#6c5ce7)}
+        .inviteCard p{font-size:14px;color:var(--muted,#7b7394);margin:0 0 26px;line-height:1.6}
+        .inviteActions{display:flex;flex-direction:column;gap:10px}
+        .ibtn{
+            border:1px solid var(--line,#e8e1fb);border-radius:14px;padding:13px 18px;
+            font-size:14px;font-weight:900;cursor:pointer;text-decoration:none;
+            display:inline-flex;align-items:center;justify-content:center;color:#42485b;background:#fff;
+            transition:.15s;font-family:inherit;
+        }
+        .ibtn:hover{transform:translateY(-1px)}
+        .ibtn.primary{background:linear-gradient(135deg,var(--primary,#6c5ce7),#7476ff);border:0;color:#fff;box-shadow:0 12px 26px rgba(86,87,245,.24)}
+        .ibtn.ghost{background:transparent;border-color:transparent;color:var(--muted,#7b7394)}
+        .ibtn.danger{background:#fff1f7;border-color:transparent;color:#e46aa1}
+
+        @media(prefers-reduced-motion:reduce){
+            .bgOrb1,.bgOrb2,.bgOrb3{animation:none}
+        }
+    </style>
+</head>
+<body>
+
+<div class="bgOrb bgOrb1"></div>
+<div class="bgOrb bgOrb2"></div>
+<div class="bgOrb bgOrb3"></div>
+
+<div class="brandMark">
+    <div class="mark">TS</div>
+    <div class="name">TeamSync</div>
+</div>
+
+<div class="inviteWrap">
+    <div class="inviteCard">
+
+        <!-- 참여 가능 -->
+        <th:block th:if="${inviteStatus == 'OK'}">
+            <div class="inviteIcon">✉️</div>
+            <h1><span th:text="${teamName}">팀</span>에 초대받았습니다</h1>
+
+            <!-- 초대코드 링크 흐름: AJAX로 즉시 참여 -->
+            <th:block th:if="${inviteKind != 'email'}">
+                <p>아래 버튼을 눌러 팀에 참여할 수 있어요.</p>
+                <div class="inviteActions">
+                    <button type="button" class="ibtn primary" onclick="tsJoinByLink()">팀 참여하기</button>
+                    <a class="ibtn ghost" th:href="@{/main/home}">나중에 할게요</a>
+                </div>
+            </th:block>
+
+            <!-- 이메일 초대 흐름: 기존 accept/reject 컨트롤러로 이동해서 처리 -->
+            <th:block th:if="${inviteKind == 'email'}">
+                <p>아래에서 초대를 수락하거나 거절할 수 있어요.</p>
+                <div class="inviteActions">
+                    <a class="ibtn primary" th:href="@{/team/invite/email/accept(invitationNum=${invitationNum})}">수락하기</a>
+                    <a class="ibtn danger" th:href="@{/team/invite/email/reject(invitationNum=${invitationNum})}">거절하기</a>
+                    <a class="ibtn ghost" th:href="@{/main/home}">나중에 할게요</a>
+                </div>
+            </th:block>
+        </th:block>
+
+        <!-- 이미 참여 중 -->
+        <th:block th:if="${inviteStatus == 'ALREADY'}">
+            <div class="inviteIcon">✅</div>
+            <h1>이미 참여 중인 팀입니다</h1>
+            <p><span th:text="${teamName}">팀</span>에 이미 소속되어 있어요.</p>
+            <div class="inviteActions">
+                <a class="ibtn primary" th:href="@{/main/home}">내 홈으로</a>
+            </div>
+        </th:block>
+
+        <!-- 만료 -->
+        <th:block th:if="${inviteStatus == 'EXPIRED'}">
+            <div class="inviteIcon">⏰</div>
+            <h1>만료된 초대입니다</h1>
+            <p th:if="${inviteKind == 'email'}">이 초대는 유효기간이 지났어요. 팀장 또는 매니저에게 재초대를 요청해주세요.</p>
+            <p th:unless="${inviteKind == 'email'}">이 초대코드는 유효기간이 지났어요. 팀장에게 새 코드를 요청해주세요.</p>
+            <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+        </th:block>
+
+        <!-- 이미 응답한 초대 (이메일 전용: 이미 수락/거절/취소됨) -->
+        <th:block th:if="${inviteStatus == 'RESPONDED'}">
+            <div class="inviteIcon">📭</div>
+            <h1>이미 처리된 초대입니다</h1>
+            <p>이 초대는 이미 수락되었거나 거절되었어요.</p>
+            <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+        </th:block>
+
+        <!-- 비활성화 -->
+        <th:block th:if="${inviteStatus == 'DISABLED'}">
+            <div class="inviteIcon">🚫</div>
+            <h1>사용할 수 없는 초대입니다</h1>
+            <p>이 초대코드는 비활성화되었어요. 팀장에게 새 코드를 요청해주세요.</p>
+            <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+        </th:block>
+
+        <!-- 유효하지 않음 -->
+        <th:block th:if="${inviteStatus == 'INVALID'}">
+            <div class="inviteIcon">❓</div>
+            <h1>유효하지 않은 초대입니다</h1>
+            <p th:if="${inviteKind == 'email'}">초대 정보를 찾을 수 없어요. 링크를 다시 확인해주세요.</p>
+            <p th:unless="${inviteKind == 'email'}">초대 링크가 올바르지 않아요. 링크를 다시 확인해주세요.</p>
+            <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+        </th:block>
+
+        <!-- 팀 없음 -->
+        <th:block th:if="${inviteStatus == 'TEAM_NOT_FOUND'}">
+            <div class="inviteIcon">❓</div>
+            <h1>팀을 찾을 수 없습니다</h1>
+            <p>삭제되었거나 존재하지 않는 팀이에요.</p>
+            <div class="inviteActions"><a class="ibtn" th:href="@{/main/home}">내 홈으로</a></div>
+        </th:block>
+
+    </div>
+</div>
+
+<input type="hidden" id="inviteCode" th:value="${inviteCode}">
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script>
+function tsJoinByLink() {
+    var code = document.getElementById('inviteCode').value;
+    var hMeta = document.querySelector('meta[name="csrf-header"]');
+    var tMeta = document.querySelector('meta[name="csrf-token"]');
+
+    $.ajax({
+        url: '/team/join/code',
+        type: 'POST',
+        data: { code: code },
+        beforeSend: function (xhr) {
+            if (hMeta && tMeta) xhr.setRequestHeader(hMeta.content, tMeta.content);
+        }
+    })
+    .done(function (res) {
+        if (typeof res === 'string' && res.indexOf('OK:') === 0) {
+            var teamNum = res.split(':')[1];
+            location.href = '/team/enter/' + teamNum;   // 세션에 팀 저장 후 대시보드로
+        } else if (res === 'ALREADY_JOINED') {
+            alert('이미 참여 중인 팀입니다.');
+            location.href = '/main/home';
+        } else if (res === 'EXPIRED_CODE') {
+            alert('만료된 초대코드입니다.'); location.reload();
+        } else if (res === 'DISABLED_CODE') {
+            alert('비활성화된 초대코드입니다.'); location.reload();
+        } else if (res === 'INVALID_CODE') {
+            alert('유효하지 않은 초대코드입니다.'); location.reload();
+        } else {
+            alert('참여에 실패했습니다. (' + res + ')');
+        }
+    })
+    .fail(function () { alert('참여 처리 중 오류가 발생했습니다.'); });
+}
+</script>
+</body>
+</html>

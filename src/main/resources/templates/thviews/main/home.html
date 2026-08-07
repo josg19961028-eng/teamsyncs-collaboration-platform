@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<meta name="csrf-header" th:content="${_csrf.headerName}">
+<meta name="csrf-token" th:content="${_csrf.token}">
+<title>TeamSync - 홈</title>
+<!--  <link rel="stylesheet" th:href="@{/assets/css/common.css}"> -->
+<link rel="stylesheet" th:href="@{/assets/css/header.css}">
+<link rel="stylesheet"
+	th:href="@{/assets/css/JW/notification-empty.css}">
+<link rel="stylesheet"
+	th:href="@{/assets/css/JW/notification-detail.css}">
+<link rel="stylesheet" th:href="@{/assets/css/home.css}" type="text/css">
+
+<!-- 캘린더 CSS -->
+<link rel="stylesheet" th:href="@{/assets/css/YJ/calendar-common.css}">
+<link rel="stylesheet" th:href="@{/assets/css/YJ/calendar-widget.css}">
+
+</head>
+<body>
+	<!-- 공통 헤더 -->
+	<th:block th:insert="~{fragments/header::header}"></th:block>
+
+	<div class="app">
+
+		<!-- 히어로 -->
+		<div class="hero">
+			<div>
+				<div class="eyebrow" id="todayLabel"></div>
+				<h1 th:text="'안녕하세요, ' + ${userName} + '님 👋'">안녕하세요 👋</h1>
+				<p>왼쪽에서 참여 중인 팀을 선택하거나, 새 팀을 만들어보세요.</p>
+			</div>
+			<div class="chipRow">
+				<button class="btn primary" onclick="openM('createTeam')">+
+					팀 만들기</button>
+				<button class="btn" onclick="openM('joinTeam')">초대코드 입력</button>
+			</div>
+		</div>
+
+		<!-- 홈 그리드 -->
+		<div class="homeGrid">
+			<!-- 내 팀 목록 (실데이터) -->
+			<aside class="panel pad">
+				<div class="head">
+					<div>
+						<h2>내 팀</h2>
+						<p>참여 중인 팀</p>
+					</div>
+					<button class="btn primary"
+						style="padding: 7px 11px; font-size: 12px"
+						onclick="openM('createTeam')">+</button>
+				</div>
+				<div id="teamList">
+					<div th:if="${#lists.isEmpty(teamSummaries)}" class="emptyTeam">
+						아직 참여 중인 팀이 없어요.<br>팀을 만들거나 초대코드로 참여해보세요.
+					</div>
+					<div class="teamCard" th:each="s : ${teamSummaries}"
+						th:attr="onclick=|location.href='/team/enter/${s.team.team_num}'|">
+						<div class="teamTop">
+							<!-- 팀 이미지가 등록돼 있으면 이미지, 없으면(404) 색상 타일 + 이모지 -->
+							<div class="tIcon"
+								th:style="|background:${s.team.color};overflow:hidden;|">
+								<img th:src="@{/team/photo/{n}(n=${s.team.team_num})}"
+									alt="팀 이미지"
+									style="width: 100%; height: 100%; object-fit: cover; display: block"
+									onerror="this.style.display='none';this.nextElementSibling.style.display='';">
+								<span style="display: none">💻</span>
+							</div>
+							<div>
+								<div class="tName" th:text="${s.team.team_name}">팀 이름</div>
+								<div class="tMeta">
+									<span
+										th:text="${s.team.description != null and !#strings.isEmpty(s.team.description)} ? ${s.team.description} : '설명 없음'">설명</span>
+									<span th:text="' · ' + ${s.memberCount} + '명'"></span>
+								</div>
+							</div>
+						</div>
+						<div class="teamFoot">
+							<span class="roleBadge"
+								th:classappend="${s.role == 3 ? 'roleLeader' : (s.role == 2 ? 'roleManager' : 'roleMember')}"
+								th:text="${s.role == 3 ? '팀장' : (s.role == 2 ? '매니저' : '팀원')}">역할</span>
+							<button class="enterBtn"
+								th:attr="onclick=|event.stopPropagation();location.href='/team/enter/${s.team.team_num}'|">입장
+								→</button>
+						</div>
+					</div>
+				</div>
+			</aside>
+
+			<!-- 가운데: 통계 + 캘린더 (목업, 캘린더 모듈 완성 전까지 mock) -->
+			<main>
+				<div class="stats">
+					<div class="stat">
+						<b id="stSch">-</b>
+						<p>전체 일정</p>
+					</div>
+					<div class="stat">
+						<b th:text="${#lists.size(teamSummaries)}">0</b>
+						<p>참여 팀</p>
+					</div>
+					<div class="stat">
+						<b id="stToday">-</b>
+						<p>오늘 일정</p>
+					</div>
+					<div class="stat">
+						<b id="stMin">-</b>
+						<p>회의록</p>
+					</div>
+				</div>
+				<div class="panel">
+					<div id="homeCalendar" data-events-url="/calendar/my-events">
+					</div>
+				</div>
+			</main>
+
+			<!-- 우측 (목업, 캘린더/회의록/투두 모듈 완성 전까지 mock) -->
+			<aside>
+				<div class="rightStack">
+					<div class="panel pad">
+						<div class="head">
+							<div>
+								<h2>오늘 일정</h2>
+								<p>전체 팀 기준</p>
+							</div>
+						</div>
+						<div id="todayList" class="rightStack"></div>
+					</div>
+					<div class="panel pad">
+						<div class="head">
+							<div>
+								<h2>최근 회의록</h2>
+							</div>
+						</div>
+						<div id="minutesList" class="rightStack"></div>
+					</div>
+					<div class="panel pad">
+						<div class="head">
+							<div>
+								<h2>내 To-Do</h2>
+							</div>
+							<button class="btn" style="padding: 6px 10px; font-size: 12px"
+								onclick="openM('addTodo')">+ 추가</button>
+						</div>
+						<div id="todoList" class="rightStack"></div>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</div>
+
+	<!-- 모달 -->
+	<div class="mLayer" id="mLayer"
+		onclick="if(event.target===this)closeM()">
+		<div class="modal" id="modal">
+			<div class="mHead">
+				<h3 id="mTitle2"></h3>
+				<button class="mClose" onclick="closeM()">✕</button>
+			</div>
+			<div class="mBody" id="mBody"></div>
+		</div>
+	</div>
+
+	<!-- 홈 캘린더 일정 등록 모달 -->
+	<div class="mLayer" id="homeScheduleModalLayer"
+		onclick="if(event.target === this) closeHomeScheduleModal()">
+
+		<div class="modal">
+
+			<div class="mHead">
+				<h3>일정 등록</h3>
+
+				<button type="button" class="mClose" id="btnCloseHomeScheduleModal">
+					✕</button>
+			</div>
+
+			<div class="mBody">
+
+				<form id="homeScheduleForm">
+
+					<div class="f full">
+						<label for="homeScheduleTitle">제목 *</label> <input type="text"
+							id="homeScheduleTitle" name="title" maxlength="200"
+							placeholder="일정 제목" required>
+					</div>
+
+					<div class="fG">
+
+						<div class="f">
+							<label for="homeScheduleTeam">팀 *</label> <select
+								id="homeScheduleTeam" name="team_num" required>
+
+								<option value="">팀을 선택하세요</option>
+
+								<option th:each="s : ${teamSummaries}"
+									th:if="${s.role == 2 or s.role == 3}"
+									th:value="${s.team.team_num}" th:text="${s.team.team_name}">
+									팀명</option>
+
+							</select>
+						</div>
+
+						<div class="f">
+							<label for="homeScheduleCategory">카테고리</label> <select
+								id="homeScheduleCategory" name="category">
+								<option value="일반 일정">일반 일정</option>
+								<option value="회의">회의</option>
+								<option value="개발">개발</option>
+								<option value="마감">마감</option>
+							</select>
+						</div>
+
+						<div class="f">
+							<label for="homeScheduleStartDate">시작일 *</label> <input
+								type="date" id="homeScheduleStartDate" name="start_date"
+								required>
+						</div>
+
+						<div class="f">
+							<label for="homeScheduleEndDate">종료일 *</label> <input type="date"
+								id="homeScheduleEndDate" name="end_date" required>
+						</div>
+						<!-- 종일 일정 -->
+						<div class="f full home-all-day-wrap">
+							<label class="home-switch-label"> <span>종일 일정</span> <span
+								class="home-switch"> <input type="checkbox"
+									id="homeScheduleAllDayCheck" checked> <span
+									class="home-switch-slider"></span>
+							</span>
+							</label>
+
+							<!-- 서버로 보낼 실제 값: 1=종일, 2=시간 지정 -->
+							<input type="hidden" id="homeScheduleAllDay" name="all_day"
+								value="1">
+						</div>
+
+						<!-- 시간 지정 입력 영역 -->
+						<div class="f home-schedule-time-field">
+							<label for="homeScheduleStartTime">시작 시간 *</label> <input
+								type="time" id="homeScheduleStartTime" value="09:00">
+						</div>
+
+						<div class="f home-schedule-time-field">
+							<label for="homeScheduleEndTime">종료 시간 *</label> <input
+								type="time" id="homeScheduleEndTime" value="10:00">
+						</div>
+
+						<div class="f">
+							<label for="homeScheduleColor">색상</label> <input type="color"
+								id="homeScheduleColor" name="color" value="#6C5CE7">
+						</div>
+
+						<div class="f full">
+							<label for="homeScheduleContent">내용</label>
+
+							<textarea id="homeScheduleContent" name="content"
+								maxlength="2000" placeholder="일정 상세 내용"></textarea>
+						</div>
+
+					</div>
+
+					<input type="hidden" id="homeScheduleAllDay" name="all_day"
+						value="1">
+
+					<div class="acts">
+						<button type="button" class="btn" id="btnCancelHomeSchedule">
+							취소</button>
+
+						<button type="submit" class="btn primary">저장</button>
+					</div>
+
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- 페이지에서 하나만 유지 -->
+	<div id="toast"></div>
+
+	<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+
+	<!-- FullCalendar JS -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales-all.global.min.js"></script>
+
+	<script th:src="@{/assets/js/YJ/home-calendar.js}"></script>
+</body>
+</html>

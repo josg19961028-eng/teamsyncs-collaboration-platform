@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>TeamSync - 로그인/회원가입</title>
+  <link rel="stylesheet" th:href="@{/assets/css/SY/member.login.css(v=2)}"/>
+  <link rel="stylesheet" th:href="@{/assets/css/Chatbot.css}"/>
+  <style>
+    #sy-login > .sy-msg { display: none; }
+  </style>
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+<body>
+<div class="sy-member-page">
+  <div class="sy-member-card">
+
+
+    <div id="sy-login" class="sy-pane sy-on">
+      <button type="button" class="sy-back-icon" id="sy-login-back" aria-label="뒤로가기">
+        <span></span>
+      </button>
+      <div class="sy-signup-title">
+       	<div class="sy-brand-mark">TS</div>
+        <h2 class="sy-title">TeamSync</h2>
+      </div>
+
+      <div class="sy-msg sy-msg-error" th:if="${error != null and error == 'error'}">
+        이메일 또는 비밀번호가 일치하지 않습니다.
+      </div>
+      <div class="sy-msg sy-msg-error" th:if="${error != null and error == 'error_suspended'}">
+        정지된 계정입니다.
+      </div>
+      <div class="sy-msg sy-msg-success" th:if="${signupSuccess != null}" th:text="${signupSuccess}"></div>
+
+      <div id="sy-login-form-view" class="sy-auth-view sy-show">
+        <h3 class="sy-subview-title">로그인</h3>
+        <p class="sy-sub">로그인하고 팀 업무를 이어가세요.</p>
+
+        <div class="sy-msg sy-msg-error" th:if="${error != null and error == 'error'}">
+          이메일 또는 비밀번호가 일치하지 않습니다.
+        </div>
+        <div class="sy-msg sy-msg-error" th:if="${error != null and error == 'error_suspended'}">
+          정지된 계정입니다.
+        </div>
+        <div class="sy-msg sy-msg-success" th:if="${signupSuccess != null}" th:text="${signupSuccess}"></div>
+
+        <form th:action="@{/member/login}" method="post" id="sy-login-form">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <div class="sy-field">
+            <label>이메일</label>
+            <input type="email" name="email" id="sy-login-email" placeholder="hello@example.com" autocomplete="off"/>
+          </div>
+
+          <div class="sy-field">
+            <label>비밀번호</label>
+            <input type="password" name="passwd" id="sy-login-passwd" placeholder="비밀번호"/>
+          </div>
+
+          <div class="sy-login-row">
+            <label>
+              <input type="checkbox" id="sy-remember-email"/>
+              <span>아이디 저장</span>
+            </label>
+          </div>
+
+          <button type="submit" class="sy-btn sy-btn-primary">로그인</button>
+        </form>
+        
+        <div class="sy-divider">다른 방법으로 로그인</div>
+		<button type="button" class="sy-btn sy-btn-google" id="sy-btn-google-login">
+		  <img class="sy-google-logo" th:src="@{/assets/images/google-logo.png}" alt="Google">
+		</button>
+
+        <div class="sy-auth-links">
+		  <button type="button" id="sy-show-find-email">이메일 찾기</button>
+		  <span>|</span>
+		  <button type="button" id="sy-show-reset-password">비밀번호 재설정</button>
+		  <span>|</span>
+		  <button type="button" id="sy-show-signup">회원가입</button>
+		</div>
+      </div>
+
+      <div id="sy-find-email-view" class="sy-auth-view">
+        <h3 class="sy-subview-title">이메일 찾기</h3>
+        <p class="sy-sub">로그인하고 팀 업무를 이어가세요.</p>
+        <div class="sy-field">
+          <label>이름</label>
+          <input type="text" id="sy-find-real-name" placeholder="홍길동" autocomplete="off" />
+        </div>
+        <div class="sy-field">
+          <label>휴대폰번호</label>
+          <input type="text" id="sy-find-phone" placeholder="01012345678 (- 제외)" inputmode="numeric" maxlength="11" autocomplete="off" />
+        </div>
+        <div class="sy-field">
+          <label>생년월일</label>
+          <input type="text" id="sy-find-birth" placeholder="19970130" inputmode="numeric" maxlength="8" autocomplete="off" />
+        </div>
+        <button type="button" class="sy-btn sy-btn-primary" id="sy-btn-find-email">확인</button>
+        <div class="sy-check-msg" id="sy-find-email-msg"></div>
+      </div>
+
+      <div id="sy-reset-password-view" class="sy-auth-view">
+        <h3 class="sy-subview-title">비밀번호 재설정</h3>
+        <p class="sy-sub">로그인하고 팀 업무를 이어가세요.</p>
+        <div class="sy-field">
+          <label>이메일</label>
+          <div class="sy-email-row">
+            <input type="email" id="sy-reset-email" placeholder="hello@example.com" autocomplete="off" />
+            <button type="button" class="sy-btn sy-btn-check" id="sy-btn-send-reset-code">인증번호전송</button>
+          </div>
+          <div class="sy-check-msg" id="sy-reset-email-msg"></div>
+        </div>
+
+        <div class="sy-field">
+          <label>인증번호</label>
+          <div class="sy-email-row">
+            <input type="text" id="sy-reset-code" placeholder="인증번호 입력" autocomplete="off" />
+            <button type="button" class="sy-btn sy-btn-check" id="sy-btn-verify-reset-code">확인</button>
+          </div>
+          <div class="sy-code-info" id="sy-reset-code-info">
+            <span id="sy-reset-code-msg">메일로 전송된 인증번호를 입력해주세요.</span>
+            <span id="sy-reset-timer">05:00</span>
+          </div>
+        </div>
+
+        <div class="sy-form-grid">
+          <div class="sy-field">
+            <label>새 비밀번호</label>
+            <input type="password" id="sy-reset-passwd" placeholder="8~20자" />
+          </div>
+
+          <div class="sy-field">
+            <label>새 비밀번호 확인</label>
+            <input type="password" id="sy-reset-confirm-passwd" placeholder="동일하게 입력" />
+          </div>
+        </div>
+
+        <button type="button" class="sy-btn sy-btn-primary" id="sy-btn-reset-password">변경</button>
+      </div>
+    </div>
+
+    <div id="sy-signup" class="sy-pane">
+      <button type="button" class="sy-back-icon" id="sy-signup-back-login" aria-label="뒤로가기">
+        <span></span>
+      </button>
+      <div class="sy-signup-brand">
+        <div class="sy-brand-mark">TS</div>
+        <h2>TeamSync</h2>
+      </div>
+
+      <div class="sy-stepper" aria-label="회원가입 단계">
+        <div class="sy-step-dot sy-active" data-step-dot="email">1</div>
+        <div class="sy-step-line"></div>
+        <div class="sy-step-dot" data-step-dot="account">2</div>
+        <div class="sy-step-line"></div>
+        <div class="sy-step-dot" data-step-dot="profile">3</div>
+      </div>
+      <div class="sy-step-labels">
+        <span data-step-label="email">이메일 인증</span>
+        <span data-step-label="account">계정 정보 입력</span>
+        <span data-step-label="profile">프로필 설정</span>
+      </div>
+
+      <div class="sy-msg sy-msg-error" id="sy-signup-server-error" th:if="${signupError != null}" th:text="${signupError}"></div>
+      <form th:action="@{/users/signup}" method="post" id="sy-signup-form">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div id="sy-signup-step-email" class="sy-signup-step sy-show" data-step-name="email">
+          <div class="sy-step-head">
+            <h3>이메일 인증</h3>
+            <p>회원가입을 위해 이메일 주소를 인증해주세요.</p>
+          </div>
+
+          <div class="sy-field">
+            <label>이메일 <span class="sy-required">*</span></label>
+            <div class="sy-email-row">
+              <input type="email" name="email" id="sy-signup-email" placeholder="hello@example.com" autocomplete="off" />
+              <button type="button" class="sy-btn sy-btn-check" id="sy-btn-check-email">중복확인</button>
+            </div>
+            <div class="sy-check-msg" id="sy-email-check-msg"></div>
+          </div>
+
+          <div class="sy-field sy-verification-box sy-show" id="sy-email-verification-box">
+            <label>인증번호 <span class="sy-required">*</span></label>
+            <div class="sy-email-row">
+              <input type="text" id="sy-email-code" placeholder="인증번호 입력" autocomplete="off" />
+              <button type="button" class="sy-btn sy-btn-check" id="sy-btn-verify-email">확인</button>
+            </div>
+            <div class="sy-code-info">
+              <span id="sy-email-code-msg">메일로 전송된 인증번호를 입력해주세요.</span>
+              <span id="sy-email-timer">05:00</span>
+            </div>
+          </div>
+
+          <button type="button" class="sy-btn sy-btn-primary sy-step-next" id="sy-signup-email-next">다음</button>
+        </div>
+
+        <div id="sy-signup-step-account" class="sy-signup-step" data-step-name="account">
+          <div class="sy-step-head">
+            <h3>계정 정보 입력</h3>
+            <p>계정 이용을 위해 기본 정보를 입력해주세요.</p>
+          </div>
+
+          <div class="sy-field">
+            <label>이름 <span class="sy-required">*</span></label>
+            <input type="text" name="real_name" id="sy-signup-real-name" placeholder="홍길동" autocomplete="off" />
+          </div>
+
+          <div class="sy-field">
+            <label>휴대폰번호 <span class="sy-required">*</span></label>
+            <div class="sy-phone-row">
+              <input type="text" name="phone" id="sy-signup-phone" placeholder="01012345678 (- 제외)" inputmode="numeric" maxlength="11" autocomplete="off" />
+              <button type="button" class="sy-btn sy-btn-check" id="sy-check-phone">중복확인</button>
+            </div>
+            <div class="sy-check-msg" id="sy-phone-check-msg"></div>
+          </div>
+
+          <div class="sy-field">
+            <label>생년월일 <span class="sy-required">*</span></label>
+            <input type="text" name="birthText" id="sy-signup-birth" placeholder="19980509" inputmode="numeric" maxlength="8" autocomplete="off" />
+          </div>
+
+          <div class="sy-form-grid">
+            <div class="sy-field">
+              <label>비밀번호 <span class="sy-required">*</span></label>
+              <input type="password" name="passwd" id="sy-signup-passwd" placeholder="8~20자" />
+            </div>
+
+            <div class="sy-field">
+              <label>비밀번호 확인 <span class="sy-required">*</span></label>
+              <input type="password" name="confirm_passwd" id="sy-signup-confirm-passwd" placeholder="동일하게 입력" />
+            </div>
+          </div>
+
+          <div class="sy-step-actions">
+            <button type="button" class="sy-btn sy-btn-primary" id="sy-signup-next">다음</button>
+          </div>
+        </div>
+
+        <div id="sy-signup-step-profile" class="sy-signup-step" data-step-name="profile">
+          <div class="sy-step-head">
+            <h3>프로필 설정</h3>
+            <p>팀원들에게 보여질 정보를 입력해주세요.</p>
+          </div>
+
+          <div class="sy-field">
+            <label>닉네임 <span class="sy-required">*</span></label>
+            <input type="text" name="user_name" id="sy-signup-user-name" placeholder="서비스에서 사용할 이름" autocomplete="off" />
+          </div>
+
+          <div class="sy-field">
+            <label>자기소개 <span class="sy-required">*</span></label>
+            <textarea name="intro" id="sy-signup-intro" placeholder="자기소개를 입력해주세요."></textarea>
+          </div>
+
+          <div class="sy-terms">
+            <label class="sy-term-line sy-term-all">
+              <input type="checkbox" id="sy-agree-all" />
+              <span>전체 동의</span>
+            </label>
+            <label class="sy-term-line">
+              <input type="checkbox" class="sy-required-term" />
+              <span>서비스 이용약관 동의</span>
+              <span class="sy-term-badge">필수</span>
+              <button type="button" class="sy-term-view">보기</button>
+            </label>
+            <label class="sy-term-line">
+              <input type="checkbox" class="sy-required-term" />
+              <span>개인정보 처리방침 동의</span>
+              <span class="sy-term-badge">필수</span>
+              <button type="button" class="sy-term-view">보기</button>
+            </label>
+            <label class="sy-term-line">
+              <input type="checkbox" class="sy-optional-term" />
+              <span>마케팅 수신 동의</span>
+              <span class="sy-term-badge sy-term-choice">선택</span>
+              <button type="button" class="sy-term-view">보기</button>
+            </label>
+          </div>
+
+          <div class="sy-step-actions">
+            <button type="submit" class="sy-btn sy-btn-primary">회원가입</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<th:block th:insert="~{fragments/Chatbot::chatbot}"></th:block>
+<th:block th:insert="~{fragments/chatbot::chatbot}"></th:block>
+
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/SY/member.login.js}"></script>
+<script th:src="@{/assets/js/Chatbot.js}"></script>
+<script th:src="@{/assets/js/chatbot.js}"></script>
+</body>
+</html>

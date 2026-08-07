@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout_main}">
+<head>
+<meta charset="UTF-8">
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+<title>TeamSync - 실시간 협업 채팅</title>
+
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script
+	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<link rel="stylesheet" th:href="@{/assets/css/chat/chatList.css}">
+</head>
+<body>
+	<div layout:fragment="content" th:with="currentMenu='chat'">
+		<!-- 자바스크립트용 내 유저 번호 -->
+		<input type="hidden" id="loginUserId"
+			th:value="${#authentication.principal.usersVO.user_num}"> <input
+			type="hidden" id="loginUserName"
+			th:value="${#authentication.principal.usersVO.user_name}"> <input
+			type="hidden" id="teamNum" th:value="${session.teamNum}">
+		<div class="chat-layout">
+
+			<aside class="channels-panel">
+				<!-- 헤더: 채팅방 생성 버튼은 권한(팀장: 1, 매니저: 2) 확인 후 렌더링 -->
+				<div class="panel-header"
+					style="display: flex; justify-content: space-between; align-items: center;">
+					<h2>채팅 스페이스</h2>
+					<button th:if="${teamRole == 1 or teamRole == 2}"
+						class="btn-create-channel" onclick="openCreateChannelModal()"
+						title="새 채팅방 생성">
+						<i class="fa-solid fa-plus"></i>
+					</button>
+				</div>
+
+				<div class="channel-list-scroll">
+
+					<th:block th:each="entry : ${groupedChannels}">
+						<div class="category-group" th:attr="data-category=${entry.key}">
+
+							<div class="list-section-title" th:switch="${entry.key}">
+								<th:block th:case="1">일반</th:block>
+								<th:block th:case="2">프로젝트</th:block>
+								<th:block th:case="3">공지사항</th:block>
+								<th:block th:case="4">기타</th:block>
+								<th:block th:case="*">기타</th:block>
+							</div>
+
+							<div th:each="channel : ${entry.value}" class="channel-item"
+								th:attr="data-channel-num=${channel.channel_num}"
+								th:onclick="switchChannel([[${channel.channel_num}]], [[${channel.channel_name}]], this)">
+
+								<div class="channel-info">
+									<div class="channel-row-top">
+										<div class="channel-name-wrap">
+											<span class="channel-icon">#</span> <span
+												class="channel-name" th:text="${channel.channel_name}">방
+												이름</span>
+										</div>
+										<div style="display: flex; align-items: center; gap: 4px;">
+											<span class="channel-time"
+												th:text="${channel.lastTime != null ? channel.lastTime : ''}"></span>
+											<!-- 팀장(1) 또는 매니저(2)이고 기본채널이 아닐 때만 표시 -->
+											<button
+												th:if="${(teamRole == 1 or teamRole == 2) and channel.is_default == 'N'}"
+												class="btn-delete-channel"
+												th:onclick="|deleteChannel([[${channel.channel_num}]], event)|"
+												title="채널 삭제">
+												<i class="fa-solid fa-xmark"></i>
+											</button>
+										</div>
+									</div>
+
+									<div class="channel-row-bottom">
+										<span class="last-message"
+											th:text="${channel.lastMessage != null ? channel.lastMessage : '개설된 채팅방입니다.'}">
+										</span> <span class="unread-badge" th:if="${channel.unreadCount > 0}"
+											th:text="${channel.unreadCount}"></span>
+									</div>
+								</div>
+
+							</div>
+
+						</div>
+					</th:block>
+
+					<div th:if="${#maps.isEmpty(groupedChannels)}"
+						style="padding: 20px; font-size: 12px; color: #7b7394; text-align: center;">
+						참여 중인 대화방이 없습니다.</div>
+				</div>
+			</aside>
+
+			<main class="chat-workspace">
+				<header class="chat-header">
+					<div class="active-info">
+						<h3 id="chatRoomName">채팅방을 선택해주세요</h3>
+					</div>
+				</header>
+
+				<section class="chat-feed" id="chatMessageContainer">
+					<div
+						style="text-align: center; padding: 48px; color: #7b7394; font-size: 13px; font-weight: 700;">
+						왼쪽에서 채팅방을 선택하면 대화 내역이 표시됩니다.</div>
+				</section>
+
+				<div class="chat-input-container" style="position: relative;">
+					<!-- 멘션 자동완성 팝업 -->
+					<div id="mentionPopup" style="display: none;">
+						<ul id="mentionList"></ul>
+					</div>
+
+					<!-- 답글 미리보기 (입력창 위에 위치) -->
+					<div id="replyPreview" style="display: none;">
+						<div class="reply-preview-content">
+							<i class="fa-solid fa-reply"></i>
+							<div>
+								<span id="replyUserName"></span> <span id="replyContent"></span>
+							</div>
+						</div>
+						<button type="button" onclick="clearReply()">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>
+
+					<!-- 입력창 -->
+					<div class="chat-input-bar-wrap">
+						<label for="fileInput" class="btn-file-attach" title="파일 첨부">
+							<i class="fa-solid fa-paperclip"></i>
+						</label> <input type="file" id="fileInput" style="display: none"
+							accept="image/*,.pdf,.docx,.xlsx,.pptx">
+						<!-- 파일 선택 시 미리보기 -->
+						<div id="filePreview" style="display: none;">
+							<span id="filePreviewName"></span>
+							<button type="button" onclick="clearFile()">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
+						</div>
+						<textarea class="chat-textarea" id="chatInput"
+							placeholder="메시지를 입력하세요..."></textarea>
+						<button class="btn-send-message" onclick="sendMessage()">전송</button>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<!-- 새 채팅방 생성 모달창 -->
+		<div class="modal-overlay" id="createChannelModal">
+			<div class="modal-box">
+				<form id="createChannelForm" th:action="@{/chat/channel}"
+					method="post">
+					<div class="modal-head">
+						<h3>새 채팅방 만들기</h3>
+						<button type="button" class="modal-close"
+							onclick="closeCreateChannelModal()">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label>채팅방 이름 <span style="color: #e46aa1">*</span></label> <input
+								type="text" name="channel_name" id="newChannelName"
+								class="form-control" placeholder="예: 디자인팀 아이디어 회의방" required>
+						</div>
+
+						<div class="form-group" style="margin-top: 16px;">
+							<label>채팅방 설명</label> <input type="text" name="channel_desc"
+								id="newChannelDesc" class="form-control"
+								placeholder="어떤 대화를 나누는 곳인가요?">
+						</div>
+
+						<div class="form-group" style="margin-top: 16px;">
+							<label>카테고리</label> <select name="category" class="form-control">
+								<option value="1">일반</option>
+								<option value="2">프로젝트</option>
+								<option value="3">공지사항</option>
+								<option value="4">기타</option>
+							</select>
+						</div>
+					</div>
+					<div class="modal-foot">
+						<button type="button" class="btn-modal btn-modal-cancel"
+							onclick="closeCreateChannelModal()">취소</button>
+						<button type="submit" class="btn-modal btn-modal-submit">생성하기</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- 채팅 기능 스크립트 -->
+		<script th:src="@{/assets/js/chat/chat.list.js}"></script>
+	</div>
+</body>
+</html>
