@@ -22,27 +22,16 @@
 ## 주요 기능
 
 <details open>
-<summary><strong>칸반 카드 등록</strong></summary>
+<summary><strong>칸반 카드 조회</strong></summary>
 <br>
 
-업무 제목, 설명, 담당자, 마감일, 태그 등의 정보를 입력하여 새로운 업무 카드를 등록합니다.
+업무 태그와 검색어, 내 카드만 기능을 이용하여 필요한 카드만 빠르게 조회할 수 있습니다.
 
 <img
   src="docs/images/demo/kanban-card-create.gif"
   alt="TeamSync 칸반 카드 등록 시연"
   width="900"
 />
-</details>
-
-<br>
-
-<details>
-<summary><strong>팀 협업 기능</strong></summary>
-<br>
-
-팀 대시보드에서 일정과 공지사항을 확인하고, 캘린더·회의록·채팅·자료 보관함 등
-프로젝트 협업 기능으로 이동할 수 있습니다.
-
 <img
   src="docs/images/demo/teamsync-collaboration.gif"
   alt="TeamSync 팀 협업 기능 시연"
@@ -50,14 +39,14 @@
 />
 </details>
 
+
 <br>
 
 <details>
-<summary><strong>드래그 앤 드롭 업무 상태 변경</strong></summary>
+<summary><strong>칸반 카드 등록</strong></summary>
 <br>
 
-업무 카드를 드래그하여 할 일, 진행 중, 검토, 완료 단계로 이동시키고
-변경된 업무 상태를 서버에 저장합니다.
+업무 제목, 설명, 담당자, 마감일, 태그 등의 정보를 입력하여 새로운 업무 카드를 등록합니다.
 
 <img
   src="docs/images/demo/kanban-drag-drop.gif"
@@ -69,10 +58,11 @@
 <br>
 
 <details>
-<summary><strong>태그 필터 및 업무 검색</strong></summary>
+<summary><strong>드래그 앤 드롭 업무 상태 변경</strong></summary>
 <br>
 
-업무 태그와 검색어를 이용하여 필요한 카드만 빠르게 조회할 수 있습니다.
+업무 카드를 드래그하여 할 일, 진행 중, 검토, 완료 단계로 이동시키고 변경된
+ 업무 상태를 서버에 저장합니다.
 
 <img
   src="docs/images/demo/kanban-filter-search.gif"
@@ -84,11 +74,10 @@
 <br>
 
 <details>
-<summary><strong>칸반보드 통합 관리</strong></summary>
+<summary><strong>칸반카드 상세보기</strong></summary>
 <br>
 
-전체 업무 진행률을 확인하고 내 카드 조회, 팀 캘린더 확인 및 카드 추가 등의
-칸반보드 관리 기능을 제공합니다.
+카드 내 담당자 추가, 체크리스트, 댓글을 입력하여 업무 공유가 가능합니다.
 
 <img
   src="docs/images/demo/kanban-board-management.gif"
