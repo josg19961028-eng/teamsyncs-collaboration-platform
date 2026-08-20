@@ -2,6 +2,101 @@
 
 팀 일정, 업무, 채팅, 공지와 알림을 하나의 공간에서 관리하는 Spring Boot 기반 협업 플랫폼입니다.
 
+## 시연 영상
+
+### TeamSync 프로젝트 협업 서비스
+
+캘린더, 일정, 회의록, 채팅, 자료 보관함과 칸반보드를 하나의 서비스에서 이용할 수 있는
+팀 프로젝트 협업 플랫폼입니다.
+
+<br>
+
+<img
+  src="docs/images/demo/teamsync-overview.gif"
+  alt="TeamSync 서비스 소개"
+  width="900"
+/>
+
+<br><br>
+
+## 주요 기능
+
+<details open>
+<summary><strong>칸반 카드 등록</strong></summary>
+<br>
+
+업무 제목, 설명, 담당자, 마감일, 태그 등의 정보를 입력하여 새로운 업무 카드를 등록합니다.
+
+<img
+  src="docs/images/demo/kanban-card-create.gif"
+  alt="TeamSync 칸반 카드 등록 시연"
+  width="900"
+/>
+</details>
+
+<br>
+
+<details>
+<summary><strong>팀 협업 기능</strong></summary>
+<br>
+
+팀 대시보드에서 일정과 공지사항을 확인하고, 캘린더·회의록·채팅·자료 보관함 등
+프로젝트 협업 기능으로 이동할 수 있습니다.
+
+<img
+  src="docs/images/demo/teamsync-collaboration.gif"
+  alt="TeamSync 팀 협업 기능 시연"
+  width="900"
+/>
+</details>
+
+<br>
+
+<details>
+<summary><strong>드래그 앤 드롭 업무 상태 변경</strong></summary>
+<br>
+
+업무 카드를 드래그하여 할 일, 진행 중, 검토, 완료 단계로 이동시키고
+변경된 업무 상태를 서버에 저장합니다.
+
+<img
+  src="docs/images/demo/kanban-drag-drop.gif"
+  alt="TeamSync 칸반 드래그 앤 드롭 시연"
+  width="900"
+/>
+</details>
+
+<br>
+
+<details>
+<summary><strong>태그 필터 및 업무 검색</strong></summary>
+<br>
+
+업무 태그와 검색어를 이용하여 필요한 카드만 빠르게 조회할 수 있습니다.
+
+<img
+  src="docs/images/demo/kanban-filter-search.gif"
+  alt="TeamSync 칸반 필터와 검색 시연"
+  width="900"
+/>
+</details>
+
+<br>
+
+<details>
+<summary><strong>칸반보드 통합 관리</strong></summary>
+<br>
+
+전체 업무 진행률을 확인하고 내 카드 조회, 팀 캘린더 확인 및 카드 추가 등의
+칸반보드 관리 기능을 제공합니다.
+
+<img
+  src="docs/images/demo/kanban-board-management.gif"
+  alt="TeamSync 칸반보드 관리 시연"
+  width="900"
+/>
+</details>
+
 ## 프로젝트 정보
 
 | 구분 | 내용 |
