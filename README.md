@@ -28,13 +28,13 @@
 업무 태그와 검색어, 내 카드만 기능을 이용하여 필요한 카드만 빠르게 조회할 수 있습니다.
 
 <img
-  src="docs/images/demo/kanban-card-create.gif"
-  alt="TeamSync 칸반 카드 등록 시연"
+  src="docs/images/demo/kanban-card-select.gif"
+  alt="TeamSync 칸반 카드 조회 시연"
   width="900"
 />
 <img
-  src="docs/images/demo/teamsync-collaboration.gif"
-  alt="TeamSync 팀 협업 기능 시연"
+  src="docs/images/demo/kanban-card-select2.gif"
+  alt="TeamSync 칸반 카드 조회 시연2"
   width="900"
 />
 </details>
@@ -49,8 +49,8 @@
 업무 제목, 설명, 담당자, 마감일, 태그 등의 정보를 입력하여 새로운 업무 카드를 등록합니다.
 
 <img
-  src="docs/images/demo/kanban-drag-drop.gif"
-  alt="TeamSync 칸반 드래그 앤 드롭 시연"
+  src="docs/images/demo/kanban-card-create.gif"
+  alt="TeamSync 칸반 카드 추가 시연"
   width="900"
 />
 </details>
@@ -65,8 +65,8 @@
  업무 상태를 서버에 저장합니다.
 
 <img
-  src="docs/images/demo/kanban-filter-search.gif"
-  alt="TeamSync 칸반 필터와 검색 시연"
+  src="docs/images/demo/kanban-drag-and-drop.gif"
+  alt="TeamSync 칸반 카드 드래그 앤 드랍 시연"
   width="900"
 />
 </details>
@@ -80,8 +80,8 @@
 카드 내 담당자 추가, 체크리스트, 댓글을 입력하여 업무 공유가 가능합니다.
 
 <img
-  src="docs/images/demo/kanban-board-management.gif"
-  alt="TeamSync 칸반보드 관리 시연"
+  src="docs/images/demo/kanban-card-detail.gif"
+  alt="TeamSync 칸반카드 상세보기 시연"
   width="900"
 />
 </details>
